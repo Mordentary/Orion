@@ -1,36 +1,100 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Orion">
+      <UniqueIdentifier>{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Orion\Events">
+      <UniqueIdentifier>{F0F60E51-DC59-9EF5-85DF-D6AB71216A78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Orion\ImGui">
+      <UniqueIdentifier>{B68EDE9D-2244-5793-AB38-516A17ED4D97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Orion\Layers">
+      <UniqueIdentifier>{CBE1F15F-B744-8104-60CA-B9BA4C0C4D87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{1E7D2C1D-8A08-9AE1-9319-1DD6FF23F6E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Windows">
+      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Orion\Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Application.h">
-      <Filter>Header Files</Filter>
+      <Filter>Orion</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Orion\Core.h">
+      <Filter>Orion</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\EntryPoint.h">
-      <Filter>Header Files</Filter>
+      <Filter>Orion</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Events\ApplicationEvent.h">
+      <Filter>Orion\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Events\Event.h">
+      <Filter>Orion\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Events\KeyEvent.h">
+      <Filter>Orion\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Events\MouseEvent.h">
+      <Filter>Orion\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\ImGui\ImGuiLayer.h">
+      <Filter>Orion\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Layers\Layer.h">
+      <Filter>Orion\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Layers\LayerStack.h">
+      <Filter>Orion\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Log.h">
+      <Filter>Orion</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Window.h">
+      <Filter>Orion</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.h">
+      <Filter>Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\imgui_impl_opengl3_loader.h">
+      <Filter>Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\oripch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Orion</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\ImGui\ImGuiLayer.cpp">
+      <Filter>Orion\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Layers\Layer.cpp">
+      <Filter>Orion\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Layers\LayerStack.cpp">
+      <Filter>Orion\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Log.cpp">
+      <Filter>Orion</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
+      <Filter>Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\oripch.cpp" />
+    <ClCompile Include="vendor\imgui\backends\imgui_impl_glfw.cpp" />
   </ItemGroup>
 </Project>
