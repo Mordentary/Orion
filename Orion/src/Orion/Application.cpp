@@ -2,6 +2,9 @@
 #include "Application.h"
 
 #include<Glad/glad.h>
+
+#include"Orion/Input.h"
+
 namespace Orion 
 {
 
@@ -62,6 +65,7 @@ namespace Orion
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 
+			ORI_CORE_TRACE("{0}", Input::IsKeyPressed(83));
 
 			m_Window->OnUpdate();
 		}
