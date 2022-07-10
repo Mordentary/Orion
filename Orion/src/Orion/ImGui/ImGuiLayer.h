@@ -18,26 +18,14 @@ namespace Orion {
 		ImGuiLayer();
 		~ImGuiLayer();
 
-
-		void OnAttach();
-		void OnDetach();
-		void OnUpdate();
-		void OnEvent(Event& e);
-
-		bool OnMouseMoved(MouseMovedEvent& e);
-		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
-		bool OnMouseButtonReleased(MouseButtonReleasedEvent& e);
-		bool OnMouseScrolled(MouseScrolledEvent& e);
-
-		bool OnWindowResize(WindowResizeEvent& e);  
-	
-		bool OnKeyPressed(KeyPressedEvent& e);
-		bool OnKeyReleased(KeyReleasedEvent& e);
-		bool OnKeyTyped(KeyTypedEvent& e);
-
 		
+		virtual void OnAttach() override;
+		virtual void OnDetach() override;
+		virtual void OnImGuiRender() override;
 
-		
+
+		void Begin();
+		void End();
 	private:
 		float m_Time = 0.0f;
 	};

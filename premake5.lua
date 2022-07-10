@@ -14,6 +14,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Orion/vendor/GLFW/include"
 IncludeDir["Glad"] = "Orion/vendor/Glad/include"
 IncludeDir["ImGui"] = "Orion/vendor/imgui"
+IncludeDir["glm"] = "Orion/vendor/glm"
 
 include "Orion/vendor/GLFW"
 include "Orion/vendor/Glad"
@@ -21,9 +22,10 @@ include "Orion/vendor/imgui"
 
 project "Orion"
     location "Orion"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
-	staticruntime "off"
+	cppdialect "C++17"
+	staticruntime "on"
 	
 
 
@@ -36,7 +38,14 @@ project "Orion"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl"
+	}
+	
+	defines
+	{	
+		"_CRT_SECURE_NO_WARNINGS" 
 	}
 
 	includedirs
@@ -45,7 +54,8 @@ project "Orion"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -58,7 +68,6 @@ project "Orion"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 
@@ -68,27 +77,23 @@ project "Orion"
 			"ORI_BUILD_DLL",
 			"GLFW_INCLUDE_NONE",
 			"IMGUI_IMPL_OPENGL_LOADER_CUSTOM"
-		}
-
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
+		
 		}
 
 	filter "configurations:Debug"
 		defines "ORI_DEBUG"
 		runtime "Debug"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "ORI_REALESE"
 		runtime "Release"
-		optimize "On"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "ORI_DIST"
 		runtime "Release"
-		optimize "On"
+		optimize "on"
 
 
 
@@ -97,7 +102,8 @@ project "Sandbox"
 	location"Sandbox"
 	kind"ConsoleApp"
 	language "C++"
-	staticruntime "off"
+	cppdialect "C++17"
+	staticruntime "on"
 
 	targetdir("bin/" .. outputdir ..  "/%{prj.name}")
 	objdir("bin-int/" .. outputdir ..  "/%{prj.name}")
@@ -111,7 +117,9 @@ project "Sandbox"
 	includedirs
 	{
 		"Orion/vendor/spdlog/include",
-		"Orion/src"
+		"Orion/src",
+		"Orion/vendor",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -120,7 +128,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 
@@ -133,14 +140,14 @@ project "Sandbox"
 	filter "configurations:Debug"
 		defines "ORI_DEBUG"
 		runtime "Debug"
-		symbols "On"
+		symbols "on"
 
 	filter "configurations:Release"
 		defines "ORI_REALESE"
 		runtime "Release"
-		optimize "On"
+		optimize "on"
 
 	filter "configurations:Dist"
 		defines "ORI_DIST"
 		runtime "Release"
-		optimize "On"
+		optimize "on"

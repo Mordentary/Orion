@@ -1,10 +1,14 @@
 #pragma once
 
 #include"Orion/Window.h"
+#include"Orion/Renderer/GraphicsContext.h"
+
 
 #include <GLFW/glfw3.h>
 
 namespace Orion {
+
+
 	class WindowsWindow : public Window
 	{
 	public:
@@ -28,13 +32,14 @@ namespace Orion {
 		virtual void Shutdown();
 	private:
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
+
 
 		struct WindowData 
 		{
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync;
-
 			EventCallbackFn EventCallback;
 		};
 		WindowData m_Data;

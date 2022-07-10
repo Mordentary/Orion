@@ -1,10 +1,15 @@
 #pragma once
 #ifdef ORI_PLATFORM_WINDOWS
+
+#if ORI_DYNAMIC_LINK
 	#ifdef ORI_BUILD_DLL
 		#define ORION_API __declspec(dllexport)
 	#else 
 		#define ORION_API __declspec(dllimport)
 	#endif
+#else 
+	#define ORION_API
+#endif
 #else 
 #error Orion only supports windows! 
 #endif
