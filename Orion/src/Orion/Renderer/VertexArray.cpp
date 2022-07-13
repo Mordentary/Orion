@@ -7,15 +7,15 @@
 namespace Orion
 {
 
-	std::unique_ptr<VertexArray> VertexArray::Create()
+	Scope<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
 			return nullptr;
 	
-		case RendererAPI::OpenGL:
+		case RendererAPI::API::OpenGL:
 			return std::make_unique<OpenGLVertexArray>();
 	
 		}

@@ -3,7 +3,9 @@
 
 #include "Orion/Core.h"
 #include "Orion/Events/Event.h"
+#include "Orion/Core/TimeHelper.h"
 namespace Orion {
+
 	class ORION_API Layer
 	{
 
@@ -13,7 +15,8 @@ namespace Orion {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep deltaTime) {}
+		virtual void Init()		{}
 		virtual void OnEvent(Event& event) {}
 		virtual void OnImGuiRender() {}
 

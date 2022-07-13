@@ -1,20 +1,29 @@
 #pragma once
 
+#include"RenderCommand.h"
+#include"OrthographicCamera.h"
+#include"Shader.h"
 
 namespace Orion {
 
 
-	enum class RendererAPI
-	{
-		None = 0, OpenGL = 1
-	};
+
 
 	class Renderer
 	{
 	public:
-		inline static RendererAPI GetAPI() { return s_RendererAPI; }
-	private: 
-		static RendererAPI s_RendererAPI;
+
+		static void BeginScene(const Ref<OrthographicCamera>& m_Camera);
+		static void EndScene();
+		static void Submit(const Ref<Shader>& shader, const  Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix);
+
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+	private:
+		struct SceneData
+		{
+			glm::mat4 ViewProjectionMatrix;
+		};
+		static Scope<SceneData> s_SceneData;
 	};
 }
 

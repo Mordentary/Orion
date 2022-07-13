@@ -1,3 +1,14 @@
 [submodule "Orion/vendor/glm"]
 	path = Orion/vendor/glm
 	url = https://github.com/g-truc/glm
+[submodule "Orion/vendor/GLFW"]
+	path = Orion/vendor/GLFW
+	url = https://github.com/Mordentary/glfw
+[submodule "Orion/vendor/imgui"]
+	path = Orion/vendor/imgui
+	url = https://github.com/Mordentary/imgui
+[submodule "Orion/vendor/spdlog"]
+	path = Orion/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+
+

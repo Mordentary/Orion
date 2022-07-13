@@ -1,6 +1,10 @@
 #pragma once
-#ifdef ORI_PLATFORM_WINDOWS
 
+
+#include<memory>
+
+
+#ifdef ORI_PLATFORM_WINDOWS
 #if ORI_DYNAMIC_LINK
 	#ifdef ORI_BUILD_DLL
 		#define ORION_API __declspec(dllexport)
@@ -32,3 +36,11 @@
 
 #define ORI_BIND_EVENT_FN(fn) [this](auto& e) { return fn(e); }
 
+namespace Orion
+{
+		template<typename T>
+		using Ref = std::shared_ptr<T>;
+
+		template<typename T>
+		using Scope = std::unique_ptr<T>;
+}

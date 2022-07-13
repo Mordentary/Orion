@@ -1356,6 +1356,11 @@
     <ClInclude Include="src\Orion\Renderer\Shader.h" />
     <ClInclude Include="src\Orion\Renderer\VertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
+    <ClInclude Include="src\Orion\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Orion\Renderer\RenderCommand.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
+    <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h" />
+    <ClInclude Include="src\Orion\Core\TimeHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Application.cpp">
@@ -1393,5 +1398,9 @@
     <ClCompile Include="src\Orion\Renderer\Shader.cpp" />
     <ClCompile Include="src\Orion\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
+    <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
+    <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp" />
   </ItemGroup>
 </Project>

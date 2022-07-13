@@ -13,6 +13,8 @@
 #include"Orion/Renderer/VertexArray.h"
 #include"Orion/Renderer/Buffer.h"
 
+#include"Orion/Renderer/OrthographicCamera.h"
+
 namespace Orion {
 
 	class ORION_API Application
@@ -34,20 +36,12 @@ namespace Orion {
 		inline Window& GetWindow() { return *m_Window; }
 	private: 
 
-
 		bool OnWindowClose(WindowCloseEvent& e);
-
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
+		float m_lastFrameTime;
 		bool m_Running = true;
-
-	
-
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexBuffer> m_VertexBuffer;
-		std::shared_ptr<IndexBuffer> m_IndexBuffer;
-		std::shared_ptr<VertexArray> m_VertexArray;
 
 	private:
 

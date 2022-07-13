@@ -53,7 +53,9 @@ namespace Orion
 		template<typename T>
 		using EventFn = std::function<bool(T&)>;
 	public:
-		EventDispatcher(Event& event) : m_Event(event){}
+		EventDispatcher(Event& event) : m_Event(event) {}
+		static auto CreateDispatcher(Event& event) { return std::make_unique<EventDispatcher>(event); }
+		void SetEvent(Event& event) { m_Event = event; }
 		template<typename T>
 		bool Dispatch(std::function<bool(T&)> func)
 		{

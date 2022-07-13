@@ -5,15 +5,30 @@
 
 namespace Orion 
 {
-	std::unique_ptr<Shader> Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
+
+	Scope<Shader> Shader::Create(const std::string& srcPath) 
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
 			return nullptr;
 			break;
-		case RendererAPI::OpenGL:
+		case RendererAPI::API::OpenGL:
+			return std::make_unique<OpenGLShader>(srcPath);
+			break;
+		}
+	}
+
+	Scope<Shader> Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+			break;
+		case RendererAPI::API::OpenGL:
 			return std::make_unique<OpenGLShader>(vertexSrc, fragmentSrc);
 			break;
 		}
