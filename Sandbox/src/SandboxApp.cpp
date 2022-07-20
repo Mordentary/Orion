@@ -3,6 +3,7 @@
 #include"imgui/imgui.h"
 #include"glm/gtc/type_ptr.hpp"
 #include"Platform/OpenGL/OpenGLShader.h"
+#include"Orion/Core/Camera2D/CamerasController2D.h"
 class ExampleLayer : public Orion::Layer
 {
 public:
@@ -21,9 +22,15 @@ public:
 			 -0.5f,  0.5f,  0.0f,  0.2f, 0.7f,  0.5f,
 			  0.5f,  0.5f,  0.0f,  0.2f, 0.7f,  0.5f
 		};
+		float verticesTex[5 * 4] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+		};
 
 		uint32_t indices[3] = { 0,1,2 };
-		uint32_t indicesQuad[6] = { 0, 1, 2, 2, 3, 1 };
+		uint32_t indicesQuad[6] = { 0, 1, 2, 2, 3, 0 };
 
 		m_VertexArray = Orion::VertexArray::Create();
 		m_VertexArray->Bind();
@@ -32,7 +39,7 @@ public:
 		Orion::BufferLayout layoutTriangle =
 		{
 			{Orion::ShaderDataType::Float3, "a_Position"},
-			{Orion::ShaderDataType::Float3, "a_Color"},
+			{Orion::ShaderDataType::Float3, "a_Color"}
 		};
 
 		m_VertexBuffer->SetLayout(layoutTriangle);
@@ -43,33 +50,59 @@ public:
 		m_VertexArray->Unbind();
 		
 
+
+
 		m_VertexArrayQuad = Orion::VertexArray::Create();
 		m_VertexArrayQuad->Bind();
 
+		m_VertexBufferQuad = Orion::VertexBuffer::Create(verticesTex, sizeof(verticesTex));
+		Orion::BufferLayout layoutQuad =
+		{
+			{Orion::ShaderDataType::Float3, "a_Position"},
+			{Orion::ShaderDataType::Float2, "a_Texture"}
+		};
+
+		m_VertexBufferQuad->SetLayout(layoutQuad);
 		m_IndexBufferQuad = Orion::IndexBuffer::Create(indicesQuad, std::size(indicesQuad));
 
-		m_VertexArrayQuad->AddVertexBuffer(m_VertexBuffer);
+		m_VertexArrayQuad->AddVertexBuffer(m_VertexBufferQuad);
 		m_VertexArrayQuad->SetIndexBuffer(m_IndexBufferQuad);
 
 
-		m_Camera->SetPosition({ 0.0f,0.0f, 0.0f });
-		m_Shader = Orion::Shader::Create("assets/shaders/Triangle.glsl");
-		m_ShaderQuad = Orion::Shader::Create("assets/shaders/Quad.glsl");
+
+
+		m_Shader = m_ShaderLibrary.Load("assets/shaders/Triangle.glsl");
+		m_ShaderTexture = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+
+		Orion::CamerasController2D::AddCamera("PrimaryCamera", m_Camera->GetAspectRatio());
+		Orion::CamerasController2D::AddCamera("SecondaryCamera", m_Camera);
+
+
+		m_Texture2D = Orion::Texture2D::Create("assets/textures/joker.png");
+
+
+
+
+		std::dynamic_pointer_cast<Orion::OpenGLShader>(m_ShaderTexture)->Bind();
+		std::dynamic_pointer_cast<Orion::OpenGLShader>(m_ShaderTexture)->UploadUniformInt("u_Texture", 0);
+
 	}
 	void OnUpdate(Orion::Timestep deltaTime) override
 	{
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 		Orion::RenderCommand::Clear();
+		Orion::CamerasController2D::OnUpdate(deltaTime);
 
-		CameraMove(0.1f * deltaTime);
 	
 
-		Orion::Renderer::BeginScene(m_Camera);
-		m_Shader->Bind();
+		Orion::Renderer::BeginScene(Orion::CamerasController2D::GetActiveCamera());
+	
 		Orion::Renderer::Submit(m_Shader, m_VertexArray, m_Model);
-		m_ShaderQuad->Bind();
-		std::dynamic_pointer_cast<Orion::OpenGLShader>(m_ShaderQuad)->UploadUniformFloat3("u_Color", m_Color);
-		Orion::Renderer::Submit(m_ShaderQuad, m_VertexArrayQuad, glm::mat4(1.0f));
+		
+	
+		m_JokerModel = glm::rotate(m_JokerModel, 0.5f * deltaTime, glm::vec3(0.0, 1.0, 0.0));
+		m_Texture2D->Bind();
+		Orion::Renderer::Submit(m_ShaderTexture, m_VertexArrayQuad, m_JokerModel);
 
 
 
@@ -77,56 +110,23 @@ public:
 	}
 	void OnEvent(Orion::Event& event) override
 	{
+		Orion::CamerasController2D::OnEvent(event);
 		m_Dispatcher = Orion::EventDispatcher::CreateDispatcher(event);
-
 		m_Dispatcher->Dispatch<Orion::KeyPressedEvent>(ORI_BIND_EVENT_FN(ExampleLayer::OnKeyPressed));
 	}
 
 	bool OnKeyPressed(Orion::KeyPressedEvent e)
 	{
-		
+		if (e.GetKeyCode() == ORI_KEY_1)
+		{
+			Orion::CamerasController2D::SetActiveCamera("PrimaryCamera");
+		}
+		if (e.GetKeyCode() == ORI_KEY_2) 
+		{
+			Orion::CamerasController2D::SetActiveCamera("SecondaryCamera");
+		}
 		return false;
 		
-	}
-	void CameraMove(float&& speed) 
-	{
-		if (Orion::Input::IsKeyPressed(ORI_KEY_W))
-		{
-			m_Camera->SetPosition(m_Camera->GetPosition() + glm::vec3(0.0f, speed, 0.0f));
-			
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_S))
-		{
-			m_Camera->SetPosition(m_Camera->GetPosition() + glm::vec3(0.0f, -speed, 0.0f));
-		
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_D))
-		{
-			m_Camera->SetPosition(m_Camera->GetPosition() + glm::vec3(speed, 0.0f, 0.0f));
-		
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_A))
-		{
-			m_Camera->SetPosition(m_Camera->GetPosition() + glm::vec3(-speed, 0.0f, 0.0f));
-			
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_UP))
-		{
-			m_Model = glm::translate(m_Model, glm::vec3(0.0f, speed, 0.0f));
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_DOWN))
-		{
-			m_Model = glm::translate(m_Model, glm::vec3(0.0f, -speed, 0.0f));
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_LEFT))
-		{
-			m_Model = glm::translate(m_Model, glm::vec3(-speed, 0.0f, 0.0f));
-		}
-		if (Orion::Input::IsKeyPressed(ORI_KEY_RIGHT))
-		{
-			m_Model = glm::translate(m_Model, glm::vec3(speed, 0.0f, 0.0f));
-		}
-	
 	}
 
 	virtual void OnImGuiRender() override 
@@ -137,16 +137,22 @@ public:
 		
 	}
 private:
-	Orion::Ref<Orion::Shader> m_ShaderQuad;
-	Orion::Ref<Orion::IndexBuffer> m_IndexBufferQuad;
-	Orion::Ref<Orion::VertexArray> m_VertexArrayQuad;
+	
+	Orion::Shared<Orion::Shader> m_ShaderTexture;
+	Orion::Shared<Orion::VertexArray> m_VertexArrayQuad;
+	Orion::Shared<Orion::IndexBuffer> m_IndexBufferQuad;
+	Orion::Shared<Orion::VertexBuffer> m_VertexBufferQuad;
+	Orion::Shared<Orion::Texture2D> m_Texture2D;
+	Orion::ShaderLibrary m_ShaderLibrary;
+	glm::mat4 m_JokerModel = glm::mat4(1.0f);
 
-	Orion::Ref<Orion::Shader> m_Shader;
-	Orion::Ref<Orion::VertexBuffer> m_VertexBuffer;
-	Orion::Ref<Orion::IndexBuffer> m_IndexBuffer;
-	Orion::Ref<Orion::VertexArray> m_VertexArray;
-	Orion::Ref<Orion::EventDispatcher> m_Dispatcher;
-	Orion::Ref<Orion::OrthographicCamera> m_Camera;
+	Orion::Shared<Orion::Shader> m_Shader;
+	Orion::Shared<Orion::VertexBuffer> m_VertexBuffer;
+	Orion::Shared<Orion::IndexBuffer> m_IndexBuffer;
+	Orion::Shared<Orion::VertexArray> m_VertexArray;
+
+	Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
+	Orion::Shared<Orion::OrthographicCamera> m_Camera;
 	glm::vec3 m_Color { 1.0f, 1.0f, 1.0f};
 	glm::mat4 m_Model = glm::mat4(1.0f);
 };

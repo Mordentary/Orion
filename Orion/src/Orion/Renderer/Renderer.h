@@ -12,10 +12,12 @@ namespace Orion {
 	class Renderer
 	{
 	public:
+		static void OnWindowResize(uint32_t width, uint32_t height);
+		static void Init();
 
-		static void BeginScene(const Ref<OrthographicCamera>& m_Camera);
+		static void BeginScene(const Shared<OrthographicCamera>& m_Camera);
 		static void EndScene();
-		static void Submit(const Ref<Shader>& shader, const  Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix);
+		static void Submit(const Shared<Shader>& shader, const  Shared<VertexArray>& vertexArray, const glm::mat4& modelMatrix);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
@@ -23,7 +25,7 @@ namespace Orion {
 		{
 			glm::mat4 ViewProjectionMatrix;
 		};
-		static Scope<SceneData> s_SceneData;
+		static Scoped<SceneData> s_SceneData;
 	};
 }
 

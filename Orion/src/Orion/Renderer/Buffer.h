@@ -38,7 +38,7 @@ namespace Orion {
 		uint32_t Offset;
 		bool Normalized;
 
-		BufferElement() {}
+		
 
 		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
@@ -70,7 +70,7 @@ namespace Orion {
 	class BufferLayout
 	{
 	public:
-		BufferLayout() {}
+		BufferLayout() = default;
 		BufferLayout(const std::initializer_list<BufferElement>& element) : m_Elements(element)
 		{
 			CalculateOffsetsAndStride();
@@ -114,7 +114,7 @@ namespace Orion {
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static Scope<VertexBuffer> Create(float* vertices, uint32_t size);
+		static Scoped<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
 	class IndexBuffer
@@ -127,6 +127,6 @@ namespace Orion {
 
 		virtual uint32_t GetCount() const = 0;
 
-		static Scope<IndexBuffer> Create(uint32_t* indices, uint32_t size);
+		static Scoped<IndexBuffer> Create(uint32_t* indices, uint32_t size);
 	};
 }

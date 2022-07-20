@@ -50,7 +50,6 @@ namespace Orion
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	{
 		glDeleteBuffers(GL_ARRAY_BUFFER, &m_RendererID);
-
 	}
 
 	void OpenGLIndexBuffer::Bind() const

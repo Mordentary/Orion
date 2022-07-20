@@ -1,6 +1,6 @@
 #include "oripch.h"
 #include "WindowsWindow.h"
-#include "Orion/Core.h"
+#include "Orion/Core/Core.h"
 
 #include "Orion/Events/ApplicationEvent.h"
 #include "Orion/Events/MouseEvent.h"
@@ -62,7 +62,7 @@ namespace Orion
 
 	
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		SetVSync(false);
 		
 		
 		//GLFW callbacks

@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Orion/Input.h"
+#include"Orion/Core/Input.h"
 namespace Orion
 {
 	class WindowsInput : public Input

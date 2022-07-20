@@ -46,7 +46,7 @@ namespace Orion {
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Shared<VertexBuffer>& vertexBuffer)
 	{
 
 		ORI_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(),"Vertex Buffer has no layout!")
@@ -71,7 +71,7 @@ namespace Orion {
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) 
+	void OpenGLVertexArray::SetIndexBuffer(const Shared<IndexBuffer>& indexBuffer) 
 	{
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();

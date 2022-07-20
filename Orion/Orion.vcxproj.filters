@@ -7,6 +7,12 @@
     <Filter Include="src\Orion">
       <UniqueIdentifier>{E3EE91B3-4F59-462A-9897-F7CF0441247F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Orion\Core">
+      <UniqueIdentifier>{1BD9F2D6-07A7-E6DC-F03A-5703DCA7C241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Orion\Core\Camera2D">
+      <UniqueIdentifier>{A9E0DE91-1518-2729-1E22-8B4C8AD84D22}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Orion\Events">
       <UniqueIdentifier>{679D2F64-5396-4EB6-7CC8-333B68202EC2}</UniqueIdentifier>
     </Filter>
@@ -16,8 +22,14 @@
     <Filter Include="src\Orion\Layers">
       <UniqueIdentifier>{42881273-2E81-31C5-57B3-164A430B11D1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Orion\Renderer">
+      <UniqueIdentifier>{E9A18725-D585-487B-3EE6-42CE2AE932FD}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Platform\OpenGL">
+      <UniqueIdentifier>{35A49437-A105-7245-2A73-B8F796D3A804}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform\Windows">
       <UniqueIdentifier>{5B054582-4794-CE4B-F0B2-E246DC20DFF1}</UniqueIdentifier>
@@ -43,19 +55,43 @@
     <Filter Include="vendor\glm\glm\gtx">
       <UniqueIdentifier>{B3A6A76B-9F8A-68C1-08EB-6214F4ED5243}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vendor\stb_image">
+      <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Orion.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Application.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Core\Application.h">
+      <Filter>src\Orion\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Core.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h">
+      <Filter>src\Orion\Core\Camera2D</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\EntryPoint.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Core\Core.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\EntryPoint.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\Input.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\KeyCodes.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\Log.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\MouseButtonCodes.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\TimeHelper.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\Window.h">
+      <Filter>src\Orion\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Events\ApplicationEvent.h">
       <Filter>src\Orion\Events</Filter>
@@ -72,26 +108,56 @@
     <ClInclude Include="src\Orion\ImGui\ImGuiLayer.h">
       <Filter>src\Orion\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Input.h">
-      <Filter>src\Orion</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Orion\KeyCodes.h">
-      <Filter>src\Orion</Filter>
-    </ClInclude>
     <ClInclude Include="src\Orion\Layers\Layer.h">
       <Filter>src\Orion\Layers</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Layers\LayerStack.h">
       <Filter>src\Orion\Layers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Log.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Renderer\Buffer.h">
+      <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\MouseButtonCodes.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsContext.h">
+      <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Window.h">
-      <Filter>src\Orion</Filter>
+    <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\RenderCommand.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\Renderer.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\RendererAPI.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\Shader.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\Texture.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\VertexArray.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
       <Filter>src\Platform\Windows</Filter>
@@ -1347,24 +1413,19 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsContext.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
-    <ClInclude Include="src\Orion\Renderer\Buffer.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
-    <ClInclude Include="src\Orion\Renderer\Renderer.h" />
-    <ClInclude Include="src\Orion\Renderer\Shader.h" />
-    <ClInclude Include="src\Orion\Renderer\VertexArray.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
-    <ClInclude Include="src\Orion\Renderer\RendererAPI.h" />
-    <ClInclude Include="src\Orion\Renderer\RenderCommand.h" />
-    <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
-    <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h" />
-    <ClInclude Include="src\Orion\Core\TimeHelper.h" />
+    <ClInclude Include="vendor\stb_image\stb_image.h">
+      <Filter>vendor\stb_image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Orion\Application.cpp">
-      <Filter>src\Orion</Filter>
+    <ClCompile Include="src\Orion\Core\Application.cpp">
+      <Filter>src\Orion\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Core\Camera2D\CamerasController2D.cpp">
+      <Filter>src\Orion\Core\Camera2D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Core\Log.cpp">
+      <Filter>src\Orion\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\ImGui\ImGuiBuild.cpp">
       <Filter>src\Orion\ImGui</Filter>
@@ -1378,8 +1439,47 @@
     <ClCompile Include="src\Orion\Layers\LayerStack.cpp">
       <Filter>src\Orion\Layers</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Log.cpp">
-      <Filter>src\Orion</Filter>
+    <ClCompile Include="src\Orion\Renderer\Buffer.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\Renderer.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\Shader.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\Texture.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\VertexArray.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>src\Platform\Windows</Filter>
@@ -1390,17 +1490,8 @@
     <ClCompile Include="src\oripch.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
-    <ClCompile Include="src\Orion\Renderer\Buffer.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
-    <ClCompile Include="src\Orion\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Orion\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Orion\Renderer\VertexArray.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
-    <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp" />
-    <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp" />
-    <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
-    <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp" />
+    <ClCompile Include="vendor\stb_image\stb_image.cpp">
+      <Filter>vendor\stb_image</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@
 #include<unordered_map>
 #include<unordered_set>
 
-#include<Orion/Log.h>
+#include<Orion/Core/Log.h>
 
 #ifdef ORI_PLATFORM_WINDOWS
 	#include<Windows.h>

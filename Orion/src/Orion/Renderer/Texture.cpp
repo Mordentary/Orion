@@ -1,24 +1,23 @@
 #include "oripch.h"
-#include "VertexArray.h"
+#include "Texture.h"
 
 #include"Renderer.h"
-#include"Platform/OpenGL/OpenGLVertexArray.h"
+#include"Platform/OpenGL/OpenGLTexture.h"
 
-namespace Orion
-{
+namespace Orion {
 
-	Scoped<VertexArray> VertexArray::Create()
+
+	Scoped<Texture2D> Texture2D::Create(const std::string& path)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
 			return nullptr;
-	
+
 		case RendererAPI::API::OpenGL:
-			return std::make_unique<OpenGLVertexArray>();
-	
+			return std::make_unique<OpenGLTexture2D>(path);
+
 		}
 	}
-
 }

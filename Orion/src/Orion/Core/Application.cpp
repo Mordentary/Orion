@@ -3,7 +3,7 @@
 
 
 
-#include"Orion/Input.h"
+#include"Orion/Core/Input.h"
 #include"Orion/Renderer/Renderer.h"
 #include"Orion/Core/TimeHelper.h"
 
@@ -50,7 +50,7 @@ namespace Orion
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(ORI_BIND_EVENT_FN(OnWindowClose));
-		
+		dispatcher.Dispatch<WindowResizeEvent>(ORI_BIND_EVENT_FN(OnWindowResize));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
@@ -59,7 +59,7 @@ namespace Orion
 		}
 
 	}
-
+	
 	void Application::Run() 
 	{
 		for (Layer* layer : m_LayerStack)
@@ -73,9 +73,12 @@ namespace Orion
 			Timestep deltaTime = timer.GetTimeSeconds();
 			ORI_CORE_INFO("DeltaTime: {0}",deltaTime);
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(deltaTime);
 
+			if (!m_Minimized) 
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(deltaTime);
+			}
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
@@ -87,6 +90,17 @@ namespace Orion
 
 			timer.End();
 		}
+	}
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 1) {
+			m_Minimized = true;  
+			return false;
+		}
+
+		m_Minimized = false;
+		Renderer::OnWindowResize(e.GetWidth(),e.GetHeight());
+		return false;
 	}
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{

@@ -6,7 +6,7 @@
 namespace Orion 
 {
 
-	Scope<Shader> Shader::Create(const std::string& srcPath) 
+	Scoped<Shader> Shader::Create(const std::string& srcPath) 
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -20,7 +20,7 @@ namespace Orion
 		}
 	}
 
-	Scope<Shader> Shader::Create(const std::string& vertexSrc, const std::string& fragmentSrc)
+	Scoped<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -29,9 +29,46 @@ namespace Orion
 			return nullptr;
 			break;
 		case RendererAPI::API::OpenGL:
-			return std::make_unique<OpenGLShader>(vertexSrc, fragmentSrc);
+			return std::make_unique<OpenGLShader>(name, vertexSrc, fragmentSrc);
 			break;
 		}
+	}
+
+	void ShaderLibrary::Add(const Shared<Shader>& shader)
+	{
+		auto& name = shader->GetName();
+		ORI_CORE_ASSERT(!Exists(name), "Shaders already exists!");
+		m_Shaders[name];
+
+	}
+	void ShaderLibrary::Add(const std::string& name, const Shared<Shader>& shader) 
+	{
+		ORI_CORE_ASSERT(!Exists(name), "Shaders already exists!");
+		m_Shaders[name];
+	}
+	Shared<Shader> ShaderLibrary::Load(const std::string& filepath)
+	{
+		Shared<Shader> shader = Shader::Create(filepath);
+		Add(shader);
+		return shader;
+	}
+
+	Shared<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
+	{
+		Shared<Shader> shader = Shader::Create(filepath);
+		Add(name, shader);
+		return shader;
+	}
+
+	bool ShaderLibrary::Exists(const std::string& name) const
+	{
+		return m_Shaders.find(name) != m_Shaders.end();
+	}
+	Shared<Shader> ShaderLibrary::Get(const std::string& name)
+	{
+
+		ORI_CORE_ASSERT(Exists(name), "Shader not found!");
+		return m_Shaders[name];
 	}
 
 }

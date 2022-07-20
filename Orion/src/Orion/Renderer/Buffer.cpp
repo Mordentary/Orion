@@ -7,7 +7,7 @@ namespace Orion
 {
 
 	
-	Scope<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
+	Scoped<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI()) 
 		{
@@ -23,7 +23,7 @@ namespace Orion
 
 
 
-	Scope<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	Scoped<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{

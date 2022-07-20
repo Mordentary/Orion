@@ -4,7 +4,7 @@
 
 #include"Window.h"
 #include"Orion/Layers/LayerStack.h"
-#include"Events/Event.h"
+#include"Orion/Events/Event.h"
 #include "Orion/Events/ApplicationEvent.h"
 
 #include"Orion/ImGui/ImGuiLayer.h"
@@ -35,12 +35,13 @@ namespace Orion {
 
 		inline Window& GetWindow() { return *m_Window; }
 	private: 
-
+		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnWindowClose(WindowCloseEvent& e);
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 		float m_lastFrameTime;
+		bool m_Minimized = false;
 		bool m_Running = true;
 
 	private:

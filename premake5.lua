@@ -15,6 +15,8 @@ IncludeDir["GLFW"] = "Orion/vendor/GLFW/include"
 IncludeDir["Glad"] = "Orion/vendor/Glad/include"
 IncludeDir["ImGui"] = "Orion/vendor/imgui"
 IncludeDir["glm"] = "Orion/vendor/glm"
+IncludeDir["stb_image"] = "Orion/vendor/stb_image"
+
 
 include "Orion/vendor/GLFW"
 include "Orion/vendor/Glad"
@@ -39,6 +41,8 @@ project "Orion"
 	{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/vendor/stb_image/**.cpp",
+		"%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
 		"%{prj.name}/vendor/glm/glm/**.inl"
 	}
@@ -55,6 +59,7 @@ project "Orion"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.glm}"
 	}
 
@@ -111,7 +116,8 @@ project "Sandbox"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/assets/**.glsl"
 	}
 
 	includedirs

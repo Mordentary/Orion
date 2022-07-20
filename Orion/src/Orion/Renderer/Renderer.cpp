@@ -5,9 +5,19 @@
 
 namespace Orion
 {
-	Scope<Renderer::SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
+	Scoped<Renderer::SceneData> Renderer::s_SceneData = std::make_unique<SceneData>();
 
-	void Renderer::BeginScene(const Ref<OrthographicCamera>& m_Camera)
+	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		RenderCommand::SetViewport(0, 0, width, height);
+	}
+
+	void Renderer::Init()
+	{
+		RenderCommand::Init();
+	}
+
+	void Renderer::BeginScene(const Shared<OrthographicCamera>& m_Camera)
 	{
 		s_SceneData->ViewProjectionMatrix = m_Camera->GetProjectionViewMatrix();
 	}
@@ -15,7 +25,7 @@ namespace Orion
 	{
 
 	}
-	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& modelMatrix)
+	void Renderer::Submit(const Shared<Shader>& shader, const Shared<VertexArray>& vertexArray, const glm::mat4& modelMatrix)
 	{
 		shader->Bind();
 

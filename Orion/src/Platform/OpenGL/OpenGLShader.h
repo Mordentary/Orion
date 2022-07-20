@@ -12,13 +12,13 @@ namespace Orion
 	{
 	public:
         OpenGLShader(const std::string& srcPath);
-		OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		~OpenGLShader();
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 	
-
+        virtual inline std::string GetName() const { return m_Name; }
 
         uint32_t GetUniformLocation(const std::string& name) const;
 
@@ -55,6 +55,7 @@ namespace Orion
 
 	private:
 		uint32_t m_RendererID;
+        std::string m_Name;
         mutable std::unordered_map<std::string, uint32_t> m_UniformLocationCache;
 	};
 }

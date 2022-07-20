@@ -2,8 +2,8 @@
 #include"OpenGLShader.h"
 
 #include<fstream>
+#include<array>
 #include<glad/glad.h>
-
 #include"glm/gtc/type_ptr.hpp"
 
 namespace Orion 
@@ -29,9 +29,15 @@ namespace Orion
 		auto shaderSources = PreProcess(shaderSource);
 		Compile(shaderSources);
 
+		// assets/shaders/Texture.glsl
+		auto lastSlash = srcPath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = srcPath.rfind('.');
+		auto count = lastDot == std::string::npos ? srcPath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = srcPath.substr(lastSlash, count);
 
 	}
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc): m_Name(name)
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
@@ -54,7 +60,7 @@ namespace Orion
 	std::string OpenGLShader::ReadFile(const std::string& srcPath)
 	{
 		std::string result;
-		std::ifstream in(srcPath, std::ios::in, std::ios::binary);
+		std::ifstream in(srcPath, std::ios::in | std::ios::binary);
 		if (in)
 		{
 			in.seekg(0, std::ios::end);
@@ -96,7 +102,10 @@ namespace Orion
 	void OpenGLShader::Compile(std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs(shaderSources.size());
+		ORI_CORE_ASSERT(2 <= shaderSources.size(), "Orion supports only 2 types of shaders!");
+		std::array<GLuint, 2> glShaderIDs;
+		int glShaderIDIndex = 0;
+
 
 		auto iterator = glShaderIDs.begin();
  		for (auto& kv : shaderSources)
@@ -133,7 +142,7 @@ namespace Orion
 			}
 			glAttachShader(program, shader);
 
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++] = shader;
 		
 		}
 
