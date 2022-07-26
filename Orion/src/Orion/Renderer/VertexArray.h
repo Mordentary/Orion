@@ -13,6 +13,8 @@ namespace Orion {
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
+	
+
 
 		virtual void AddVertexBuffer(const Shared<VertexBuffer>& vertexBuffer)  = 0;
 		virtual void SetIndexBuffer(const Shared<IndexBuffer>& indexBuffer) = 0;

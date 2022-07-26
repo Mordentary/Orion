@@ -51,6 +51,7 @@ namespace Orion
 	}
 	void OpenGLShader::Bind() const
 	{
+		ORI_PROFILE_FUNCTION();
 		glUseProgram(m_RendererID);
 	}
 	void OpenGLShader::Unbind() const
@@ -101,11 +102,11 @@ namespace Orion
 	}
 	void OpenGLShader::Compile(std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		ORI_PROFILE_FUNCTION();
 		GLuint program = glCreateProgram();
 		ORI_CORE_ASSERT(2 <= shaderSources.size(), "Orion supports only 2 types of shaders!");
-		std::array<GLuint, 2> glShaderIDs;
+		std::array<GLuint, 2> glShaderIDs{};
 		int glShaderIDIndex = 0;
-
 
 		auto iterator = glShaderIDs.begin();
  		for (auto& kv : shaderSources)
@@ -147,6 +148,10 @@ namespace Orion
 		}
 
 
+		m_RendererID = program;
+
+
+
 		glLinkProgram(program);
 
 		GLint isLinked = 0;
@@ -175,13 +180,12 @@ namespace Orion
 			glDetachShader(program, id);
 		}
 	
-
-		m_RendererID = program;
 	}
 
 
-	uint32_t  OpenGLShader::GetUniformLocation(const std::string& name) const
+	uint32_t OpenGLShader::GetUniformLocation(const std::string& name) const
 	{
+		ORI_PROFILE_FUNCTION();
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 		{
 			return m_UniformLocationCache[name];
@@ -191,10 +195,59 @@ namespace Orion
 		return m_UniformLocationCache[name];
 
 	}
+
+
+	void OpenGLShader::SetInt(const std::string& name, int value)
+	{
+		UploadUniformInt(name, value);
+	}
+	void OpenGLShader::SetIntArray(const std::string& name, const int* values, uint32_t count)
+	{
+		UploadUniformIntArray(name, values, count);
+	}
+	void OpenGLShader::SetFloat(const std::string& name, float value)
+	{
+		UploadUniformFloat(name, value);
+	}
+	void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		UploadUniformFloat2(name, value);
+
+	}
+	void OpenGLShader::SetFloat2(const std::string& name, float x, float y)
+	{
+		UploadUniformFloat2(name, x, y);
+
+	}
+	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		UploadUniformFloat3(name, value);
+	}
+	void OpenGLShader::SetFloat3(const std::string& name, float x, float y, float z)
+	{
+		UploadUniformFloat3(name, x, y, z);
+	}
+	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+		UploadUniformFloat4(name, value);
+	}
+	void OpenGLShader::SetFloat4(const std::string& name, float x, float y, float z, float w)
+	{
+		UploadUniformFloat4(name, x, y, z,w);
+	}
+	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& mat)
+	{
+		UploadUniformMat4(name, mat);
+	}
 	void OpenGLShader::UploadUniformBool(const std::string& uniformName, bool value)
 	{
 		GLint location = GetUniformLocation(uniformName);
 		glUniform1i(location, (int)value);
+	}
+	void OpenGLShader::UploadUniformIntArray(const std::string& uniformName, const int* values, uint32_t count)
+	{
+		GLint location = GetUniformLocation(uniformName);
+		glUniform1iv(location, count, values);
 	}
 	void OpenGLShader::UploadUniformInt(const std::string& uniformName, int value)
 	{

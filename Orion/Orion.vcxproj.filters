@@ -69,6 +69,9 @@
     <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h">
       <Filter>src\Orion\Core\Camera2D</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Core\ConstValues.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Orion\Core\Core.h">
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
@@ -76,6 +79,9 @@
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\Input.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\Instrumentor.h">
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\KeyCodes.h">
@@ -127,6 +133,9 @@
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\Renderer.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\Renderer2D.h">
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\RendererAPI.h">
@@ -1449,6 +1458,9 @@
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\Renderer.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\Renderer2D.cpp">
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp">

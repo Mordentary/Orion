@@ -28,9 +28,9 @@ namespace Orion
 			s_RendererAPI->Clear();
 		}
 
-		inline static void DrawIndexed(const Shared<VertexArray>& vertexArray)
+		inline static void DrawIndexed(const Shared<VertexArray>& vertexArray, uint32_t indexCount = 0)
 		{
-			s_RendererAPI->DrawIndexed(vertexArray);
+			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 	private:
 		static Scoped<RendererAPI> s_RendererAPI;

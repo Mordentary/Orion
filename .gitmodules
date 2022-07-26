@@ -1,14 +1,18 @@
 [submodule "Orion/vendor/glm"]
 	path = Orion/vendor/glm
 	url = https://github.com/g-truc/glm
+	branch = master
 [submodule "Orion/vendor/GLFW"]
 	path = Orion/vendor/GLFW
 	url = https://github.com/Mordentary/glfw
+	branch = master
 [submodule "Orion/vendor/imgui"]
 	path = Orion/vendor/imgui
 	url = https://github.com/Mordentary/imgui
+	branch = docking
 [submodule "Orion/vendor/spdlog"]
 	path = Orion/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+	branch = v1.x
 
 

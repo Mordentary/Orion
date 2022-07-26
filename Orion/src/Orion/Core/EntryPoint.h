@@ -6,16 +6,18 @@ extern Orion::Application* Orion::CreateApplication();
 
 int main(int argc, char** argv) 
 {
-
 	Orion::Log::Init();
-	//ORI_CORE_TRACE("INIT_TRACE");
-	//ORI_CORE_INFO("INIT_INFO");
-	//ORI_CORE_WARN("INIT_WARN");
-	//ORI_CORE_ERROR("INIT_ERROR");
-	//ORI_ERROR("NICE ENGINE!");
-	//ORI_CORE_FATAL("INIT_FATAL");
+	
+	ORI_PROFILE_BEGIN_SESSION("Startup", "OrionProfile-Startup.json");
 	auto app = Orion::CreateApplication();
+	ORI_PROFILE_END_SESSION();
+
+	ORI_PROFILE_BEGIN_SESSION("Runtime", "OrionProfile-Runtime.json");
 	app->Run();
+	ORI_PROFILE_END_SESSION();
+
+	ORI_PROFILE_BEGIN_SESSION("Shutdown", "OrionProfile-Shutdown.json");
 	delete app;
+	ORI_PROFILE_END_SESSION();
 }
 #endif 

@@ -28,16 +28,19 @@ namespace Orion {
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
+		ORI_PROFILE_FUNCTION();
 		glCreateVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
+		ORI_PROFILE_FUNCTION();
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
+		ORI_PROFILE_FUNCTION();
 		glBindVertexArray(m_RendererID);
 	}
 
@@ -48,6 +51,7 @@ namespace Orion {
 
 	void OpenGLVertexArray::AddVertexBuffer(const Shared<VertexBuffer>& vertexBuffer)
 	{
+		ORI_PROFILE_FUNCTION();
 
 		ORI_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(),"Vertex Buffer has no layout!")
 
@@ -56,17 +60,20 @@ namespace Orion {
 
 		uint32_t index = 0;
 		const auto& layout = vertexBuffer->GetLayout();
-		for (const auto& element : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
-				element.GetComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.Type),
-				element.Normalized ? GL_TRUE : GL_FALSE,
-				layout.GetStride(),
-				(const void*)element.Offset
-			);
-			index++;
+		{ 
+			
+			for (const auto& element : layout)
+			{
+				glEnableVertexAttribArray(index);
+				glVertexAttribPointer(index,
+					element.GetComponentCount(),
+					ShaderDataTypeToOpenGLBaseType(element.Type),
+					element.Normalized ? GL_TRUE : GL_FALSE,
+					layout.GetStride(),
+					(const void*)element.Offset
+				);
+				index++;
+			}
 		}
 		m_VertexBuffers.push_back(vertexBuffer);
 	}

@@ -10,6 +10,8 @@
 
 #include"Orion/Core/Log.h"
 #include"Orion/Core/TimeHelper.h"
+#include"Orion/Core/Instrumentor.h"
+
 			   
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
@@ -18,6 +20,7 @@
 
 //Renderer
 #include"Orion/Renderer/Renderer.h"
+#include "Orion/Renderer/Renderer2D.h"
 #include"Orion/Renderer/RenderCommand.h"
 
 //Renderer API

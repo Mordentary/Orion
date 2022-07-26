@@ -22,11 +22,13 @@ namespace Orion
 
 	Window* Window::Create(const WindowProps& props)
 	{
+
 		return new WindowsWindow(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		ORI_PROFILE_FUNCTION();
 		Init(props);
 	}
 
@@ -36,6 +38,8 @@ namespace Orion
 	}
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		ORI_PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -161,11 +165,15 @@ namespace Orion
 
 	void WindowsWindow::Shutdown()
 	{
+		ORI_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate()	 
 	{
+		ORI_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 		

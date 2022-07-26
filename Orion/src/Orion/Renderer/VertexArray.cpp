@@ -19,6 +19,10 @@ namespace Orion
 			return std::make_unique<OpenGLVertexArray>();
 	
 		}
+
+		ORI_CORE_ASSERT(false, "Uknown render API");
+		return nullptr;
+
 	}
 
 }

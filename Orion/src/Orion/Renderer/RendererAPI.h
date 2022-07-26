@@ -21,7 +21,7 @@ namespace Orion
 		virtual void Init() const  = 0;
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;
-		virtual void DrawIndexed(const Shared<VertexArray>& vertexArray) = 0;
+		virtual void DrawIndexed(const Shared<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
 		inline static API GetAPI() { return s_RendererAPI; }
 

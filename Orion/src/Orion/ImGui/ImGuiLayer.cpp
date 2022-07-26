@@ -87,7 +87,7 @@ namespace Orion {
 		}
 	}
 
-	void ImGuiLayer::OnImGuiRender()
+	void ImGuiLayer::OnImGuiRender(Timestep deltaTime)
 	{
 		//static bool show = true;
 		//ImGui::ShowDemoWindow(&show);

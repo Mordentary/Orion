@@ -1,5 +1,5 @@
 workspace "Orion"
-	architecture "x64"
+	architecture "x86_64"
 	startproject "Sandbox"
 
 	configurations
@@ -7,6 +7,10 @@ workspace "Orion"
 		"Debug",
 		"Release",
 		"Dist"
+	}
+	flags
+	{
+		"MultiProcessorCompile"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -18,9 +22,12 @@ IncludeDir["glm"] = "Orion/vendor/glm"
 IncludeDir["stb_image"] = "Orion/vendor/stb_image"
 
 
-include "Orion/vendor/GLFW"
-include "Orion/vendor/Glad"
-include "Orion/vendor/imgui"
+group "Dependencies"
+	include "Orion/vendor/GLFW"
+	include "Orion/vendor/Glad"
+	include "Orion/vendor/imgui"
+
+group ""
 
 project "Orion"
     location "Orion"
@@ -89,7 +96,6 @@ project "Orion"
 		defines "ORI_DEBUG"
 		runtime "Debug"
 		symbols "on"
-
 	filter "configurations:Release"
 		defines "ORI_REALESE"
 		runtime "Release"
@@ -135,13 +141,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		systemversion "latest"
-
-
-		defines 
-		{
-			"ORI_PLATFORM_WINDOWS"
-		}
-
 
 	filter "configurations:Debug"
 		defines "ORI_DEBUG"

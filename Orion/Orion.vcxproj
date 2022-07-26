@@ -80,7 +80,9 @@
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\stb_image;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -104,6 +106,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -128,6 +131,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -143,9 +147,11 @@
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\Application.h" />
     <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h" />
+    <ClInclude Include="src\Orion\Core\ConstValues.h" />
     <ClInclude Include="src\Orion\Core\Core.h" />
     <ClInclude Include="src\Orion\Core\EntryPoint.h" />
     <ClInclude Include="src\Orion\Core\Input.h" />
+    <ClInclude Include="src\Orion\Core\Instrumentor.h" />
     <ClInclude Include="src\Orion\Core\KeyCodes.h" />
     <ClInclude Include="src\Orion\Core\Log.h" />
     <ClInclude Include="src\Orion\Core\MouseButtonCodes.h" />
@@ -163,6 +169,7 @@
     <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h" />
     <ClInclude Include="src\Orion\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Orion\Renderer\Renderer.h" />
+    <ClInclude Include="src\Orion\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Orion\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Orion\Renderer\Shader.h" />
     <ClInclude Include="src\Orion\Renderer\Texture.h" />
@@ -605,6 +612,7 @@
     <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Orion\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Orion\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Orion\Renderer\Shader.cpp" />
     <ClCompile Include="src\Orion\Renderer\Texture.cpp" />

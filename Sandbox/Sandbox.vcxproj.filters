@@ -20,10 +20,13 @@
     <None Include="assets\shaders\Quad.glsl">
       <Filter>assets\shaders</Filter>
     </None>
-    <None Include="assets\shaders\Texture.glsl">
+    <None Include="assets\shaders\BatchShader.glsl">
       <Filter>assets\shaders</Filter>
     </None>
     <None Include="assets\shaders\Triangle.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\OnlyTexture.glsl">
       <Filter>assets\shaders</Filter>
     </None>
   </ItemGroup>

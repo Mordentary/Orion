@@ -71,7 +71,7 @@ namespace Orion
 		{
 			timer.Start();
 			Timestep deltaTime = timer.GetTimeSeconds();
-			ORI_CORE_INFO("DeltaTime: {0}",deltaTime);
+			//ORI_CORE_INFO("DeltaTime: {0}",deltaTime);
 
 
 			if (!m_Minimized) 
@@ -81,7 +81,7 @@ namespace Orion
 			}
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
+				layer->OnImGuiRender(deltaTime);
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();

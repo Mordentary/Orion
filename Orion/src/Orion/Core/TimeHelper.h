@@ -10,6 +10,7 @@ namespace Orion
 		Timestep(float time = 0.0f) : m_Time(time) {}
 		float GetMilliseconds() const { return m_Time * 1000.0f; }
 		float GetSeconds() const { return m_Time; }
+        float GetFPS() const { return 1000 / GetMilliseconds(); }
 
         operator float() const { return m_Time; }
         operator std::string() const { return std::to_string(m_Time); }

@@ -14,6 +14,8 @@ namespace Orion
 	}
 	void OpenGLContext::Init()
 	{
+		ORI_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		ORI_CORE_ASSERT(status, "Failder to initialize Glad!");
@@ -26,6 +28,8 @@ namespace Orion
 	}
 	void OpenGLContext::SwapBuffers()
 	{
+		ORI_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(m_WindowHandle);
 	}
 }

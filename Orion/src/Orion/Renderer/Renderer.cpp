@@ -1,5 +1,7 @@
 #include "oripch.h"
+
 #include "Renderer.h"
+#include "Renderer2D.h"
 #include"Platform/OpenGL/OpenGLShader.h"
 
 
@@ -14,7 +16,9 @@ namespace Orion
 
 	void Renderer::Init()
 	{
+		ORI_PROFILE_FUNCTION();
 		RenderCommand::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::BeginScene(const Shared<OrthographicCamera>& m_Camera)

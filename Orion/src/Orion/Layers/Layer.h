@@ -18,7 +18,7 @@ namespace Orion {
 		virtual void OnUpdate(Timestep deltaTime) {}
 		virtual void Init()		{}
 		virtual void OnEvent(Event& event) {}
-		virtual void OnImGuiRender() {}
+		virtual void OnImGuiRender(Timestep deltaTime) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 	protected:
