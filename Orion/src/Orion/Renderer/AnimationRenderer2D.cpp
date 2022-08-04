@@ -195,6 +195,13 @@ namespace Orion
 
 		if (name != m_ActiveAnimation) 
 		{
+			if (m_AnimationStorage[m_ActiveAnimation]->BindedState)
+			{
+				*m_AnimationStorage[m_ActiveAnimation]->BindedState = !m_AnimationStorage[m_ActiveAnimation]->InitialBindedState;
+			}
+				m_AnimationStorage[m_ActiveAnimation]->IsRunning = false;
+
+
 			anim->Reset();
 			if (StateToBind)
 			{
