@@ -38,13 +38,14 @@ namespace Orion
 	{
 		auto& name = shader->GetName();
 		ORI_CORE_ASSERT(!Exists(name), "Shaders already exists!");
-		m_Shaders[name];
+		m_Shaders[name] = shader;
+
 
 	}
 	void ShaderLibrary::Add(const std::string& name, const Shared<Shader>& shader) 
 	{
 		ORI_CORE_ASSERT(!Exists(name), "Shaders already exists!");
-		m_Shaders[name];
+		m_Shaders[name] = shader;
 	}
 	Shared<Shader> ShaderLibrary::Load(const std::string& filepath)
 	{

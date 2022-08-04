@@ -75,6 +75,8 @@
 
 
 #define ORI_BIND_EVENT_FN(fn) [this](auto& e) { return fn(e); }
+#define ORI_BIND_ANIMATION_FN(fn) [&](const auto animType1, const auto animType2) { return fn(animType1, animType2); }
+
 
 namespace Orion
 {

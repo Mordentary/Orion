@@ -76,6 +76,8 @@ namespace Orion {
 			}
 		}
 		m_VertexBuffers.push_back(vertexBuffer);
+		
+
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const Shared<IndexBuffer>& indexBuffer) 

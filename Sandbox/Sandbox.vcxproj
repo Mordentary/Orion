@@ -135,18 +135,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\test\Skeleton.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Quad.glsl" />
     <None Include="assets\shaders\BatchShader.glsl" />
-    <None Include="assets\shaders\Triangle.glsl" />
     <None Include="assets\shaders\OnlyTexture.glsl" />
+    <None Include="assets\shaders\Quad.glsl" />
+    <None Include="assets\shaders\Triangle.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion\Orion.vcxproj">
       <Project>{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\test\Skeleton.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,7 +7,7 @@
 namespace Orion {
 
 
-	Scoped<Texture2D> Texture2D::Create(const std::string& path)
+	Shared<Texture2D> Texture2D::Create(const std::string& path)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -16,13 +16,13 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return std::make_unique<OpenGLTexture2D>(path);
+			return CreateShared<OpenGLTexture2D>(path);
 
 		}
 	}
 
 
-	Scoped<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -31,7 +31,7 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return std::make_unique<OpenGLTexture2D>(width, height);
+			return CreateShared<OpenGLTexture2D>(width, height);
 
 		}
 	}

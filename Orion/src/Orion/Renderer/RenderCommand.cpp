@@ -5,6 +5,6 @@
 #include"Platform/OpenGL/OpenGLRendererAPI.h"
 namespace Orion
 {	
-	Scoped<RendererAPI> RenderCommand::s_RendererAPI = std::make_unique<OpenGLRendererAPI>();;
+	Scoped<RendererAPI> RenderCommand::s_RendererAPI = std::make_unique<OpenGLRendererAPI>();
 
 }

@@ -15,19 +15,27 @@
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\test\Skeleton.cpp">
+      <Filter>assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Quad.glsl">
-      <Filter>assets\shaders</Filter>
-    </None>
     <None Include="assets\shaders\BatchShader.glsl">
-      <Filter>assets\shaders</Filter>
-    </None>
-    <None Include="assets\shaders\Triangle.glsl">
       <Filter>assets\shaders</Filter>
     </None>
     <None Include="assets\shaders\OnlyTexture.glsl">
       <Filter>assets\shaders</Filter>
     </None>
+    <None Include="assets\shaders\Quad.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\Triangle.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\test\Skeleton.h">
+      <Filter>assets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

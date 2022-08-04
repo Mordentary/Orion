@@ -18,6 +18,8 @@ namespace Orion {
 			virtual void SetData(void* data, uint32_t size) = 0;
 
 			virtual void Bind(uint32_t slot = 0) const = 0;
+			virtual void Unbind(uint32_t slot = 0) const = 0;
+
 
 			virtual bool operator==(Texture& other) = 0;
 		};
@@ -25,8 +27,8 @@ namespace Orion {
 		class Texture2D : public Texture 
 		{
 		public: 
-			static Scoped<Texture2D> Create(uint32_t width, uint32_t height);
-			static Scoped<Texture2D> Create(const std::string& path);
+			static Shared<Texture2D> Create(uint32_t width, uint32_t height);
+			static Shared<Texture2D> Create(const std::string& path);
 
 		};
 }

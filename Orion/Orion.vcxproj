@@ -144,6 +144,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\Application.h" />
     <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="src\Orion\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Orion\Layers\Layer.h" />
     <ClInclude Include="src\Orion\Layers\LayerStack.h" />
+    <ClInclude Include="src\Orion\Renderer\AnimationRenderer2D.h" />
     <ClInclude Include="src\Orion\Renderer\Buffer.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="src\Orion\Renderer\Renderer2D.h" />
     <ClInclude Include="src\Orion\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Orion\Renderer\Shader.h" />
+    <ClInclude Include="src\Orion\Renderer\SubTexture.h" />
     <ClInclude Include="src\Orion\Renderer\Texture.h" />
     <ClInclude Include="src\Orion\Renderer\VertexArray.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
@@ -601,6 +604,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp" />
     <ClCompile Include="src\Orion\Core\Application.cpp" />
     <ClCompile Include="src\Orion\Core\Camera2D\CamerasController2D.cpp" />
     <ClCompile Include="src\Orion\Core\Log.cpp" />
@@ -608,6 +612,7 @@
     <ClCompile Include="src\Orion\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Orion\Layers\Layer.cpp" />
     <ClCompile Include="src\Orion\Layers\LayerStack.cpp" />
+    <ClCompile Include="src\Orion\Renderer\AnimationRenderer2D.cpp" />
     <ClCompile Include="src\Orion\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp" />
@@ -615,6 +620,7 @@
     <ClCompile Include="src\Orion\Renderer\Renderer2D.cpp" />
     <ClCompile Include="src\Orion\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Orion\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Orion\Renderer\SubTexture.cpp" />
     <ClCompile Include="src\Orion\Renderer\Texture.cpp" />
     <ClCompile Include="src\Orion\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />

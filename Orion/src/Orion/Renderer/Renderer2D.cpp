@@ -42,10 +42,12 @@ namespace Orion
 	};
 
 
-	static RendererStorage2D s_RendererData2D;
+	RendererStorage2D Renderer2D::s_RendererData2D;
 
 
-
+	/////////////////////////////////////////////
+	// Functions for batching //////////////////
+	///////////////////////////////////////////
 
 	void Renderer2D::Init()
 	{
@@ -110,7 +112,9 @@ namespace Orion
 
 		s_RendererData2D.TextureSlots[0] = s_RendererData2D.WhiteTexture;
 
-		ResetBatch();
+		s_RendererData2D.VertexIterator = s_RendererData2D.PtrToFirstVertex;
+		s_RendererData2D.QuadIndexCount = 0;
+		s_RendererData2D.TextureSlotsIndex = 1;
 	}
 	void Renderer2D::Shutdown()
 	{
@@ -135,9 +139,10 @@ namespace Orion
 		s_RendererData2D.TexQuadBuffer->SetData(s_RendererData2D.PtrToFirstVertex, dataSize);
 		s_RendererData2D.TexQuadArray->AddVertexBuffer(s_RendererData2D.TexQuadBuffer);
 		Flush();
-		ResetBatch();
-	}
+		ResetBatch(dataSize);
 
+		
+	}
 	void Renderer2D::Flush()
 	{
 		ORI_PROFILE_FUNCTION();
@@ -147,14 +152,32 @@ namespace Orion
 		}
 		RenderCommand::DrawIndexed(s_RendererData2D.TexQuadArray, s_RendererData2D.QuadIndexCount);
 		s_RendererData2D.DrawCalls++;
+	
 	}
-	void Renderer2D::ResetBatch()
+	void Renderer2D::ResetBatch(int32_t dataSize)
 	{
+		memset(s_RendererData2D.PtrToFirstVertex, 0, dataSize);
+		s_RendererData2D.TexQuadBuffer->SetData(s_RendererData2D.PtrToFirstVertex, dataSize);
 		s_RendererData2D.VertexIterator = s_RendererData2D.PtrToFirstVertex;
 		s_RendererData2D.QuadIndexCount = 0;
 		s_RendererData2D.TextureSlotsIndex = 1;
 	}
 
+
+
+	//------------------------------------------//
+	/////////////////////////////////////////////
+	// RENDERING ZONE //////////////////////////
+	///////////////////////////////////////////
+	//--------------------------------------//
+
+
+
+
+
+	/////////////////////////////////////////////
+	// Draw simple quad  ///////////////////////
+	///////////////////////////////////////////
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
 		DrawQuad(glm::vec3(position, 0), size, rotation, color);
@@ -213,6 +236,12 @@ namespace Orion
 		s_RendererData2D.QuadCount++;
 	}
 
+
+
+	/////////////////////////////////////////////
+	// Draw texture  ///////////////////////////
+	///////////////////////////////////////////
+
 	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture,  const glm::vec4& color, const float tilling)
 	{
 
@@ -265,6 +294,106 @@ namespace Orion
 	{
 		DrawTexturedQuad(glm::vec3(position, 0), size,  texture, color, tilling);
 	}
+
+
+
+
+
+	/////////////////////////////////////////////
+	// Draw subTexture  ////////////////////////
+	///////////////////////////////////////////
+
+
+	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
+	{
+
+		DrawTexturedQuad(glm::vec3(position, 0), size, rotation, subTexture, color, tilling);
+	}
+	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
+	{
+		ORI_PROFILE_FUNCTION();
+
+		if (s_RendererData2D.QuadIndexCount >= s_RendererData2D.MaxIndices)
+			EndScene();
+
+		int32_t textureSlot = GetTextureSlot(subTexture->GetTexture());
+
+		glm::mat4 modelMatrix =
+			glm::translate(glm::mat4(1.0f), position) *
+			glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+		const glm::vec2* textureCoords = subTexture->GetTextureCoords();
+
+
+
+
+		AddVertexToBatch(modelMatrix * glm::vec4(-size.x, -size.y, 0.0f, 1.0f), { 0,0 }, textureCoords[0], textureSlot, color);
+		AddVertexToBatch(modelMatrix * glm::vec4(size.x, -size.y, 0.0f, 1.0f), { 0,0 }, textureCoords[1], textureSlot, color);
+		AddVertexToBatch(modelMatrix * glm::vec4(size.x, size.y, 0.0f, 1.0f), { 0,0 }, textureCoords[2], textureSlot, color);
+		AddVertexToBatch(modelMatrix * glm::vec4(-size.x, size.y, 0.0f, 1.0f), { 0,0 }, textureCoords[3], textureSlot, color);
+
+		s_RendererData2D.QuadIndexCount += 6;
+		s_RendererData2D.QuadCount++;
+
+	}
+	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
+	{
+		if (s_RendererData2D.QuadIndexCount >= s_RendererData2D.MaxIndices)
+			EndScene();
+
+
+		int32_t textureSlot = GetTextureSlot(subTexture->GetTexture());
+
+		const glm::vec2* textureCoords  = subTexture->GetTextureCoords();
+
+		if (flip)
+		{
+			textureCoords = subTexture->GetHorizontallyMirroredCoords();
+		}
+
+
+
+		AddVertexToBatch(position, { -size.x, -size.y },  textureCoords[0], textureSlot, color);
+		AddVertexToBatch(position, { size.x, -size.y },	  textureCoords[1], textureSlot, color);
+		AddVertexToBatch(position, { size.x,  size.y },   textureCoords[2], textureSlot, color);
+		AddVertexToBatch(position, { -size.x, size.y },   textureCoords[3], textureSlot, color);
+
+
+		s_RendererData2D.QuadIndexCount += 6;
+		s_RendererData2D.QuadCount++;
+	}
+	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
+	{
+		DrawTexturedQuad(glm::vec3(position, 0), size, subTexture, color, flip);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	inline void Renderer2D::AddVertexToBatch(const glm::vec3& position, const glm::vec2& size, const glm::vec2& textureCoord, const uint32_t textureSlot, const glm::vec4& color)

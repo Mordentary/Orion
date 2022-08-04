@@ -37,7 +37,7 @@ uniform sampler2D u_Texture[32];
 
 void main()
 {
-
+	
 	color = texture(u_Texture[v_TextSlot], v_TextCoord) * v_Color;
 	//color = v_Color;
 }

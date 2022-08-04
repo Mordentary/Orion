@@ -120,6 +120,9 @@
     <ClInclude Include="src\Orion\Layers\LayerStack.h">
       <Filter>src\Orion\Layers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\AnimationRenderer2D.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Orion\Renderer\Buffer.h">
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
@@ -142,6 +145,9 @@
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\Shader.h">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\SubTexture.h">
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\Texture.h">
@@ -1425,6 +1431,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\Application.cpp">
@@ -1448,6 +1455,9 @@
     <ClCompile Include="src\Orion\Layers\LayerStack.cpp">
       <Filter>src\Orion\Layers</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\AnimationRenderer2D.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Orion\Renderer\Buffer.cpp">
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
@@ -1467,6 +1477,9 @@
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\Shader.cpp">
+      <Filter>src\Orion\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\SubTexture.cpp">
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\Texture.cpp">
@@ -1505,5 +1518,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp" />
   </ItemGroup>
 </Project>

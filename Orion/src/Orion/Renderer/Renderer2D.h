@@ -4,6 +4,8 @@
 #include"Orion/Renderer/VertexArray.h"
 #include"Orion/Renderer/Shader.h"
 #include"Texture.h"
+#include"SubTexture.h"
+
 
 
 namespace Orion {
@@ -32,6 +34,12 @@ namespace Orion {
 		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
 
 
+		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
+		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
+
+
 		//Stats
 		struct Statistics
 		{
@@ -52,7 +60,8 @@ namespace Orion {
 
 
 	private:
-		static void Renderer2D::ResetBatch();
+		static RendererStorage2D s_RendererData2D;
+		static void ResetBatch(int32_t dataSize);
 		static inline void AddVertexToBatch(const glm::vec3& position, const glm::vec2& size, const glm::vec2& textureCoord, const uint32_t textureSlot, const glm::vec4& color);
 		static int32_t GetTextureSlot(const Shared<Texture2D>& textures);
 	};

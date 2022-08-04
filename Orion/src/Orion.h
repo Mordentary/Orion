@@ -8,6 +8,8 @@
 #include"Orion/Layers/Layer.h"
 #include"Orion/ImGui/ImGuiLayer.h"
 
+
+
 #include"Orion/Core/Log.h"
 #include"Orion/Core/TimeHelper.h"
 #include"Orion/Core/Instrumentor.h"
@@ -21,6 +23,7 @@
 //Renderer
 #include"Orion/Renderer/Renderer.h"
 #include "Orion/Renderer/Renderer2D.h"
+#include "Orion/Renderer/AnimationRenderer2D.h"
 #include"Orion/Renderer/RenderCommand.h"
 
 //Renderer API
@@ -28,6 +31,8 @@
 #include"Orion/Renderer/Shader.h"
 #include"Orion/Renderer/VertexArray.h"
 #include"Orion/Renderer/Texture.h"
+#include"Orion/Renderer/SubTexture.h"
+
 
 //Utility
 #include"Orion/Renderer/OrthographicCamera.h"
@@ -35,6 +40,6 @@
 
 
 // Entry point ------------
-#include"Orion/Core/EntryPoint.h"
+//#include"Orion/Core/EntryPoint.h"
 // ------------------------
 

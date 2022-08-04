@@ -5,6 +5,7 @@
 
 #include"Orion/Core/Input.h"
 #include"Orion/Renderer/Renderer.h"
+#include"Orion/Renderer/AnimationRenderer2D.h"
 #include"Orion/Core/TimeHelper.h"
 
 namespace Orion 
@@ -66,16 +67,16 @@ namespace Orion
 			layer->Init();
 		
 		Timer timer("DeltaTimer");
-		
+		Timestep deltaTime(0.16);
 		while (m_Running)
 		{
 			timer.Start();
-			Timestep deltaTime = timer.GetTimeSeconds();
+			deltaTime = timer.GetTimeSeconds();
 			//ORI_CORE_INFO("DeltaTime: {0}",deltaTime);
-
 
 			if (!m_Minimized) 
 			{
+				AnimationRenderer2D::SetDelta(deltaTime);
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(deltaTime);
 			}
