@@ -13,7 +13,7 @@ namespace Test
 		m_Color = color;
 		Move(ts);
 		m_StateMachine.UpdateActiveAnimation();
-		CheckStates();
+		//CheckStates();
 	}
 	void Skeleton::InitiliazeAnimations()
 	{

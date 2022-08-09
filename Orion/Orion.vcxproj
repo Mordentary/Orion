@@ -144,8 +144,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
     <ClInclude Include="src\Orion.h" />
+    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
     <ClInclude Include="src\Orion\Core\Application.h" />
     <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h" />
     <ClInclude Include="src\Orion\Core\ConstValues.h" />

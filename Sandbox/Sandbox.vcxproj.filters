@@ -10,13 +10,21 @@
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\test">
+      <UniqueIdentifier>{DC8737CF-C854-92DA-F16D-8082DD99C768}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\test\Skeleton.h">
+      <Filter>src\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\SandboxApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\test\Skeleton.cpp">
-      <Filter>assets</Filter>
+      <Filter>src\test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,10 +40,5 @@
     <None Include="assets\shaders\Triangle.glsl">
       <Filter>assets\shaders</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\test\Skeleton.h">
-      <Filter>assets</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

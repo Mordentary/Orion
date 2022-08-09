@@ -10,6 +10,9 @@
     <Filter Include="src\Orion\Core">
       <UniqueIdentifier>{1BD9F2D6-07A7-E6DC-F03A-5703DCA7C241}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Orion\Core\Animation2D">
+      <UniqueIdentifier>{0011EDF5-EC20-99C6-55DA-FDE44109885F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Orion\Core\Camera2D">
       <UniqueIdentifier>{A9E0DE91-1518-2729-1E22-8B4C8AD84D22}</UniqueIdentifier>
     </Filter>
@@ -62,6 +65,9 @@
   <ItemGroup>
     <ClInclude Include="src\Orion.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h">
+      <Filter>src\Orion\Core\Animation2D</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\Application.h">
       <Filter>src\Orion\Core</Filter>
@@ -1431,9 +1437,11 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp">
+      <Filter>src\Orion\Core\Animation2D</Filter>
+    </ClCompile>
     <ClCompile Include="src\Orion\Core\Application.cpp">
       <Filter>src\Orion\Core</Filter>
     </ClCompile>
@@ -1518,6 +1526,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp" />
   </ItemGroup>
 </Project>
