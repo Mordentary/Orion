@@ -72,7 +72,7 @@ namespace Orion
 		}
 		else
 		{
-			ORI_CORE_ERROR("Could not open file{0} ", srcPath);
+			ORI_CORE_ERROR("Could not open file {0}", srcPath);
 		}
 		return result;
 	}

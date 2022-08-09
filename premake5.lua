@@ -47,6 +47,7 @@ project "Orion"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/Platform/**.glsl",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.cpp",
 		"%{prj.name}/vendor/stb_image/**.h",

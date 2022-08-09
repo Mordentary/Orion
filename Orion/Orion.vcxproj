@@ -637,6 +637,9 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Platform\OpenGL\DefaultShaders\BatchShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
       <Project>{154B857C-0182-860D-AA6E-6C109684020F}</Project>
     </ProjectReference>

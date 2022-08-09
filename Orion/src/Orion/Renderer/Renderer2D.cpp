@@ -2,7 +2,6 @@
 #include "Renderer2D.h"
 #include"RenderCommand.h"
 
-
 namespace Orion
 {
 
@@ -105,8 +104,8 @@ namespace Orion
 		{
 			samples[i] = i;
 		}
-
-		s_RendererData2D.TextureShader = Shader::Create("assets/shaders/BatchShader.glsl");
+	
+		s_RendererData2D.TextureShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/BatchShader.glsl");
 		s_RendererData2D.TextureShader->Bind();
 		s_RendererData2D.TextureShader->SetIntArray("u_Texture", &samples[0], s_RendererData2D.MaxTextureSlots);
 
