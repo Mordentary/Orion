@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glad", "Orion\vendor\Glad\G
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGui", "Orion\vendor\imgui\ImGui.vcxproj", "{C0FF640D-2C14-8DBE-F595-301E616989EF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Orion", "Orion\Orion.vcxproj", "{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Orion", "Orion\Orion.vcxproj", "{57943020-8A99-EAB6-271F-61E0F7F6B73B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,12 +44,12 @@ Global
 		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Dist|x64.Build.0 = Dist|x64
 		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Release|x64.ActiveCfg = Release|x64
 		{C0FF640D-2C14-8DBE-F595-301E616989EF}.Release|x64.Build.0 = Release|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Debug|x64.ActiveCfg = Debug|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Debug|x64.Build.0 = Debug|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Dist|x64.ActiveCfg = Dist|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Dist|x64.Build.0 = Dist|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Release|x64.ActiveCfg = Release|x64
-		{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}.Release|x64.Build.0 = Release|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Debug|x64.ActiveCfg = Debug|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Debug|x64.Build.0 = Debug|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Dist|x64.ActiveCfg = Dist|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Dist|x64.Build.0 = Dist|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Release|x64.ActiveCfg = Release|x64
+		{57943020-8A99-EAB6-271F-61E0F7F6B73B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

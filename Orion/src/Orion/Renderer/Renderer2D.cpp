@@ -109,11 +109,13 @@ namespace Orion
 		s_RendererData2D.TextureShader->Bind();
 		s_RendererData2D.TextureShader->SetIntArray("u_Texture", &samples[0], s_RendererData2D.MaxTextureSlots);
 
+
 		s_RendererData2D.TextureSlots[0] = s_RendererData2D.WhiteTexture;
 
 		s_RendererData2D.VertexIterator = s_RendererData2D.PtrToFirstVertex;
 		s_RendererData2D.QuadIndexCount = 0;
 		s_RendererData2D.TextureSlotsIndex = 1;
+
 	}
 	void Renderer2D::Shutdown()
 	{

@@ -149,7 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orion\Orion.vcxproj">
-      <Project>{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}</Project>
+      <Project>{57943020-8A99-EAB6-271F-61E0F7F6B73B}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

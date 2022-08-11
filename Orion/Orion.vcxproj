@@ -15,7 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8CE0D40D-F8F4-FCBE-C176-A01E2D4AF9EF}</ProjectGuid>
+    <ProjectGuid>{57943020-8A99-EAB6-271F-61E0F7F6B73B}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Orion</RootNamespace>

@@ -35,7 +35,7 @@ project "Orion"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "on"
-	
+	uuid "57943020-8A99-EAB6-271F-61E0F7F6B73B"
 
 
 	targetdir("bin/" .. outputdir ..  "/%{prj.name}")
