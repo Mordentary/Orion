@@ -12,6 +12,9 @@ namespace Test {
 		Skeleton() = default;
 
 		void Update(Orion::Timestep ts, glm::vec4& color);
+		inline glm::vec3 GetPosition() { return m_Position; };
+		inline glm::vec2 GetSize() { return m_Size; };
+
 	private:
 		void InitiliazeAnimations();
 		//bool StatePattern(const Orion::AnimationTypes& activeAnim, const Orion::AnimationTypes& outgoingAnim);

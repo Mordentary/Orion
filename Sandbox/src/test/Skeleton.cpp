@@ -157,6 +157,29 @@ namespace Test
 					}
 					if(!m_IsAttacking) {
 
+
+
+						if (Orion::Input::IsKeyPressed(ORI_KEY_UP))
+						{
+							m_IsWalking = true;
+							m_StateMachine.SetFlipForAllAnimation(false);
+							m_StateMachine.TryActivateAnimation(m_SkeletonWalk, false, &m_IsWalking);
+							m_Position.y += speed;
+						}
+						else if (Orion::Input::IsKeyPressed(ORI_KEY_DOWN))
+						{
+							m_IsWalking = true;
+							m_StateMachine.SetFlipForAllAnimation(true);
+							m_StateMachine.TryActivateAnimation(m_SkeletonWalk, false, &m_IsWalking);
+							m_Position.y -= speed;
+						}
+						else
+						{
+							m_IsWalking = false;
+
+						}
+
+
 						if (Orion::Input::IsKeyPressed(ORI_KEY_RIGHT))
 						{
 							m_IsWalking = true;

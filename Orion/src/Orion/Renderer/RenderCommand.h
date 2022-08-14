@@ -12,6 +12,10 @@ namespace Orion
 		{
 			s_RendererAPI->Init();
 		}
+		inline static void SetLineWidth(float width)
+		{
+			s_RendererAPI->SetLineWidth(width);
+		}
 
 		inline static void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 		{
@@ -32,6 +36,14 @@ namespace Orion
 		{
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
+	
+		inline static void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
+		{
+			s_RendererAPI->DrawLines(vertexArray, vertexCount);
+		}
+
+
+
 	private:
 		static Scoped<RendererAPI> s_RendererAPI;
 	};

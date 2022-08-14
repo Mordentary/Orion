@@ -1531,8 +1531,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Platform\OpenGL\DefaultShaders\BatchShader.glsl">
+    <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
   </ItemGroup>
 </Project>
