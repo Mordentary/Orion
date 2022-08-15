@@ -24,8 +24,8 @@ namespace Orion
 	struct RendererStorage2D
 	{
 		const uint32_t MaxQuads = 20000;
-		const uint32_t MaxVertices = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		const uint32_t MaxVertices_Quad = MaxQuads * 4;
+		const uint32_t MaxIndices_Quad = MaxQuads * 6;
 		static const uint32_t MaxTextureSlots = 32; 
 
 		Scoped<Shader> QuadShader;
@@ -33,7 +33,8 @@ namespace Orion
 		Shared<VertexBuffer> QuadVertexBuffer;
 		Shared<Texture2D> WhiteTexture;
 
-		const uint32_t MaxLines = 5000;
+		const uint32_t MaxLines = 1000;
+		const uint32_t MaxVertices_Line = MaxLines * 2;
 		float LineWidth = 2.5f;
 
 		Scoped<Shader> LineShader;
@@ -77,9 +78,9 @@ namespace Orion
 
 		//Quad prepare
 
-		uint32_t* quadIndices = new uint32_t[s_Data2D.MaxIndices];
+		uint32_t* quadIndices = new uint32_t[s_Data2D.MaxIndices_Quad];
 		uint32_t offset = 0;
-		for (uint32_t i = 0; i < s_Data2D.MaxIndices; i+=6)
+		for (uint32_t i = 0; i < s_Data2D.MaxIndices_Quad; i+=6)
 		{
 			quadIndices[i + 0] = offset + 0;
 			quadIndices[i + 1] = offset + 1;
@@ -91,7 +92,7 @@ namespace Orion
 
 			offset += 4;
 		}
-		Shared<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data2D.MaxIndices);
+		Shared<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data2D.MaxIndices_Quad);
 
 		s_Data2D.QuadVertexArray = VertexArray::Create();
 		s_Data2D.QuadVertexArray->SetIndexBuffer(quadIB);
@@ -107,13 +108,13 @@ namespace Orion
 			});
 
 		s_Data2D.QuadVertexArray->AddVertexBuffer(s_Data2D.QuadVertexBuffer);
-		s_Data2D.QuadVertexBufferBase = new QuadVertex[s_Data2D.MaxVertices];
+		s_Data2D.QuadVertexBufferBase = new QuadVertex[s_Data2D.MaxVertices_Quad];
 
 
 		//Line prepare
 
 		s_Data2D.LineVertexArray = VertexArray::Create();
-		s_Data2D.LineVertexBuffer = VertexBuffer::Create(s_Data2D.MaxVertices * (sizeof(LineVertex)));
+		s_Data2D.LineVertexBuffer = VertexBuffer::Create(s_Data2D.MaxVertices_Line * (sizeof(LineVertex)));
 		s_Data2D.LineVertexBuffer->SetLayout
 		(
 			{
@@ -123,7 +124,7 @@ namespace Orion
 		);
 			
 		s_Data2D.LineVertexArray->AddVertexBuffer(s_Data2D.LineVertexBuffer);
-		s_Data2D.LineVertexBufferBase = new LineVertex[s_Data2D.MaxVertices];
+		s_Data2D.LineVertexBufferBase = new LineVertex[s_Data2D.MaxVertices_Line];
 
 
 		//Texture prepare
@@ -256,7 +257,7 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 		
 		const uint32_t textureSlot = 0;
@@ -288,7 +289,7 @@ namespace Orion
 	 }
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 
 
@@ -319,7 +320,7 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 
 		int32_t textureSlot = GetTextureSlot(texture);
@@ -343,7 +344,7 @@ namespace Orion
 	}
 	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 
 
@@ -381,7 +382,7 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 
 		int32_t textureSlot = GetTextureSlot(subTexture->GetTexture());
@@ -405,7 +406,7 @@ namespace Orion
 	}
 	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
 	{
-		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices)
+		if (s_Data2D.QuadIndexCount >= s_Data2D.MaxIndices_Quad)
 			EndScene();
 
 
@@ -441,7 +442,8 @@ namespace Orion
 
 	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color)
 	{
-		
+		if (s_Data2D.LineVertexCount >= s_Data2D.MaxVertices_Line)
+			EndScene();
 
 
 		AddLineVertexToBatch(p0, color);
@@ -453,7 +455,8 @@ namespace Orion
 
 	void Renderer2D::DrawBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		
+		if(s_Data2D.LineVertexCount >= s_Data2D.MaxVertices_Line)
+			EndScene();
 
 
 		AddLineVertexToBatch((position + glm::vec3(-size.x, size.y, 0.0f)), color);

@@ -51,7 +51,7 @@ namespace Orion {
 			 uint32_t GetTotalDrawCalls() { return DrawCalls; }
 			 uint32_t GetTotalQuadCount() { return QuadCount; }
 			 uint32_t GetTotalLineCount() { return LineCount; }
-			 uint32_t GetTotalQuadVertexCount() { return QuadCount * 4; }
+			 uint32_t GetTotalVertexCount() { return (QuadCount * 4) + (LineCount * 2); }
 			 uint32_t GetTotalQuadIndexCount() { return QuadCount * 6; }
 
 

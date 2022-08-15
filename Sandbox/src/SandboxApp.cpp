@@ -73,10 +73,13 @@ public:
 		Orion::Renderer2D::BeginScene(Orion::CamerasController2D::GetActiveCamera());
 
 		Orion::Renderer2D::DrawQuad(glm::vec3(0.0f,-0.5f,0.0f), glm::vec2(0.5f,0.5f), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
-		
-		Orion::Renderer2D::DrawBorderedQuad(m_Skeleton->GetPosition(), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
-
-		Orion::Renderer2D::DrawBorderedQuad(m_Skeleton->GetPosition() + glm::vec3(3.f), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+		for (size_t i = 0; i < 300; i++)
+		{
+			for (size_t j = 0; j < 300; j++)
+			{
+				Orion::Renderer2D::DrawBorderedQuad(glm::vec3(i, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+			}
+		}
 
 		m_Skeleton->Update(deltaTime, m_Color);
 		
@@ -167,9 +170,9 @@ public:
 		ImGui::Text("FPS: %f",ts.GetFPS());
 		ImGui::Text("DrawCalls: %d", stats.GetTotalDrawCalls());
 		ImGui::Text("Quads: %d", stats.GetTotalQuadCount());
+		ImGui::Text("QuadIndicies: %d", stats.GetTotalQuadIndexCount());
 		ImGui::Text("Lines: %d", stats.GetTotalLineCount());
-		ImGui::Text("Vertcies: %d", stats.GetTotalQuadVertexCount());
-		ImGui::Text("Index: %d", stats.GetTotalQuadIndexCount());
+		ImGui::Text("Verticies: %d", stats.GetTotalVertexCount());
 
 		 
 
