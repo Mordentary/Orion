@@ -13,7 +13,7 @@
 #include"Orion/Renderer/VertexArray.h"
 #include"Orion/Renderer/Buffer.h"
 
-#include"Orion/Renderer/OrthographicCamera.h"
+#include"Orion/Renderer/Cameras/OrthographicCamera.h"
 
 namespace Orion {
 

@@ -18,7 +18,7 @@
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
 #include"Orion/Core/MouseButtonCodes.h"
-#include "Orion/Core/Camera2D/CamerasController2D.h"
+#include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
 
 //Renderer
 #include"Orion/Renderer/Renderer.h"
@@ -35,7 +35,9 @@
 
 
 //Utility
-#include"Orion/Renderer/OrthographicCamera.h"
+#include"Orion/Renderer/Cameras/OrthographicCamera.h"
+#include"Orion/Renderer/Cameras/PerspectiveCamera.h"
+
 
 
 

@@ -26,6 +26,8 @@
     <ClCompile Include="src\test\Skeleton.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
+    <ClCompile Include="src\ExampleLayer2D.h" />
+    <ClCompile Include="src\ExampleLayer3D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\BatchShader.glsl">

@@ -1,6 +1,7 @@
 #pragma once
 
-#include"Orion/Renderer/OrthographicCamera.h"
+#include"Orion/Renderer/Cameras/OrthographicCamera.h"
+#include"Orion/Renderer/Cameras/PerspectiveCamera.h"
 #include"Orion/Renderer/VertexArray.h"
 #include"Orion/Renderer/Shader.h"
 #include"Texture.h"
@@ -19,7 +20,7 @@ namespace Orion {
 		static void Shutdown();
 		static void Flush();
 
-		static void BeginScene(const Shared<OrthographicCamera>& camera);
+		static void BeginScene(const Shared<DummyCamera>& camera);
 		static void EndScene();
 
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color);

@@ -138,6 +138,8 @@
     <ClInclude Include="src\test\Skeleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ExampleLayer2D.h" />
+    <ClCompile Include="src\ExampleLayer3D.h" />
     <ClCompile Include="src\SandboxApp.cpp" />
     <ClCompile Include="src\test\Skeleton.cpp" />
   </ItemGroup>

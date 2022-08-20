@@ -20,7 +20,20 @@ namespace Orion {
 		inline unsigned int GetWidth() const override { return m_Data.Width; }
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
 
+		 void DisableCursor(bool IsDisabled) override 
+		{ 
+			if (IsDisabled) 
+			{
+				glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+			}
+			else
+			{
+				glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+			}
+		}
+		inline void SetCursorPosition(float xPos, float yPos) override { glfwSetCursorPos(m_Window, xPos, yPos); }
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

@@ -75,7 +75,7 @@
     <ClInclude Include="src\Orion\Core\Application.h">
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Core\Camera2D\CamerasController2D.h">
+    <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h">
       <Filter>src\Orion\Core\Camera2D</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\ConstValues.h">
@@ -138,7 +138,7 @@
     <ClInclude Include="src\Orion\Renderer\GraphicsContext.h">
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\OrthographicCamera.h">
+    <ClInclude Include="src\Orion\Renderer\Cameras\OrthographicCamera.h">
       <Filter>src\Orion\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\RenderCommand.h">
@@ -1440,6 +1440,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\Cameras\PerspectiveCamera.h" />
+    <ClInclude Include="src\Orion\Renderer\Cameras\DummyCamera.h" />
+    <ClInclude Include="src\Orion\Core\MathHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp">
@@ -1448,7 +1451,7 @@
     <ClCompile Include="src\Orion\Core\Application.cpp">
       <Filter>src\Orion\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Core\Camera2D\CamerasController2D.cpp">
+    <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
       <Filter>src\Orion\Core\Camera2D</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Core\Log.cpp">
@@ -1472,7 +1475,7 @@
     <ClCompile Include="src\Orion\Renderer\Buffer.cpp">
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\OrthographicCamera.cpp">
+    <ClCompile Include="src\Orion\Renderer\Cameras\OrthographicCamera.cpp">
       <Filter>src\Orion\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\RenderCommand.cpp">
@@ -1529,6 +1532,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\Cameras\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\Orion\Renderer\Cameras\DummyCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">

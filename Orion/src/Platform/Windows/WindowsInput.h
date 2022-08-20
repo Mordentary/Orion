@@ -10,6 +10,10 @@ namespace Orion
 
 		virtual bool IsMouseButtonPressedImpl(int keycode) override;
 
+		virtual bool IsKeyReleasedImpl(int keycode) override;
+
+		virtual bool IsMouseButtonReleasedImpl(int keycode) override;
+
 		virtual  std::pair<float, float> GetMousePositionImpl() override;
 
 		virtual float GetMouseXImpl() override;
