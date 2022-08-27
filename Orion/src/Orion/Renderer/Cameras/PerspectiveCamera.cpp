@@ -13,7 +13,7 @@ namespace Orion
 		
 		if (position == cameraTarget) 
 		{
-			ORI_CORE_ASSERT(true, "Camera target and positin are equal!");
+			ORI_CORE_ASSERT(false, "Camera target and position are equal!");
 		}
 		m_CameraSpaceAxisZ = -glm::normalize(position - cameraTarget);
 		m_CameraSpaceAxisX = glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY));

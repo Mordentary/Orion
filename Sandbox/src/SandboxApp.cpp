@@ -13,7 +13,7 @@
 
 class Sandbox : public Orion::Application 
 {
-public: 
+public:   
 	Sandbox() 
 	{
 		//PushLayer(new ExampleLayer2D());

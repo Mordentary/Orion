@@ -1,7 +1,7 @@
 #pragma once
 
-#include"Orion/Renderer/Texture.h"
-#include"Orion/Renderer/SubTexture.h"
+#include"Orion/Renderer/GraphicsObjects/Texture.h"
+#include"Orion/Renderer//GraphicsObjects/SubTexture.h"
 
 namespace Orion {
 

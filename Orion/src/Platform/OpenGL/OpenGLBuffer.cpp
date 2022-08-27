@@ -53,7 +53,14 @@ namespace Orion
 
 	}
 
+	void OpenGLVertexBuffer::SetData(const void* data, uint32_t offset, uint32_t size)
+	{
 
+		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
+		glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+
+
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// IndexBuffer ///////////////////////////////////////////////////////

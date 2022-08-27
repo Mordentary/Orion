@@ -1,7 +1,7 @@
 #pragma once
 
 #include"Orion/Core/Window.h"
-#include"Orion/Renderer/GraphicsContext.h"
+#include"Orion/Renderer/GraphicsRendering/GraphicsContext.h"
 
 
 #include <GLFW/glfw3.h>

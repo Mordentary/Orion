@@ -15,9 +15,9 @@ public:
 	bool skeletState = false;
 	void Init() override
 	{
-		Orion::Renderer::Init();
+		Orion::Renderer2D::Init();
 
-		m_Camera = std::make_unique<Orion::OrthographicCamera>(-1.6, 1.6, -0.9, 0.9);
+		m_Camera = Orion::CreateShared<Orion::OrthographicCamera>(-1.6, 1.6, -0.9, 0.9);
 
 		Orion::CamerasController::AddCamera("PrimaryCamera", m_Camera);
 

@@ -18,8 +18,10 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Orion/vendor/GLFW/include"
 IncludeDir["Glad"] = "Orion/vendor/Glad/include"
 IncludeDir["ImGui"] = "Orion/vendor/imgui"
+IncludeDir["assimp"] = "Orion/vendor/assimp/include"
 IncludeDir["glm"] = "Orion/vendor/glm"
 IncludeDir["stb_image"] = "Orion/vendor/stb_image"
+
 
 
 group "Dependencies"
@@ -68,18 +70,22 @@ project "Orion"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.assimp}",
 		"%{IncludeDir.glm}"
 	}
-
+	
+	libdirs { "%{prj.name}/vendor/assimp/lib" }
+	
 	links
 	{
 		"GLFW",
 		"Glad",
 		"ImGui",
-		"opengl32.lib"
-
+		"opengl32.lib",
+		--Assimp
+		"zlibstaticd.lib",
+		"assimp-vc143-mtd.lib"
 	}
-
 	filter "system:windows"
 		systemversion "latest"
 

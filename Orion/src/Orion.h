@@ -21,17 +21,17 @@
 #include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
 
 //Renderer
-#include"Orion/Renderer/Renderer.h"
-#include "Orion/Renderer/Renderer2D.h"
-#include "Orion/Renderer/AnimationRenderer2D.h"
-#include"Orion/Renderer/RenderCommand.h"
+#include"Orion/Renderer/GraphicsRendering/Renderer.h"
+#include"Orion/Renderer/GraphicsRendering/Renderer2D.h"
+#include"Orion/Renderer/GraphicsRendering/AnimationRenderer2D.h"
+#include"Orion/Renderer/GraphicsRendering/RenderCommand.h"
 
 //Renderer API
-#include"Orion/Renderer/Buffer.h"
-#include"Orion/Renderer/Shader.h"
-#include"Orion/Renderer/VertexArray.h"
-#include"Orion/Renderer/Texture.h"
-#include"Orion/Renderer/SubTexture.h"
+#include"Orion/Renderer/GraphicsObjects/Buffer.h"
+#include"Orion/Renderer/GraphicsObjects/Shader.h"
+#include"Orion/Renderer/GraphicsObjects/VertexArray.h"
+#include"Orion/Renderer/GraphicsObjects/Texture.h"
+#include"Orion/Renderer/GraphicsObjects/SubTexture.h"
 
 
 //Utility

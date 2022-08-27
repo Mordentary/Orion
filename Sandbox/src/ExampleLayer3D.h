@@ -8,6 +8,7 @@
 
 
 
+
 class ExampleLayer3D : public Orion::Layer
 {
 public:
@@ -16,8 +17,9 @@ public:
 	void Init() override
 	{
 		Orion::Renderer::Init();
+
 		m_Camera = Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0,0.0f,3.0f),glm::vec3(0.0f));
-		auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f), false, false);
+		auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
 
 
 		Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
@@ -45,8 +47,8 @@ public:
 		Orion::Renderer2D::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
-
-		Orion::Renderer2D::DrawQuad(glm::vec3(0.0f), glm::vec2(25.0f), rotation, m_Color);
+		//Orion::Renderer::
+		//Orion::Renderer::AppendMesh();
 
 
 
@@ -98,7 +100,7 @@ public:
 		ImGui::Begin("Setting");
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 
-		auto& stats = Orion::Renderer2D::GetStats();
+		/*auto& stats = Orion::Renderer::GetStats();
 
 
 		ImGui::Text("FPS: %f", ts.GetFPS());
@@ -106,7 +108,7 @@ public:
 		ImGui::Text("Quads: %d", stats.GetTotalQuadCount());
 		ImGui::Text("QuadIndicies: %d", stats.GetTotalQuadIndexCount());
 		ImGui::Text("Lines: %d", stats.GetTotalLineCount());
-		ImGui::Text("Verticies: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Verticies: %d", stats.GetTotalVertexCount());*/
 
 
 

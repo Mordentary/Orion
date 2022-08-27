@@ -23,7 +23,7 @@ namespace Orion
 
 	void Renderer::BeginScene(const Shared<OrthographicCamera>& m_Camera)
 	{
-		s_SceneData->ViewProjectionMatrix = m_Camera->GetProjectionMatrix();
+		s_SceneData->ViewProjectionMatrix = m_Camera->GetProjectionViewMatrix();
 	}
 	void Renderer::EndScene()
 	{

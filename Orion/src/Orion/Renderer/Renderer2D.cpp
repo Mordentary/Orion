@@ -158,7 +158,7 @@ namespace Orion
 		ORI_PROFILE_FUNCTION();
 		
 	}
-	void Renderer2D::BeginScene(const Shared<DummyCamera>& camera)
+	void Renderer2D::BeginScene(const Shared<OrthographicCamera>& camera)
 	{
 		ORI_PROFILE_FUNCTION();
 
@@ -169,7 +169,6 @@ namespace Orion
 		s_Data2D.LineShader->SetMat4("u_ViewProjection", camera->GetProjectionViewMatrix());
 
 	}
-
 	void Renderer2D::EndScene()
 	{
 		ORI_PROFILE_FUNCTION();

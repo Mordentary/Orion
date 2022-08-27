@@ -1,8 +1,7 @@
 #pragma once
 
 #include"RenderCommand.h"
-#include"Cameras/OrthographicCamera.h"
-#include"Cameras/PerspectiveCamera.h"
+#include"OrthographicCamera.h"
 #include"Shader.h"
 namespace Orion {
 

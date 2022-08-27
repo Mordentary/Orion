@@ -9,9 +9,9 @@
 
 #include"Orion/ImGui/ImGuiLayer.h"
 
-#include"Orion/Renderer/Shader.h"
-#include"Orion/Renderer/VertexArray.h"
-#include"Orion/Renderer/Buffer.h"
+#include"Orion/Renderer/GraphicsObjects/Shader.h"
+#include"Orion/Renderer/GraphicsObjects/VertexArray.h"
+#include"Orion/Renderer/GraphicsObjects/Buffer.h"
 
 #include"Orion/Renderer/Cameras/OrthographicCamera.h"
 

@@ -4,8 +4,8 @@
 
 
 #include"Orion/Core/Input.h"
-#include"Orion/Renderer/Renderer.h"
-#include"Orion/Renderer/AnimationRenderer2D.h"
+#include"Orion/Renderer/GraphicsRendering/Renderer.h"
+#include"Orion/Renderer/GraphicsRendering/AnimationRenderer2D.h"
 #include"Orion/Core/TimeHelper.h"
 
 namespace Orion 
