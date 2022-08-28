@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h" />
-    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h" />
+    <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h" />
     <ClInclude Include="src\Orion\Core\Application.h" />
     <ClInclude Include="src\Orion\Core\ConstValues.h" />
     <ClInclude Include="src\Orion\Core\Core.h" />
@@ -172,12 +172,12 @@
     <ClInclude Include="src\Orion\Renderer\Cameras\DummyCamera.h" />
     <ClInclude Include="src\Orion\Renderer\Cameras\OrthographicCamera.h" />
     <ClInclude Include="src\Orion\Renderer\Cameras\PerspectiveCamera.h" />
-    <ClInclude Include="src\Orion\Renderer\Geometry\Mesh.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Buffer.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Shader.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\SubTexture.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Texture.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\VertexArray.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Buffer.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Shader.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\SubTexture.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Texture.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\VertexArray.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Mesh.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsRendering\GraphicsContext.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsRendering\RenderCommand.h" />
@@ -612,9 +612,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp" />
-    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp" />
+    <ClCompile Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.cpp" />
     <ClCompile Include="src\Orion\Core\Application.cpp" />
     <ClCompile Include="src\Orion\Core\Log.cpp" />
+    <ClCompile Include="src\Orion\Core\TimeHelper.cpp" />
     <ClCompile Include="src\Orion\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Orion\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Orion\Layers\Layer.cpp" />
@@ -622,12 +623,12 @@
     <ClCompile Include="src\Orion\Renderer\Cameras\DummyCamera.cpp" />
     <ClCompile Include="src\Orion\Renderer\Cameras\OrthographicCamera.cpp" />
     <ClCompile Include="src\Orion\Renderer\Cameras\PerspectiveCamera.cpp" />
-    <ClCompile Include="src\Orion\Renderer\Geometry\Mesh.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Buffer.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Shader.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\SubTexture.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Texture.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\VertexArray.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Buffer.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Shader.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\SubTexture.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Texture.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\VertexArray.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Mesh.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\RenderCommand.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\Renderer.cpp" />
@@ -648,6 +649,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl" />
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,8 @@
 bin-int/
 #Pictures
 **.png
-
+#Heavy lib
+!assimp/lib
 # Visual Studio files and folder
 .vs/
 **.sln

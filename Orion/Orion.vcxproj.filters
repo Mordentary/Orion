@@ -16,6 +16,9 @@
     <Filter Include="src\Orion\Core\Animation2D">
       <UniqueIdentifier>{0011EDF5-EC20-99C6-55DA-FDE44109885F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Orion\Core\Camera2D">
+      <UniqueIdentifier>{A9E0DE91-1518-2729-1E22-8B4C8AD84D22}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Orion\Events">
       <UniqueIdentifier>{679D2F64-5396-4EB6-7CC8-333B68202EC2}</UniqueIdentifier>
     </Filter>
@@ -31,8 +34,8 @@
     <Filter Include="src\Orion\Renderer\Cameras">
       <UniqueIdentifier>{D49EA174-C0AE-4D45-2968-B26315973CDE}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Orion\Renderer\Geometry">
-      <UniqueIdentifier>{6405FAF2-D012-28D9-59F9-23C4C505F48F}</UniqueIdentifier>
+    <Filter Include="src\Orion\Renderer\GraphicsCore">
+      <UniqueIdentifier>{7241DE7E-DE24-EDBE-E727-1BFB538AB30F}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Orion\Renderer\GraphicsObjects">
       <UniqueIdentifier>{93DDD91A-7F19-DD84-E82B-F57BD486859F}</UniqueIdentifier>
@@ -84,7 +87,7 @@
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h">
       <Filter>src\Orion\Core\AdvanceCamerasFamily</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Core\Animation2D\AnimationLibrary.h">
+    <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h">
       <Filter>src\Orion\Core\Animation2D</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\Application.h">
@@ -153,22 +156,22 @@
     <ClInclude Include="src\Orion\Renderer\Cameras\PerspectiveCamera.h">
       <Filter>src\Orion\Renderer\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\Geometry\Mesh.h">
-      <Filter>src\Orion\Renderer\Geometry</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Buffer.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Buffer.h">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Shader.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Shader.h">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\SubTexture.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\SubTexture.h">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Texture.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Texture.h">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\VertexArray.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\VertexArray.h">
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Mesh.h">
       <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.h">
@@ -1469,13 +1472,16 @@
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
       <Filter>src\Orion\Core\AdvanceCamerasFamily</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Core\Animation2D\AnimationLibrary.cpp">
+    <ClCompile Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.cpp">
       <Filter>src\Orion\Core\Animation2D</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Core\Application.cpp">
       <Filter>src\Orion\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Core\Log.cpp">
+      <Filter>src\Orion\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Core\TimeHelper.cpp">
       <Filter>src\Orion\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\ImGui\ImGuiBuild.cpp">
@@ -1499,22 +1505,22 @@
     <ClCompile Include="src\Orion\Renderer\Cameras\PerspectiveCamera.cpp">
       <Filter>src\Orion\Renderer\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\Geometry\Mesh.cpp">
-      <Filter>src\Orion\Renderer\Geometry</Filter>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Buffer.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Buffer.cpp">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Shader.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Shader.cpp">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\SubTexture.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\SubTexture.cpp">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Texture.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Texture.cpp">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\VertexArray.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\VertexArray.cpp">
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Mesh.cpp">
       <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.cpp">
@@ -1565,6 +1571,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">

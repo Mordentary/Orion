@@ -2,7 +2,7 @@
 
 #include<string>
 #include<unordered_map>
-#include"Orion/Renderer/GraphicsObjects/Shader.h"
+#include"Orion/Renderer/GraphicsCore/Shader.h"
 
 typedef unsigned int GLenum;
 

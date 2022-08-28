@@ -2,10 +2,10 @@
 
 #include"../Cameras/OrthographicCamera.h"
 #include"../Cameras/PerspectiveCamera.h"
-#include"../GraphicsObjects/VertexArray.h"
-#include"../GraphicsObjects/Shader.h"
-#include"../GraphicsObjects/Texture.h"
-#include"../GraphicsObjects/SubTexture.h"
+#include"../GraphicsCore/VertexArray.h"
+#include"../GraphicsCore/Shader.h"
+#include"../GraphicsCore/Texture.h"
+#include"../GraphicsCore/SubTexture.h"
 
 
 
@@ -57,7 +57,7 @@ namespace Orion {
 
 
 		private:
-			friend struct RendererStorage2D;
+			friend struct RendererData2D;
 			uint32_t DrawCalls;
 			uint32_t QuadCount;
 			uint32_t LineCount;
@@ -69,7 +69,7 @@ namespace Orion {
 
 
 	private:
-		static RendererStorage2D s_Data2D;
+		static RendererData2D s_RenData2D;
 		static void ResetBatch();
 		static int32_t GetTextureSlot(const Shared<Texture2D>& textures);
 		static inline void AddQuadVertexToBatch(const glm::vec3& position, const glm::vec2& size, const glm::vec2& textureCoord, const uint32_t textureSlot, const glm::vec4& color);

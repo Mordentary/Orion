@@ -13,7 +13,6 @@ class ExampleLayer3D : public Orion::Layer
 {
 public:
 	ExampleLayer3D() : Layer("Example") {}
-	bool skeletState = false;
 	void Init() override
 	{
 		Orion::Renderer::Init();
@@ -36,7 +35,7 @@ public:
 		Orion::RenderCommand::Clear();
 		Orion::CamerasController::OnUpdate(deltaTime);
 
-		Orion::Renderer2D::ResetStats();
+		//Orion::Renderer2D::ResetStats();
 
 
 		
@@ -44,18 +43,14 @@ public:
 	//	rotation += deltaTime * 100.f;
 		ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
 
-		Orion::Renderer2D::BeginScene(Orion::CamerasController::GetActiveCamera());
+		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
-		//Orion::Renderer::
-		//Orion::Renderer::AppendMesh();
-
-
-
-		Orion::Renderer2D::EndScene();
+		Orion::Renderer::DrawCube(glm::mat4(1.0f));
 
 
 
+		Orion::Renderer::EndScene();
 
 	}
 

@@ -34,6 +34,16 @@ namespace Orion {
 			}
 		}
 		inline void SetCursorPosition(float xPos, float yPos) override { glfwSetCursorPos(m_Window, xPos, yPos); }
+
+		inline int32_t GetCurrentTimeInSec_Int() override
+		{
+			return static_cast<int32_t>(glfwGetTime());
+		}
+		inline float GetCurrentTimeInSec_Float() override
+		{
+			return static_cast<float>(glfwGetTime());
+		}
+		
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;

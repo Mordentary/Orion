@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Orion/Renderer/GraphicsObjects/VertexArray.h"
+#include"Orion/Renderer/GraphicsCore/VertexArray.h"
 
 namespace Orion 
 {

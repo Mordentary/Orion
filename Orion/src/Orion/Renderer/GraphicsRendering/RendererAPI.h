@@ -3,7 +3,7 @@
 
 #include"glm/glm.hpp"
 
-#include"../GraphicsObjects/VertexArray.h"
+#include"../GraphicsCore/VertexArray.h"
 
 namespace Orion
 {
@@ -23,6 +23,7 @@ namespace Orion
 		virtual void Clear() = 0;
 		virtual void DrawIndexed(const Shared<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 		virtual void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
+		virtual void DrawArray(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void SetLineWidth(float width) = 0;
 		inline static API GetAPI() { return s_RendererAPI; }
 	private:

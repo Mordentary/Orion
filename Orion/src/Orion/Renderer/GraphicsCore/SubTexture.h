@@ -1,5 +1,5 @@
 #pragma once
-#include"../GraphicsObjects/Texture.h"
+#include"../GraphicsCore/Texture.h"
 #include<algorithm>
 namespace Orion
 {

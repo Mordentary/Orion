@@ -1,5 +1,5 @@
 #pragma once
-#include"Orion/Renderer/GraphicsObjects/Buffer.h"
+#include"Orion/Renderer/GraphicsCore/Buffer.h"
 
 
 namespace Orion

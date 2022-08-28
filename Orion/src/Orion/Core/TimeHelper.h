@@ -66,5 +66,13 @@ namespace Orion
     };
 
 
+    class CurrentTime 
+    {
+    public:
+        static int32_t GetCurrentTimeInSec_Int();
+        static float GetCurrentTimeInSec();
+    };
+
+
 
 }

@@ -41,7 +41,10 @@ namespace Orion
 		{
 			s_RendererAPI->DrawLines(vertexArray, vertexCount);
 		}
-
+		inline static void DrawArray(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
+		{
+			s_RendererAPI->DrawArray(vertexArray, vertexCount);
+		}
 
 
 	private:

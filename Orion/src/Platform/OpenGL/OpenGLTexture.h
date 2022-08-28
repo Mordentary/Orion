@@ -1,7 +1,7 @@
 #pragma once
 
 #include<glad/glad.h>
-#include"Orion/Renderer/GraphicsObjects/Texture.h"
+#include"Orion/Renderer/GraphicsCore/Texture.h"
 
 namespace Orion 
 {

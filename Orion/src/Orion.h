@@ -27,11 +27,11 @@
 #include"Orion/Renderer/GraphicsRendering/RenderCommand.h"
 
 //Renderer API
-#include"Orion/Renderer/GraphicsObjects/Buffer.h"
-#include"Orion/Renderer/GraphicsObjects/Shader.h"
-#include"Orion/Renderer/GraphicsObjects/VertexArray.h"
-#include"Orion/Renderer/GraphicsObjects/Texture.h"
-#include"Orion/Renderer/GraphicsObjects/SubTexture.h"
+#include"Orion/Renderer/GraphicsCore/Buffer.h"
+#include"Orion/Renderer/GraphicsCore/Shader.h"
+#include"Orion/Renderer/GraphicsCore/VertexArray.h"
+#include"Orion/Renderer/GraphicsCore/Texture.h"
+#include"Orion/Renderer/GraphicsCore/SubTexture.h"
 
 
 //Utility
