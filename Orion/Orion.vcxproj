@@ -147,6 +147,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightSource.h" />
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h" />
     <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h" />
@@ -611,6 +615,10 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp" />
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp" />
     <ClCompile Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.cpp" />
     <ClCompile Include="src\Orion\Core\Application.cpp" />

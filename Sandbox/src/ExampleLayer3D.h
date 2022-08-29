@@ -23,6 +23,14 @@ public:
 
 		Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 		Orion::CamerasController::AddCamera("OrthoCamera", m_Camera2);
+		m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
+		m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
+
+		
+
+		m_SpotLight = Orion::Shared<Orion::SpotLight>(new Orion::SpotLight());
+		m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+		m_SpotLight->GetLightProperties().Position= glm::vec3(0.0f, 2.0f, 0.0f);
 
 
 	}
@@ -37,16 +45,23 @@ public:
 
 		//Orion::Renderer2D::ResetStats();
 
-
 		
 		static float rotation = 0;
 	//	rotation += deltaTime * 100.f;
 		ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
 
-		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
+
+		Orion::Renderer::AddLight(m_SpotLight);
+
+		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_Position);
+
+		Orion::Material mat =
+		{
+			m_DiffuseMap, m_SpecularMap, 16.f
+		};
 
 
-		Orion::Renderer::DrawCube(glm::mat4(1.0f));
+		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
 
 
 
@@ -94,6 +109,7 @@ public:
 	{
 		ImGui::Begin("Setting");
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
+		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_Position), -5.0f, 5.0f);
 
 		/*auto& stats = Orion::Renderer::GetStats();
 
@@ -116,4 +132,6 @@ private:
 	glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
 	glm::vec3 m_Position{ 0,0,0 };
 	glm::mat4 m_Model = glm::mat4(1.0f);
+	Orion::Shared<Orion::LightSource> m_SpotLight;
+	Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap;
 };

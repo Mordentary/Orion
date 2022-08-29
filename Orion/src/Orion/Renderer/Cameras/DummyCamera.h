@@ -23,7 +23,6 @@ namespace Orion
 		virtual void RecalculateViewProjection() {}
 		virtual void RecalculateProjection() {}
 
-
 		const inline glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionViewMatrix; }
 		const inline glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const inline glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }

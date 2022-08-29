@@ -2,7 +2,6 @@
 
 #include "Renderer.h"
 #include "Renderer2D.h"
-#include "../GraphicsObjects/Mesh.h"
 #include"Platform/OpenGL/OpenGLShader.h"
 
 
@@ -33,9 +32,13 @@ namespace Orion
 		std::array<Shared<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotsIndex = 1;
 
-		Scoped<Shader> PhongShader;
+		Shared<Shader> PhongShader;
 
 		Shared<Mesh> Cube = nullptr;
+		Material DefaultMaterial;
+
+		std::vector<Shared<LightSource>> LightSources;
+
 
 		
 
@@ -167,7 +170,11 @@ namespace Orion
 		}
 		std::vector<uint32_t> indices(36);
 
-		s_RenData3D.Cube = CreateShared<Mesh>(meshVertices,indices,s_RenData3D.WhiteTexture);
+		s_RenData3D.DefaultMaterial =
+		{
+			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture , 64.f
+		};
+		s_RenData3D.Cube = CreateShared<Mesh>(meshVertices,indices, s_RenData3D.DefaultMaterial);
 
 
 		ResetBatch();
@@ -220,42 +227,49 @@ namespace Orion
 	}
 
 
-	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
+	void Renderer::BeginScene(const Shared<DummyCamera>& camera, glm::vec3 sunPos)
 	{
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
+
+		LoadAllLights();
 
 		static glm::vec3 lightPos;
 		float time = Orion::CurrentTime::GetCurrentTimeInSec();
 		lightPos.x = sin(time) * 1.0f ;
 		lightPos.y = 1.f;
 		lightPos.z = cos(time) * 1.0f;
-
-		s_RenData3D.PhongShader->SetFloat3("light.position", lightPos);
-
-		s_RenData3D.PhongShader->SetFloat3("light.ambient", 0.2f, 0.2f, 0.2f);
-		s_RenData3D.PhongShader->SetFloat3("light.diffuse", 0.5f, 0.5f, 0.5f); 
-		s_RenData3D.PhongShader->SetFloat3("light.specular", 1.0f, 1.0f, 1.0f);
+		
+		glm::mat4 lightMatrix = glm::translate(glm::mat4(1.0f),lightPos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
 
-		s_RenData3D.PhongShader->SetFloat("light.constant", 1.0f);
-		s_RenData3D.PhongShader->SetFloat("light.linear", 0.00002f);
-		s_RenData3D.PhongShader->SetFloat("light.quadratic", 0.0008f);
+		DrawCube(lightMatrix, s_RenData3D.DefaultMaterial);
 
 
-		s_RenData3D.PhongShader->SetFloat3("material.ambient", 1.0f, 0.5f, 0.31f);
-		s_RenData3D.PhongShader->SetFloat3("material.diffuse", 1.0f, 0.5f, 0.31f);
-		s_RenData3D.PhongShader->SetFloat3("material.specular", 0.5f, 0.5f, 0.5f);
-		s_RenData3D.PhongShader->SetFloat("material.shininess", 32.0f);
 	}
 	void Renderer::EndScene()
 	{
+		auto& light = LightSource::GetCountOfSpotLights();
+		light = 0;
+	}
+	void Renderer::AddLight(const Shared<LightSource> light) 
+	{
+		s_RenData3D.LightSources.push_back(light);
+	}
+	void Renderer::LoadAllLights()
+	{
+		if (!s_RenData3D.LightSources.empty()) 
+		{
+			for (auto& lightSrc : s_RenData3D.LightSources)
+			{
+				lightSrc->LoadToShader(s_RenData3D.PhongShader);
+			}
+			s_RenData3D.PhongShader->SetFloat("u_PointLightCount", LightSource::GetCountOfPointLights());
+			s_RenData3D.PhongShader->SetFloat("u_SpotLightCount", LightSource::GetCountOfSpotLights());
+		}
 
 	}
-
-
-
 
 	void Renderer::AppendMesh(const Shared<Mesh> mesh, const glm::mat4& modelMatrix)
 	{
@@ -268,11 +282,21 @@ namespace Orion
 	}
 
 
-	void Renderer::DrawCube(glm::mat4 modelMatrix) 
+	void Renderer::DrawCube(glm::mat4 modelMatrix, const Material& material)
 	{
-		s_RenData3D.PhongShader->Bind();
-		s_RenData3D.WhiteTexture->Bind();
+		s_RenData3D.Cube->SetMaterial(material);
+	
+		s_RenData3D.Cube->GetMaterial().diffuseMap->Bind(s_RenData3D.TextureSlotsIndex);
+		s_RenData3D.TextureSlotsIndex++;
+		s_RenData3D.Cube->GetMaterial().specularMap->Bind(s_RenData3D.TextureSlotsIndex);
+
+		s_RenData3D.TextureSlotsIndex = 1;
+
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
+
+		s_RenData3D.PhongShader->SetInt("u_Material.diffuse", s_RenData3D.Cube->GetMaterial().diffuseMap->GetCurrentSlot());
+		s_RenData3D.PhongShader->SetInt("u_Material.specular", s_RenData3D.Cube->GetMaterial().specularMap->GetCurrentSlot());
+		s_RenData3D.PhongShader->SetFloat("u_Material.shininess", s_RenData3D.Cube->GetMaterial().shininess);
 
 		RenderCommand::DrawArray(s_RenData3D.Cube->GetVertexArray(), s_RenData3D.Cube->GetVerticesCount());
 	}

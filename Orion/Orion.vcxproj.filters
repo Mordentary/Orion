@@ -1467,6 +1467,10 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightSource.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
@@ -1568,6 +1572,10 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl">

@@ -88,14 +88,16 @@ namespace Orion
 		
 	}
 
-	void OpenGLTexture2D::Unbind(uint32_t slot) const
+	void OpenGLTexture2D::Unbind(uint32_t slot) 
 	{
+		m_CurrentSlot = 0;
 		glBindTextureUnit(slot, 0);
 	}
 
-	void OpenGLTexture2D::Bind(uint32_t slot) const
+	void OpenGLTexture2D::Bind(uint32_t slot) 
 	{
 		ORI_PROFILE_FUNCTION();
+		m_CurrentSlot = slot;
 		glBindTextureUnit(slot, m_RendererID);
 	}
 }
