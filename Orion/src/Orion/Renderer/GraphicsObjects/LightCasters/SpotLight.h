@@ -16,7 +16,11 @@ namespace Orion
 		virtual void SetupLight() override;
 		virtual void LoadToShader(const Shared<Shader>& shader) override;
 
+
+		inline float& GetInnerCutOff() { return m_InnerCutOff; }
+		inline float& GetOuterCutOff() { return m_OuterCutOff; }
+
 	private: 
-		float m_InnerCutOff = 25.f, m_OuterCutOff = 45.f;
+		float m_InnerCutOff = 1.f, m_OuterCutOff = 25.f;
 	};
 }

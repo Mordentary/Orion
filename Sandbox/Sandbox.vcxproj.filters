@@ -47,4 +47,14 @@
       <Filter>assets\shaders</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\SkeletonSheet.png" />
+    <Image Include="assets\textures\Board.png" />
+    <Image Include="assets\textures\container.png" />
+    <Image Include="assets\textures\container_specular.png" />
+    <Image Include="assets\textures\joker.png" />
+    <Image Include="assets\textures\jokersFace.png" />
+    <Image Include="assets\textures\MegaManAnim.png" />
+    <Image Include="assets\textures\PathAndObjects.png" />
+  </ItemGroup>
 </Project>

@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>ORI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Orion\vendor\spdlog\include;..\Orion\src;..\Orion\vendor;..\Orion\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Development\Orion\Orion\vendor\assimp\include;..\Orion\vendor\spdlog\include;..\Orion\src;..\Orion\vendor;..\Orion\vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -153,6 +153,16 @@
     <ProjectReference Include="..\Orion\Orion.vcxproj">
       <Project>{57943020-8A99-EAB6-271F-61E0F7F6B73B}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\Board.png" />
+    <Image Include="assets\textures\container.png" />
+    <Image Include="assets\textures\container_specular.png" />
+    <Image Include="assets\textures\joker.png" />
+    <Image Include="assets\textures\jokersFace.png" />
+    <Image Include="assets\textures\MegaManAnim.png" />
+    <Image Include="assets\textures\PathAndObjects.png" />
+    <Image Include="assets\textures\SkeletonSheet.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

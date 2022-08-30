@@ -24,7 +24,7 @@ namespace Orion
 		shader->SetFloat("u_Spotlight.linear", m_LightProp.LinearAttenuation);
 		shader->SetFloat("u_Spotlight.quadratic", m_LightProp.QuadraticAttenuation);
 
-		s_SpotLightIndex++;
+		
 	}
 
 

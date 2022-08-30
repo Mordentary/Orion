@@ -28,10 +28,17 @@ public:
 
 		
 
-		m_SpotLight = Orion::Shared<Orion::SpotLight>(new Orion::SpotLight());
-		m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
-		m_SpotLight->GetLightProperties().Position= glm::vec3(0.0f, 2.0f, 0.0f);
+		m_SpotLight = Orion::CreateShared<Orion::SpotLight>(); 
+		m_PointLight = Orion::CreateShared<Orion::PointLight>();
+		m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
+		m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+		m_SpotLight->GetLightProperties().Position= glm::vec3(0.0f, 1.0f, 0.0f);
+
+		Orion::Renderer::AddLight(m_SpotLight);
+		Orion::Renderer::AddLight(m_PointLight);
+		Orion::Renderer::AddLight(m_DirLight);
+		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/PolyTree/Lowpoly_tree_sample.obj");
 
 	}
 
@@ -51,9 +58,19 @@ public:
 		ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
 
 
-		Orion::Renderer::AddLight(m_SpotLight);
 
-		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_Position);
+		glm::vec3 lightPos;
+		float time = Orion::CurrentTime::GetCurrentTimeInSec();
+		lightPos.x = sin(time) * 1.0f;
+		lightPos.y = 1.f;
+		lightPos.z = cos(time) * 1.0f;
+		m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time)/4, -1.0f, sin(time) / 4);
+
+		glm::mat4 lightMatrix = glm::translate(glm::mat4(1.0f), lightPos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+		m_PointLight->GetLightProperties().Position = lightPos;
+		m_DirLight->GetLightProperties().Direction = m_SunDirection;
+
+		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 		Orion::Material mat =
 		{
@@ -61,8 +78,11 @@ public:
 		};
 
 
-		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
 
+		Orion::Renderer::DrawModel(glm::mat4(1.0f), m_ModelCat);
+
+		Orion::Renderer::DrawCube(lightMatrix, mat);
+		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
 
 
 		Orion::Renderer::EndScene();
@@ -109,7 +129,7 @@ public:
 	{
 		ImGui::Begin("Setting");
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
-		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_Position), -5.0f, 5.0f);
+		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
 
 		/*auto& stats = Orion::Renderer::GetStats();
 
@@ -131,7 +151,10 @@ private:
 	Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
 	glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
 	glm::vec3 m_Position{ 0,0,0 };
-	glm::mat4 m_Model = glm::mat4(1.0f);
-	Orion::Shared<Orion::LightSource> m_SpotLight;
+	glm::vec3 m_SunDirection{ 0,0,0 };
+
+	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+	Orion::Shared<Orion::Model> m_ModelCat;
+	Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 	Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap;
 };

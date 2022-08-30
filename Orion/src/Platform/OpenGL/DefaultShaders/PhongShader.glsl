@@ -4,9 +4,11 @@
 
 layout (location = 0) in vec3 a_Position;
 layout (location = 1) in vec3 a_Normal;
-layout (location = 2) in vec4 a_Color;
-layout (location = 3) in vec2 a_TextureCoord;
-layout (location = 4) in float a_TextureSlot;
+layout (location = 2) in vec3 a_Tangent;
+layout (location = 3) in vec3 a_Bitangent;
+layout (location = 4) in vec4 a_Color;
+layout (location = 5) in vec2 a_TextureCoord;
+layout (location = 6) in float a_TextureSlot;
 
 
 out vec3 v_Normal;
@@ -110,8 +112,8 @@ uniform Material u_Material;
 uniform int u_PointLightCount;
 uniform int u_SpotLightCount;
 
-uniform PointLight u_Pointlight[32];
-uniform SpotLight u_Spotlight[32];
+uniform PointLight u_Pointlight;
+uniform SpotLight u_Spotlight;
 uniform DirectionalLight u_Dirlight;
 
 
@@ -123,19 +125,11 @@ void main()
     
     vec3 result = vec3(0.0f);
 
-   // result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
-
-    int i;
-//    for(i = 0; i < u_PointLightCount; i++)
-//    {
-//        result += CalcPointLight(u_Pointlight[i], norm, v_FragPos, viewDir);
-//    }
-//
-
-    for(i = 0; i < u_SpotLightCount; i++)
-    {
-        result += CalcSpotLight(u_Spotlight[i], norm, v_FragPos, viewDir);
-    }
+  
+    result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
+    result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
+    result += CalcSpotLight(u_Spotlight, norm, v_FragPos, viewDir);
+    
 
 
     f_Color =  vec4(result,1.0f);

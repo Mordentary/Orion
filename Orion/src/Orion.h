@@ -37,6 +37,7 @@
 //Entity
 #include"Orion/Renderer/Cameras/OrthographicCamera.h"
 #include"Orion/Renderer/Cameras/PerspectiveCamera.h"
+#include"Orion/Renderer/GraphicsObjects/Model.h"
 
 //Light
 #include"Orion/Renderer/GraphicsObjects/LightCasters/DirectionalLight.h"

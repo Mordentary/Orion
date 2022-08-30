@@ -1,9 +1,10 @@
 #pragma once
 
-#include"Orion/Renderer/GraphicsCore/Texture.h"
-#include"Orion/Renderer/GraphicsCore/VertexArray.h"
-#include"Orion/Renderer/GraphicsCore/Buffer.h"
-
+#include"../GraphicsCore/Texture.h"
+#include"../GraphicsCore/VertexArray.h"
+#include"../GraphicsCore/Buffer.h"
+#include "../GraphicsCore/Shader.h"
+#include "../GraphicsRendering/Renderer.h"
 
 
 namespace Orion 
@@ -22,6 +23,8 @@ namespace Orion
 	{
 		glm::vec3 Position;
 		glm::vec3 Normal;
+		glm::vec3 Tangent;
+		glm::vec3 Bitangent;
 		glm::vec4 Color;
 		glm::vec2 TextureCoord;
 		float TextureSlot;
@@ -49,7 +52,7 @@ namespace Orion
 		inline Material& GetMaterial() { return m_Material; }
 		void SetMaterial(const Material& material) { m_Material = material; }
 
-
+		void Render();
 	protected:
 		void SetupMesh();
 		Shared<VertexArray>m_MeshVertexArray;

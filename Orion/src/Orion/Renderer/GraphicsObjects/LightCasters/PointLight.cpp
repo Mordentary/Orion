@@ -10,17 +10,16 @@ namespace Orion
 	void PointLight::LoadToShader(const Shared<Shader>& shader)
 	{
 		shader->Bind();
-		shader->SetFloat3("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].position", m_LightProp.Position);
+		shader->SetFloat3("u_Pointlight.position", m_LightProp.Position);
 
-		shader->SetFloat3("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].ambient", m_LightProp.AmbientLightColor);
-		shader->SetFloat3("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].diffuse", m_LightProp.DiffuseLightColor);
-		shader->SetFloat3("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].specular", m_LightProp.SpecularLightColor);
+		shader->SetFloat3("u_Pointlight.ambient", m_LightProp.AmbientLightColor);
+		shader->SetFloat3("u_Pointlight.diffuse", m_LightProp.DiffuseLightColor);
+		shader->SetFloat3("u_Pointlight.specular", m_LightProp.SpecularLightColor);
 
-		shader->SetFloat("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].constant", m_LightProp.ConstantAttenuation);
-		shader->SetFloat("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].linear", m_LightProp.LinearAttenuation);
-		shader->SetFloat("u_Spotlight[" + std::to_string(s_PointLightIndex) + "].quadratic", m_LightProp.QuadraticAttenuation);
+		shader->SetFloat("u_Pointlight.constant", m_LightProp.ConstantAttenuation);
+		shader->SetFloat("u_Pointlight.linear", m_LightProp.LinearAttenuation);
+		shader->SetFloat("u_Pointlight.quadratic", m_LightProp.QuadraticAttenuation);
 
-		s_PointLightIndex++;
 
 	}
 

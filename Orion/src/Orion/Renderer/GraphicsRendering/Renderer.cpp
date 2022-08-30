@@ -3,7 +3,9 @@
 #include "Renderer.h"
 #include "Renderer2D.h"
 #include"Platform/OpenGL/OpenGLShader.h"
-
+#include"../GraphicsObjects/LightSource.h"
+#include"../GraphicsObjects/Mesh.h"
+#include"../GraphicsObjects/Model.h"
 
 namespace Orion
 {
@@ -227,25 +229,16 @@ namespace Orion
 	}
 
 
-	void Renderer::BeginScene(const Shared<DummyCamera>& camera, glm::vec3 sunPos)
+	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
 	{
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
+		glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
+		//s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
+		
 
 		LoadAllLights();
-
-		static glm::vec3 lightPos;
-		float time = Orion::CurrentTime::GetCurrentTimeInSec();
-		lightPos.x = sin(time) * 1.0f ;
-		lightPos.y = 1.f;
-		lightPos.z = cos(time) * 1.0f;
-		
-		glm::mat4 lightMatrix = glm::translate(glm::mat4(1.0f),lightPos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-
-
-		DrawCube(lightMatrix, s_RenData3D.DefaultMaterial);
-
 
 	}
 	void Renderer::EndScene()
@@ -296,11 +289,29 @@ namespace Orion
 
 		s_RenData3D.PhongShader->SetInt("u_Material.diffuse", s_RenData3D.Cube->GetMaterial().diffuseMap->GetCurrentSlot());
 		s_RenData3D.PhongShader->SetInt("u_Material.specular", s_RenData3D.Cube->GetMaterial().specularMap->GetCurrentSlot());
+
+
 		s_RenData3D.PhongShader->SetFloat("u_Material.shininess", s_RenData3D.Cube->GetMaterial().shininess);
 
 		RenderCommand::DrawArray(s_RenData3D.Cube->GetVertexArray(), s_RenData3D.Cube->GetVerticesCount());
 	}
+	void Renderer::DrawModel(glm::mat4 modelMatrix, const Shared<Model>&  model)
+	{
 
+		model->BindAllTexture();
+
+		s_RenData3D.WhiteTexture->Bind();
+
+
+		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
+
+		s_RenData3D.PhongShader->SetInt("u_Material.diffuse", 0);
+		s_RenData3D.PhongShader->SetInt("u_Material.specular", model->GetMeshData()[0]->GetMaterial().specularMap->GetCurrentSlot());
+		s_RenData3D.PhongShader->SetFloat("u_Material.shininess", model->GetMeshData()[0]->GetMaterial().shininess);
+
+		model->Render();
+
+	}
 
 	int32_t Renderer::GetTextureSlot(const Shared<Texture2D>& texture)
 	{

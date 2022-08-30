@@ -1,6 +1,5 @@
 #include "oripch.h"
 #include "Mesh.h"
-#include <assimp/Importer.hpp>
 
 namespace Orion 
 {
@@ -19,6 +18,13 @@ namespace Orion
 		SetupMesh();
 	}
 
+
+	void Mesh::Render() 
+	{
+		
+		RenderCommand::DrawIndexed(m_MeshVertexArray, m_Indices.size());
+	}
+
 	void Mesh::SetupMesh()
 	{
 
@@ -31,6 +37,8 @@ namespace Orion
 		vertexBuffer->SetLayout({
 		{Orion::ShaderDataType::Float3, "a_Position"},
 		{Orion::ShaderDataType::Float3, "a_Normal"},
+		{Orion::ShaderDataType::Float3, "a_Tangent"},
+		{Orion::ShaderDataType::Float3, "a_Bitangent"},
 		{Orion::ShaderDataType::Float4, "a_Color"},
 		{Orion::ShaderDataType::Float2, "a_TextureCoord"},
 		{Orion::ShaderDataType::Float, "a_TextureSlot"}

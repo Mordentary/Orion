@@ -13,11 +13,8 @@
     <Filter Include="src\Orion\Core\AdvanceCamerasFamily">
       <UniqueIdentifier>{FA6AB58E-6624-2039-EF83-3A135B3CD6A8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Orion\Core\Animation2D">
-      <UniqueIdentifier>{0011EDF5-EC20-99C6-55DA-FDE44109885F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Orion\Core\Camera2D">
-      <UniqueIdentifier>{A9E0DE91-1518-2729-1E22-8B4C8AD84D22}</UniqueIdentifier>
+    <Filter Include="src\Orion\Core\AnimationLib2D">
+      <UniqueIdentifier>{B7DF0BD6-23F8-F2FF-ECA4-8299587C8799}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Orion\Events">
       <UniqueIdentifier>{679D2F64-5396-4EB6-7CC8-333B68202EC2}</UniqueIdentifier>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="src\Orion\Renderer\GraphicsObjects">
       <UniqueIdentifier>{93DDD91A-7F19-DD84-E82B-F57BD486859F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Orion\Renderer\GraphicsObjects\LightCasters">
+      <UniqueIdentifier>{6F4C9A89-DB87-FA4C-E47C-77DC50377F7D}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Orion\Renderer\GraphicsRendering">
       <UniqueIdentifier>{A726B98C-930D-7B84-3C5E-E1A12824F4EA}</UniqueIdentifier>
@@ -88,7 +88,7 @@
       <Filter>src\Orion\Core\AdvanceCamerasFamily</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h">
-      <Filter>src\Orion\Core\Animation2D</Filter>
+      <Filter>src\Orion\Core\AnimationLib2D</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Core\Application.h">
       <Filter>src\Orion\Core</Filter>
@@ -171,7 +171,22 @@
     <ClInclude Include="src\Orion\Renderer\GraphicsCore\VertexArray.h">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.h">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.h">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.h">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightSource.h">
+      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    </ClInclude>
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Mesh.h">
+      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Model.h">
       <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
     </ClInclude>
     <ClInclude Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.h">
@@ -1467,17 +1482,13 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightSource.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.h" />
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
       <Filter>src\Orion\Core\AdvanceCamerasFamily</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.cpp">
-      <Filter>src\Orion\Core\Animation2D</Filter>
+      <Filter>src\Orion\Core\AnimationLib2D</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Core\Application.cpp">
       <Filter>src\Orion\Core</Filter>
@@ -1524,7 +1535,22 @@
     <ClCompile Include="src\Orion\Renderer\GraphicsCore\VertexArray.cpp">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.cpp">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.cpp">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp">
+      <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp">
+      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    </ClCompile>
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Mesh.cpp">
+      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Model.cpp">
       <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.cpp">
@@ -1572,10 +1598,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl">
