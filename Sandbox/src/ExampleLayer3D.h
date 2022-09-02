@@ -38,7 +38,7 @@ public:
 		Orion::Renderer::AddLight(m_SpotLight);
 		Orion::Renderer::AddLight(m_PointLight);
 		Orion::Renderer::AddLight(m_DirLight);
-		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/PolyTree/Lowpoly_tree_sample.obj");
+		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 
 	}
 
@@ -74,15 +74,15 @@ public:
 
 		Orion::Material mat =
 		{
-			m_DiffuseMap, m_SpecularMap, 16.f
+		//	m_DiffuseMap, m_SpecularMap, 16.f
 		};
 
 
 
 		Orion::Renderer::DrawModel(glm::mat4(1.0f), m_ModelCat);
 
-		Orion::Renderer::DrawCube(lightMatrix, mat);
-		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
+	//	Orion::Renderer::DrawCube(lightMatrix, mat);
+	//	Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
 
 
 		Orion::Renderer::EndScene();

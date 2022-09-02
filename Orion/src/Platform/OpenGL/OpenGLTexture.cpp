@@ -1,8 +1,7 @@
 #include "oripch.h"
 #include "OpenGLTexture.h"
-
-#include<stb_image.h>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 namespace Orion
 {
@@ -10,11 +9,15 @@ namespace Orion
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : m_Path(path)
 	{
 		
-		int width, height, channels;
-
-		stbi_set_flip_vertically_on_load(1);
+		int width  , height , channels;
+		stbi_set_flip_vertically_on_load(true);
 		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-		ORI_CORE_ASSERT(data, "Failed to load image!");
+
+
+		ORI_CORE_ASSERT(data, std::string("Failed to load image!") + " STB_IMAGE_FAILURE_REASON: " + stbi_failure_reason() + "! Path: " + path);
+//		ORI_CORE_INFO(stbi_failure_reason());
+
+
 
 		m_Width = width;
 		m_Height = height;
@@ -31,11 +34,15 @@ namespace Orion
 			internalFormat = GL_RGB8;
 			dataFormat = GL_RGB;
 		}
-
+		if (channels == 1)
+		{
+			internalFormat = GL_R8;
+			dataFormat = GL_RED;
+		}
 
 		m_InternalFormat = internalFormat;
 		m_DataFormat = dataFormat;
-
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		ORI_CORE_ASSERT(internalFormat & dataFormat, "Format not supported");
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);// Create ID for texture
@@ -50,10 +57,6 @@ namespace Orion
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
 		stbi_image_free(data);
-
-
-
-
 
 
 	}

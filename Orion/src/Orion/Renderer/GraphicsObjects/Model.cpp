@@ -20,7 +20,7 @@ namespace Orion
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
-			ORI_ASSERT(false, "ERROR::ASSIMP::{0}", import.GetErrorString());
+			ORI_ASSERT(false, (import.GetErrorString()));
 			return;
 		}
 		m_Directory = path.substr(0, path.find_last_of('/'));
@@ -57,7 +57,6 @@ namespace Orion
         // walk through each of the mesh's vertices
        // auto vec = mesh->mAABB.mMax - mesh->mAABB.mMin;
 
-
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             MeshVertex vertex;
@@ -80,7 +79,7 @@ namespace Orion
                 vertex.Normal = glm::vec3(0.0f);
             }
             // texture coordinates
-            if (mesh->HasTextureCoords(i)) // does the mesh contain texture coordinates?
+            if (mesh->HasTextureCoords(0)) // does the mesh contain texture coordinates?
             {
                 glm::vec2 vec;
                 // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
@@ -88,7 +87,10 @@ namespace Orion
                 vec.x = mesh->mTextureCoords[0][i].x;
                 vec.y = mesh->mTextureCoords[0][i].y;
                 vertex.TextureCoord = vec;
+
             }
+            else
+                vertex.TextureCoord = glm::vec2(0.0f, 0.0f);
          
             if (mesh->HasTangentsAndBitangents())
             {
@@ -108,7 +110,7 @@ namespace Orion
                 vertex.Bitangent = glm::vec3(0.0f);
 
             }
-            if (mesh->HasVertexColors(i))
+            if (mesh->HasVertexColors(0))
             {
                 vertex.Color.r = mesh->mColors[0][i].r;
                 vertex.Color.g = mesh->mColors[0][i].g;
@@ -147,13 +149,13 @@ namespace Orion
         std::vector<Shared<Texture2D>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Shared<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<Shared<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-      
-            mat.diffuseMap = Texture2D::Create("assets/textures/container.png");
-       
-            mat.specularMap = Texture2D::Create("assets/models/Tree/maple_leaf_Mask.png");
+        if (!diffuseMaps.empty())
+          mat.diffuseMap = diffuseMaps[0];
+       if(!specularMaps.empty())
+            mat.specularMap = specularMaps[0];
         
 
         mat.shininess = 32.f;

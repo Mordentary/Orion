@@ -135,6 +135,7 @@ project "Sandbox"
 
 	includedirs
 	{
+		"%{IncludeDir.assimp}",
 		"Orion/vendor/spdlog/include",
 		"Orion/src",
 		"Orion/vendor",

@@ -25,7 +25,7 @@ void main()
 {
    gl_Position =  u_ViewProj * u_ModelMatrix * vec4(a_Position, 1.0);
 
-   v_Normal =  a_Normal;  
+   v_Normal =  mat3(transpose(inverse(u_ModelMatrix))) * a_Normal; 
    v_Color = a_Color;
    v_TextCoord = a_TextureCoord;
    v_TextSlot = int(a_TextureSlot);

@@ -19,14 +19,11 @@ namespace Orion
         void BindAllTexture()
         {
 
-            uint32_t TextureSlotsIndex = 3;
 
             for (auto& mesh : m_Meshes)
             {
-                if (mesh->GetMaterial().diffuseMap && mesh->GetMaterial().specularMap) {
-                    mesh->GetMaterial().diffuseMap->Bind(TextureSlotsIndex);
-                    mesh->GetMaterial().specularMap->Bind(++TextureSlotsIndex);
-                    TextureSlotsIndex = 3;
+                if (mesh->GetMaterial().diffuseMap) {
+                    mesh->GetMaterial().diffuseMap->Bind(3);
                 }
             }
 
