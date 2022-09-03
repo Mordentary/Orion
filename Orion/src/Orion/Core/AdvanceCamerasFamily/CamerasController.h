@@ -20,8 +20,8 @@ namespace Orion {
 		static void AddCamera(std::string name, const Shared<DummyCamera>& camera);
 
 
-		static const std::string& GetActiveCameraName() { return s_CamerasController->s_ActiveCamera; }
-		static const Shared<DummyCamera>& GetActiveCamera();
+		static const std::string& GetActiveCameraName() { return s_CamerasController.s_ActiveCamera; }
+		static const Shared<DummyCamera> GetActiveCamera();
 
 		static const Shared<DummyCamera>& GetCamera(std::string name);
 		static bool IsCameraExist(std::string name);
@@ -32,7 +32,7 @@ namespace Orion {
 		bool OnWindowResized(WindowResizeEvent& e);
 		void OnEventImpl(Event& e);
 	private:
-		static Scoped<CamerasController> s_CamerasController;
+		static CamerasController s_CamerasController;
 		std::string s_ActiveCamera;
 		std::unordered_map<std::string, Shared<DummyCamera>> s_CamerasStorage;
 

@@ -4,7 +4,12 @@
 
 namespace Orion 
 {
-
+	enum class Cameras
+	{
+		Uknown = 0,
+		Perspective = 1,
+		Orthographic = 2
+	};
 	class DummyCamera
 	{
 
@@ -28,6 +33,9 @@ namespace Orion
 		const inline glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
+
+		virtual const Cameras Get() { return Cameras::Perspective; }
+
 
 	    inline const float& GetAspectRatio() const { return m_AspectRatio; }
 		inline const float& GetZoomLevel() const { return m_ZoomLevel; }

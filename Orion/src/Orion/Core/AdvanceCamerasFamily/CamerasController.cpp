@@ -9,7 +9,7 @@
 
 namespace Orion 
 {
-	Scoped<CamerasController> CamerasController::s_CamerasController = Orion::CreateScoped<CamerasController>();
+	CamerasController CamerasController::s_CamerasController;
 
 	void CamerasController::Initiliaze()
 	{
@@ -17,14 +17,14 @@ namespace Orion
 	}
 	void CamerasController::OnUpdate(Timestep ts)
 	{
-		auto& cam = s_CamerasController->s_CamerasStorage[s_CamerasController->s_ActiveCamera];
+		auto& cam = s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera];
 
 		cam->Update(ts);
 	}
 
 	void CamerasController::OnEvent(Event& e)
 	{
-		s_CamerasController->OnEventImpl(e);
+		s_CamerasController.OnEventImpl(e);
 	}
 	void CamerasController::OnEventImpl(Event& e)
 	{
@@ -36,69 +36,71 @@ namespace Orion
 	void CamerasController::SetActiveCamera(std::string name)
 	{
 		if (IsCameraExist(name)) {
-			s_CamerasController->s_ActiveCamera = name;
+			s_CamerasController.s_ActiveCamera = name;
+		}else
+		{
+			ORI_CORE_ASSERT(false, "Camera doesnt exist!");
 		}
 	}
 
 	void CamerasController::AddCamera(std::string name, const Shared<DummyCamera>& camera)
 	{
-		s_CamerasController->s_ActiveCamera = name;
-		s_CamerasController->s_CamerasStorage[name] = camera; 
+		s_CamerasController.s_ActiveCamera = name;
+		s_CamerasController.s_CamerasStorage[name] = camera; 
 	}
 
 
-	const Shared<DummyCamera>& CamerasController::GetActiveCamera()
+	const Shared<DummyCamera> CamerasController::GetActiveCamera()
 	{
-		auto& activeCam = s_CamerasController->s_CamerasStorage[s_CamerasController->s_ActiveCamera];
-		auto& result =	std::dynamic_pointer_cast<Orion::PerspectiveCamera>(activeCam);
-
-		if (result)
-		{
-			return result;
-		}
-		else 
-		{
-			return std::dynamic_pointer_cast<Orion::OrthographicCamera>(activeCam);
-		}
+		auto camType = s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]->Get();
 	
+		if (camType == Cameras::Perspective)
+		{
+			return std::dynamic_pointer_cast<PerspectiveCamera>(s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]);
+		}
+		if (camType == Cameras::Orthographic)
+		{
+			return std::dynamic_pointer_cast<OrthographicCamera>(s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]);
+		}
+		ORI_ASSERT(false, "Uknown camera type!");
 	}
 
 	const Shared<DummyCamera>& CamerasController::GetCamera(std::string name)
 	{
 		if (IsCameraExist(name))
 		{
-			return s_CamerasController->s_CamerasStorage[name];
+			return s_CamerasController.s_CamerasStorage[name];
 		}
 		return nullptr;
 	}
 
 	bool CamerasController::IsCameraExist(std::string name)
 	{
-		bool isExist = s_CamerasController->s_CamerasStorage.find(name) != s_CamerasController->s_CamerasStorage.end();
+		bool isExist = s_CamerasController.s_CamerasStorage.find(name) != s_CamerasController.s_CamerasStorage.end();
 		ORI_CORE_ASSERT(isExist, "No camera with this name!")
 		return isExist;
 	}
 
 	bool CamerasController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
-		auto& cam = s_CamerasStorage[s_ActiveCamera];
+		auto& cam = *s_CamerasStorage[s_ActiveCamera];
 
-		cam->SetZoomLevel(std::max(cam->GetZoomLevel() - e.GetYOffset() * 0.25f, 0.25f));
-		cam->RecalculateProjection();
+		cam.SetZoomLevel(std::max(cam.GetZoomLevel() - e.GetYOffset() * 0.25f, 0.25f));
+		cam.RecalculateProjection();
 		return false;
 	}
 
 	bool CamerasController::OnWindowResized(WindowResizeEvent& e)
 	{
-		auto& cam = s_CamerasController->s_CamerasStorage[s_CamerasController->s_ActiveCamera];
+		auto& cam = *s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera];
 		float aspect = ((float)e.GetWidth() / (float)e.GetHeight());
 
-		for (auto& cam : s_CamerasController->s_CamerasStorage)
+		for (auto& cam : s_CamerasController.s_CamerasStorage)
 		{
 			cam.second->SetAspectRatio(aspect);
 			cam.second->SetScreenSize(glm::vec2(e.GetWidth() ,e.GetHeight()));
 		}
-		cam->RecalculateProjection();
+		cam.RecalculateProjection();
 
 		return false;
 	}

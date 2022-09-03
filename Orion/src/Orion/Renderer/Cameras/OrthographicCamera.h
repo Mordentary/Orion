@@ -14,9 +14,9 @@ namespace Orion {
 		OrthographicCamera(glm::vec3& position, bool rotation = false, bool pixelByPixel = false);
 		OrthographicCamera(float left, float right, float bottom, float top, bool rotation = false);
 	
-		virtual void Update(Orion::Timestep deltaTime) override;
+		virtual void Update(Timestep deltaTime) override;
 
-
+		virtual const Cameras Get() { return Cameras::Orthographic; }
 		void SetProjection(float left, float right, float bottom, float top);
 		void inline SetRotation(float rotation) { m_CameraRotation = rotation; RecalculateView(); }
 	

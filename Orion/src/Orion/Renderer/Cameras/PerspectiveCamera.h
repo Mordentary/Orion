@@ -11,7 +11,9 @@ namespace Orion {
 		PerspectiveCamera() = default;
 		PerspectiveCamera(const glm::vec3& position, const glm::vec3& cameraTarget, float FOV = 90.0f);
 
-		void Update(Orion::Timestep deltaTime) override;
+		void Update(Timestep deltaTime) override;
+
+		virtual const Cameras Get() { return Cameras::Perspective; }
 
 		
 

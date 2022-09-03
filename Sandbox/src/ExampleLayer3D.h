@@ -6,9 +6,6 @@
 
 
 
-
-
-
 class ExampleLayer3D : public Orion::Layer
 {
 public:
@@ -21,10 +18,10 @@ public:
 		auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
 
 
-		Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 		Orion::CamerasController::AddCamera("OrthoCamera", m_Camera2);
-		m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
-		m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
+		Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
+		//m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
+		//m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
 
 		
 
@@ -38,7 +35,7 @@ public:
 		Orion::Renderer::AddLight(m_SpotLight);
 		Orion::Renderer::AddLight(m_PointLight);
 		Orion::Renderer::AddLight(m_DirLight);
-		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
+		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Backpack/Backpack.obj");
 
 	}
 
@@ -130,11 +127,11 @@ public:
 		ImGui::Begin("Setting");
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
+		ImGui::Text("FPS: %f", ts.GetFPS());
 
 		/*auto& stats = Orion::Renderer::GetStats();
 
 
-		ImGui::Text("FPS: %f", ts.GetFPS());
 		ImGui::Text("DrawCalls: %d", stats.GetTotalDrawCalls());
 		ImGui::Text("Quads: %d", stats.GetTotalQuadCount());
 		ImGui::Text("QuadIndicies: %d", stats.GetTotalQuadIndexCount());

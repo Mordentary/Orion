@@ -18,10 +18,9 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Orion/vendor/GLFW/include"
 IncludeDir["Glad"] = "Orion/vendor/Glad/include"
 IncludeDir["ImGui"] = "Orion/vendor/imgui"
-IncludeDir["assimp"] = "Orion/vendor/assimp/include"
+IncludeDir["assimp"] = "Orion/vendor/assimp/Release/include"
 IncludeDir["glm"] = "Orion/vendor/glm"
 IncludeDir["stb_image"] = "Orion/vendor/stb_image"
-
 
 
 group "Dependencies"
@@ -74,7 +73,7 @@ project "Orion"
 		"%{IncludeDir.glm}"
 	}
 	
-	libdirs { "%{prj.name}/vendor/assimp/lib" }
+	libdirs { "%{prj.name}/vendor/assimp/Release/lib" }
 	
 	links
 	{
@@ -83,9 +82,18 @@ project "Orion"
 		"ImGui",
 		"opengl32.lib",
 		--Assimp
-		"zlibstaticd.lib",
-		"assimp-vc143-mtd.lib"
+		"assimp-vc143-mt.lib",
+		"zlibstatic.lib"
+		
 	}
+	
+
+	postbuildcommands
+	{
+		("{COPY}../vendor/assimp/Release/*.dll ../bin/" .. outputdir ..  "/Sandbox/")
+
+	}
+	
 	filter "system:windows"
 		systemversion "latest"
 
@@ -101,6 +109,7 @@ project "Orion"
 
 	filter "configurations:Debug"
 		defines "ORI_DEBUG"
+	
 		runtime "Debug"
 		symbols "on"
 	filter "configurations:Release"
@@ -135,10 +144,10 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{IncludeDir.assimp}",
 		"Orion/vendor/spdlog/include",
 		"Orion/src",
 		"Orion/vendor",
+		"%{IncludeDir.assimp}",
 		"%{IncludeDir.glm}"
 	}
 
