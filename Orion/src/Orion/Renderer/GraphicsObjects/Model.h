@@ -15,16 +15,20 @@ namespace Orion
         {
             LoadModel(path);
         }
-        void Render();
+        void Render(Shared<Shader>& shader);
         void BindAllTexture()
         {
 
-
+            uint32_t index = 3;
             for (auto& mesh : m_Meshes)
             {
-                if (mesh->GetMaterial().diffuseMap) {
-                    mesh->GetMaterial().diffuseMap->Bind(3);
+                if (mesh->GetMaterial().diffuseMap || mesh->GetMaterial().specularMap) {
+                    mesh->GetMaterial().diffuseMap->Bind(index);
+                  //  mesh->GetMaterial().specularMap->Bind(4);
+
                 }
+                index++;
+              
             }
 
         }

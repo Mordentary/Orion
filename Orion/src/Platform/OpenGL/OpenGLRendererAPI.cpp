@@ -7,8 +7,8 @@
 namespace Orion {
 	void OpenGLRendererAPI::Init() const
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -38,6 +38,7 @@ namespace Orion {
 
 	void OpenGLRendererAPI::DrawArray(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
 	{
+		glPointSize(2.f);
 		vertexArray->Bind();
 		glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 	}

@@ -35,7 +35,11 @@ public:
 		Orion::Renderer::AddLight(m_SpotLight);
 		Orion::Renderer::AddLight(m_PointLight);
 		Orion::Renderer::AddLight(m_DirLight);
-		m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Backpack/Backpack.obj");
+		m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
+		for (size_t i = 0; i < 1000; i++)
+		{
+			dirCat.push_back(std::rand() % 5);
+		}
 
 	}
 
@@ -74,9 +78,21 @@ public:
 		//	m_DiffuseMap, m_SpecularMap, 16.f
 		};
 
+		const int numCat = 10;
+		float timeCat = Orion::CurrentTime::GetCurrentTimeInSec();
+		for (size_t i = 0; i < numCat; i++)
+		{
+			for (size_t j = 1; j < numCat; j++)
+			{
+				for (size_t k = 2; k < numCat; k++)
+				{
 
-
-		Orion::Renderer::DrawModel(glm::mat4(1.0f), m_ModelCat);
+					m_ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i, j, k)) * glm::rotate(glm::mat4(1.0f), glm::radians(cos(timeCat) * 100), glm::vec3(dirCat[i], -dirCat[j], dirCat[k])) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
+					Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
+				}
+			}
+		}
+		
 
 	//	Orion::Renderer::DrawCube(lightMatrix, mat);
 	//	Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
@@ -150,8 +166,10 @@ private:
 	glm::vec3 m_Position{ 0,0,0 };
 	glm::vec3 m_SunDirection{ 0,0,0 };
 
+
+	std::vector<float> dirCat;
 	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-	Orion::Shared<Orion::Model> m_ModelCat;
+	Orion::Shared<Orion::Model> m_Model;
 	Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 	Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap;
 };

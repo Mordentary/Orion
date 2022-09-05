@@ -6,17 +6,34 @@
 namespace Orion
 {
 
-	void Model::Render()
+	void Model::Render(Shared<Shader>& shader)
 	{
-		for (unsigned int i = 0; i < m_Meshes.size(); i++)
-			m_Meshes[i]->Render();
+		for (auto& mesh : m_Meshes)
+                 mesh->Render(shader);
+        
 	}
 
     //For retrieveing scene 
 	void Model::LoadModel(const std::string& path)
 	{
 		Assimp::Importer import;
-		const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+ 
+		const aiScene* scene = import.ReadFile(path, 
+            aiProcess_Triangulate  | 
+            aiProcess_SortByPType |
+            aiProcess_RemoveRedundantMaterials |
+            aiProcess_PreTransformVertices |
+            aiProcess_GenUVCoords |
+            aiProcess_OptimizeMeshes |
+            aiProcess_OptimizeGraph |
+            aiProcess_GenBoundingBoxes | 
+            aiProcess_GenSmoothNormals | 
+            aiProcess_FixInfacingNormals |
+            aiProcess_FindInvalidData |
+            aiProcess_ValidateDataStructure | 
+          //  aiProcess_FlipUVs | 
+            aiProcess_CalcTangentSpace);
+      
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -52,12 +69,12 @@ namespace Orion
         // data to fill 
         
         std::vector<MeshVertex> vertices;
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
         std::vector<Shared<Texture2D>> textures;
         // walk through each of the mesh's vertices
        // auto vec = mesh->mAABB.mMax - mesh->mAABB.mMin;
-
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+       
+        for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
             MeshVertex vertex;
             glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
@@ -65,7 +82,7 @@ namespace Orion
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
             vector.z = mesh->mVertices[i].z;
-            vertex.Position = vector ;
+            vertex.Position = vector;
             // normals
             if (mesh->HasNormals())
             {
@@ -89,8 +106,6 @@ namespace Orion
                 vertex.TextureCoord = vec;
 
             }
-            else
-                vertex.TextureCoord = glm::vec2(0.0f, 0.0f);
          
             if (mesh->HasTangentsAndBitangents())
             {
@@ -116,7 +131,7 @@ namespace Orion
                 vertex.Color.g = mesh->mColors[0][i].g;
                 vertex.Color.b = mesh->mColors[0][i].b;
                 vertex.Color.a = mesh->mColors[0][i].a;
-
+               
             }
             else vertex.Color = glm::vec4(1.0f);
 
@@ -127,11 +142,14 @@ namespace Orion
         }
 
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+        for (uint32_t i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
-            // retrieve all indices of the face and store them in the indices vector
-            for (unsigned int j = 0; j < face.mNumIndices; j++)
+            if (face.mNumIndices < 3) {
+                continue;
+            }
+            assert(face.mNumIndices == 3);
+            for (uint32_t j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
         // process materials
@@ -142,15 +160,29 @@ namespace Orion
         // diffuse: texture_diffuseN
         // specular: texture_specularN
         // normal: texture_normalN
-        
+        aiColor3D color(0.f, 0.f, 0.f);
+        material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         Material mat;
 
+     
         // 1. diffuse maps
         std::vector<Shared<Texture2D>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Shared<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_specular");
+        std::vector<Shared<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        // 3. normal maps
+        std::vector<Shared<Texture2D>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
+        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        // 4. sheneness maps
+        std::vector<Shared<Texture2D>> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
+        textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
+        // 4. base color maps
+        std::vector<Shared<Texture2D>> colorMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_height");
+        textures.insert(textures.end(), colorMaps.begin(), colorMaps.end());
+
+
+
 
         if (!diffuseMaps.empty())
           mat.diffuseMap = diffuseMaps[0];
@@ -160,12 +192,6 @@ namespace Orion
 
         mat.shininess = 32.f;
         
-        // 3. normal maps
-        //std::vector<Texture2D> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        //textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        //// 4. height maps
-        //std::vector<Texture2D> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        //textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         // return a mesh object created from the extracted mesh data
         return CreateShared<Mesh>(vertices, indices, mat);

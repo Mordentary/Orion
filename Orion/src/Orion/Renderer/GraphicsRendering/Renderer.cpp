@@ -275,7 +275,7 @@ namespace Orion
 	}
 
 
-	void Renderer::DrawCube(glm::mat4 modelMatrix, const Material& material)
+	void Renderer::DrawCube(const glm::mat4& modelMatrix, const Material& material)
 	{
 		s_RenData3D.Cube->SetMaterial(material);
 	
@@ -295,21 +295,17 @@ namespace Orion
 
 		RenderCommand::DrawArray(s_RenData3D.Cube->GetVertexArray(), s_RenData3D.Cube->GetVerticesCount());
 	}
-	void Renderer::DrawModel(glm::mat4 modelMatrix, const Shared<Model>&  model)
+	void Renderer::DrawModel(const glm::mat4& modelMatrix, const Shared<Model>&  model)
 	{
 
-		model->BindAllTexture();
 
  		s_RenData3D.WhiteTexture->Bind();
-
+		model->BindAllTexture();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
 
-		s_RenData3D.PhongShader->SetInt("u_Material.diffuse", 3);
-		s_RenData3D.PhongShader->SetInt("u_Material.specular", 0);
-		s_RenData3D.PhongShader->SetFloat("u_Material.shininess", model->GetMeshData()[0]->GetMaterial().shininess);
 
-		model->Render();
+		model->Render(s_RenData3D.PhongShader);
 
 	}
 

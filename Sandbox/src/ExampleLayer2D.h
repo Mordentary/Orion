@@ -188,6 +188,6 @@ private:
 	Orion::Shared<Orion::OrthographicCamera> m_Camera;
 	glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
 	glm::vec3 m_Position{ 0,0,0 };
-	glm::mat4 m_Model = glm::mat4(1.0f);
+	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 	uint32_t m_Counter;
 };

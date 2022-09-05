@@ -92,11 +92,11 @@ struct SpotLight
     float quadratic;
 };
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
+vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 
 in vec3 v_Normal;
 in vec4 v_Color;
@@ -123,21 +123,22 @@ void main()
     vec3 norm = normalize(v_Normal);
     vec3 viewDir = normalize(u_CameraPos - v_FragPos);
     
-    vec3 result = vec3(0.0f);
+    vec4 result = vec4(0.0f);
 
   
     result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
     result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
     result += CalcSpotLight(u_Spotlight, norm, v_FragPos, viewDir);
-    
 
 
-    f_Color =  vec4(result,1.0f);
+    if(result.a < 0.1f) discard;
+
+    f_Color =  result;
 
 } 
 
 
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
     vec3 lightDir = normalize(light.position - fragPos);
@@ -158,10 +159,11 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
-    return (ambient + diffuse + specular);
+     return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
+
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
 
@@ -190,7 +192,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         ambient  *= attenuation;
         diffuse  *= attenuation * intensity;
         specular *= attenuation * intensity;
-        return (ambient + diffuse + specular);
+
+         return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
+
     }
     else
     {
@@ -198,12 +202,13 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));  
     vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
     ambient  *= attenuation;
-    return ambient;
+   
+      return vec4(vec3(ambient), texture(u_Material.diffuse, v_TextCoord).w);
     }
     
 }
 
-vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
+vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
 {
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
@@ -215,6 +220,7 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
     vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
+   
+        return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
 
-    return (ambient + diffuse + specular);
 }  

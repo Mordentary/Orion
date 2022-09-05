@@ -52,7 +52,7 @@ namespace Orion
 		inline Material& GetMaterial() { return m_Material; }
 		void SetMaterial(const Material& material) { m_Material = material; }
 
-		void Render();
+		void Render(Shared<Shader>& shader);
 	protected:
 		void SetupMesh();
 		Shared<VertexArray>m_MeshVertexArray;
