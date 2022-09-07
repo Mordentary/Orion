@@ -30,28 +30,22 @@ namespace Orion
 		Shared<Mesh>* MeshBufferBase = nullptr;
 		Shared<Mesh>* MeshIterator = nullptr;
 
-
 		std::array<Shared<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotsIndex = 1;
 
-		Shared<Shader> PhongShader;
+		Shared<Shader> PhongShader = nullptr;
+		Shared<Shader> LightShader = nullptr;
 
-		Shared<Mesh> Cube = nullptr;
+
+		Shared <Model> Cube = nullptr;
+		Shared <Model> Sphere = nullptr;
+
 		Material DefaultMaterial;
 
 		std::vector<Shared<LightSource>> LightSources;
-
-
-		
-
-
 	};
 
 	RendererData3D Renderer::s_RenData3D;
-
-
-	
-
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
@@ -62,13 +56,10 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 		RenderCommand::Init();
-		//Renderer2D::Init();
-
+		Renderer2D::Init();
 
 		s_RenData3D.MeshVertexArray = VertexArray::Create();
 		s_RenData3D.MeshVertexBuffer = VertexBuffer::Create(s_RenData3D.MaxPolygons * sizeof(MeshVertex));
-
-
 
 		s_RenData3D.MeshVertexBuffer->SetLayout({
 			{Orion::ShaderDataType::Float3, "a_Position"},
@@ -78,7 +69,6 @@ namespace Orion
 			{Orion::ShaderDataType::Float, "a_TextureSlot"}
 			});
 
-
 		s_RenData3D.MeshIterator = s_RenData3D.MeshBufferBase;
 		s_RenData3D.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
@@ -87,137 +77,54 @@ namespace Orion
 		int32_t  samples[s_RenData3D.MaxTextureSlots];
 		for (uint32_t i = 0; i < s_RenData3D.MaxTextureSlots; i++)
 			samples[i] = i;
-	
+
 		//Shader preparing
 
 		s_RenData3D.PhongShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/PhongShader.glsl");
+		s_RenData3D.LightShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl");
+
 
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetIntArray("u_Texture", &samples[0], s_RenData3D.MaxTextureSlots);
 
 		s_RenData3D.TextureSlots[0] = s_RenData3D.WhiteTexture;
 
-		float vertices[] = {
-			// positions          // normals           // texture coords
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
-		};
-		std::vector<MeshVertex> meshVertices(36);
-		uint32_t index = 0;
-		for (MeshVertex& vert : meshVertices)
-		{
-			vert.Position.x = vertices[index];
-			vert.Position.y = vertices[index + 1];
-			vert.Position.z = vertices[index + 2];
-
-			index += 3;
-
-			vert.Normal.x = vertices[index];
-			vert.Normal.y = vertices[index + 1];
-			vert.Normal.z = vertices[index + 2];
-
-			index += 3;
-
-			vert.Color.x = 0.5f;
-			vert.Color.y = 0.5f;
-			vert.Color.z = 0.5f;
-			vert.Color.w = 1.0f;
-
-			vert.TextureCoord.x = vertices[index];
-			vert.TextureCoord.y = vertices[index + 1];
-
-			index += 2;
-
-			vert.TextureSlot = 0;
-
-		}
-		std::vector<uint32_t> indices(36);
-
 		s_RenData3D.DefaultMaterial =
 		{
-			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture , 64.f
+			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture , 32.f
 		};
-		s_RenData3D.Cube = CreateShared<Mesh>(meshVertices,indices, s_RenData3D.DefaultMaterial);
 
+		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("assets/models/PrimitiveShapes/Cube.obj");
+		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("assets/models/PrimitiveShapes/Sphere.obj");
 
 		ResetBatch();
-
-
 	}
 
 	void Renderer::Flush()
 	{
-		
 		if (s_RenData3D.MeshCount) {
-
-
 			s_RenData3D.MeshIterator = s_RenData3D.MeshBufferBase;
 
 			for (uint32_t i = 0; i < s_RenData3D.MeshCount; i++)
 			{
 				auto& Mesh = **s_RenData3D.MeshIterator;
-				
+
 				uint32_t dataSize = sizeof(MeshVertex) * Mesh.GetVerticesCount();
 				s_RenData3D.MeshVertexBuffer->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset, dataSize);
-
 
 				s_RenData3D.MeshVertexDataOffset += dataSize;
 				s_RenData3D.MeshIterator++;
 
-
-			//	s_RenData3D.Inde->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset, dataSize);
-
+				//	s_RenData3D.Inde->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset, dataSize);
 			}
-
 
 			s_RenData3D.PhongShader->Bind();
 			RenderCommand::DrawIndexed(s_RenData3D.MeshVertexArray);
 			s_RenData3D.DrawCalls++;
 
-
 			memset(s_RenData3D.MeshBufferBase, 0, s_RenData3D.MeshVertexDataOffset);
 			s_RenData3D.MeshVertexBuffer->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset);
 		}
-
 	}
 	void Renderer::ResetBatch()
 	{
@@ -228,31 +135,35 @@ namespace Orion
 		s_RenData3D.TextureSlotsIndex = 1;
 	}
 
-
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
 	{
+		s_RenData3D.WhiteTexture->Bind();
+
+
+
+		s_RenData3D.LightShader->Bind();
+		s_RenData3D.LightShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
+
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
-		glm::mat4 modelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
-		//s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
-		
+	
 
-		LoadAllLights();
 
+
+		LoadLights();
 	}
 	void Renderer::EndScene()
 	{
-		auto& light = LightSource::GetCountOfSpotLights();
-		light = 0;
+		
 	}
-	void Renderer::AddLight(const Shared<LightSource> light) 
+	void Renderer::AddLight(const Shared<LightSource> light)
 	{
 		s_RenData3D.LightSources.push_back(light);
 	}
-	void Renderer::LoadAllLights()
+	void Renderer::LoadLights()
 	{
-		if (!s_RenData3D.LightSources.empty()) 
+		if (!s_RenData3D.LightSources.empty())
 		{
 			for (auto& lightSrc : s_RenData3D.LightSources)
 			{
@@ -260,6 +171,17 @@ namespace Orion
 			}
 			s_RenData3D.PhongShader->SetFloat("u_PointLightCount", LightSource::GetCountOfPointLights());
 			s_RenData3D.PhongShader->SetFloat("u_SpotLightCount", LightSource::GetCountOfSpotLights());
+
+
+
+			s_RenData3D.LightShader->Bind();
+			for (auto& lightSrc : s_RenData3D.LightSources)
+			{
+				s_RenData3D.LightShader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f),lightSrc->GetLightProperties().Position) * glm::scale(glm::mat4(1.0f),glm::vec3(0.5f)));
+				s_RenData3D.LightShader->SetFloat3("u_LightColor",  lightSrc->GetLightProperties().DiffuseLightColor * 2.f);
+
+				s_RenData3D.Sphere->Render(s_RenData3D.LightShader);
+			}
 		}
 
 	}
@@ -268,45 +190,39 @@ namespace Orion
 	{
 		s_RenData3D.MeshIterator = &std::const_pointer_cast<Mesh>(mesh);
 
-
 		s_RenData3D.TotalSizeOfBatch += sizeof(MeshVertex) * mesh->GetVerticesCount();
 		s_RenData3D.MeshIterator++;
 		s_RenData3D.MeshCount++;
 	}
 
-
 	void Renderer::DrawCube(const glm::mat4& modelMatrix, const Material& material)
 	{
-		s_RenData3D.Cube->SetMaterial(material);
-	
-		s_RenData3D.Cube->GetMaterial().diffuseMap->Bind(s_RenData3D.TextureSlotsIndex);
-		s_RenData3D.TextureSlotsIndex++;
-		s_RenData3D.Cube->GetMaterial().specularMap->Bind(s_RenData3D.TextureSlotsIndex);
-
-		s_RenData3D.TextureSlotsIndex = 1;
+		s_RenData3D.PhongShader->Bind();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
+		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial(material);
+		s_RenData3D.Cube->BindAllTexture();
 
-		s_RenData3D.PhongShader->SetInt("u_Material.diffuse", s_RenData3D.Cube->GetMaterial().diffuseMap->GetCurrentSlot());
-		s_RenData3D.PhongShader->SetInt("u_Material.specular", s_RenData3D.Cube->GetMaterial().specularMap->GetCurrentSlot());
-
-
-		s_RenData3D.PhongShader->SetFloat("u_Material.shininess", s_RenData3D.Cube->GetMaterial().shininess);
-
-		RenderCommand::DrawArray(s_RenData3D.Cube->GetVertexArray(), s_RenData3D.Cube->GetVerticesCount());
+		s_RenData3D.Cube->Render(s_RenData3D.PhongShader);
 	}
-	void Renderer::DrawModel(const glm::mat4& modelMatrix, const Shared<Model>&  model)
+
+	void Renderer::DrawSphere(const glm::mat4& modelMatrix, const Material& material)
 	{
+		s_RenData3D.PhongShader->Bind();
 
+		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
+		s_RenData3D.Sphere->GetMeshData()[0]->SetMaterial(s_RenData3D.DefaultMaterial);
+		s_RenData3D.Sphere->BindAllTexture();
 
- 		s_RenData3D.WhiteTexture->Bind();
+		s_RenData3D.Sphere->Render(s_RenData3D.PhongShader);
+	}
+	void Renderer::DrawModel(const glm::mat4& modelMatrix, const Shared<Model>& model)
+	{
 		model->BindAllTexture();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
 
-
 		model->Render(s_RenData3D.PhongShader);
-
 	}
 
 	int32_t Renderer::GetTextureSlot(const Shared<Texture2D>& texture)
@@ -329,7 +245,4 @@ namespace Orion
 		}
 		return textureIndex;
 	}
-
-
-
 }

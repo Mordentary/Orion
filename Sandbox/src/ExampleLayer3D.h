@@ -20,8 +20,8 @@ public:
 
 		Orion::CamerasController::AddCamera("OrthoCamera", m_Camera2);
 		Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
-		//m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
-		//m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
+		m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
+		m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
 
 		
 
@@ -36,10 +36,7 @@ public:
 		Orion::Renderer::AddLight(m_PointLight);
 		Orion::Renderer::AddLight(m_DirLight);
 		m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
-		for (size_t i = 0; i < 1000; i++)
-		{
-			dirCat.push_back(std::rand() % 5);
-		}
+	
 
 	}
 
@@ -60,42 +57,34 @@ public:
 
 
 
-		glm::vec3 lightPos;
 		float time = Orion::CurrentTime::GetCurrentTimeInSec();
-		lightPos.x = sin(time) * 1.0f;
-		lightPos.y = 1.f;
-		lightPos.z = cos(time) * 1.0f;
 		m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time)/4, -1.0f, sin(time) / 4);
 
-		glm::mat4 lightMatrix = glm::translate(glm::mat4(1.0f), lightPos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		glm::vec3 lightPos;
+		lightPos.x = sin(time) * 1.0f;
+		lightPos.y = 2.f;
+		lightPos.z = cos(time) * 1.0f;
+		glm::mat4 lightMatrix = glm::translate(glm::mat4(1.0f), lightPos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f));
 		m_PointLight->GetLightProperties().Position = lightPos;
+		m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
+
+
 		m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
 		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
+
+		m_ModelMatrix =  glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+		Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
+	
+
 		Orion::Material mat =
 		{
-		//	m_DiffuseMap, m_SpecularMap, 16.f
+			m_DiffuseMap, m_SpecularMap, 2.f
 		};
 
-		const int numCat = 10;
-		float timeCat = Orion::CurrentTime::GetCurrentTimeInSec();
-		for (size_t i = 0; i < numCat; i++)
-		{
-			for (size_t j = 1; j < numCat; j++)
-			{
-				for (size_t k = 2; k < numCat; k++)
-				{
-
-					m_ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(i, j, k)) * glm::rotate(glm::mat4(1.0f), glm::radians(cos(timeCat) * 100), glm::vec3(dirCat[i], -dirCat[j], dirCat[k])) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f));
-					Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
-				}
-			}
-		}
-		
-
-	//	Orion::Renderer::DrawCube(lightMatrix, mat);
-	//	Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
+		Orion::Renderer::DrawCube(m_ModelMatrix,mat);
 
 
 		Orion::Renderer::EndScene();

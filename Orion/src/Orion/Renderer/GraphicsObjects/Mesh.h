@@ -6,20 +6,15 @@
 #include "../GraphicsCore/Shader.h"
 #include "../GraphicsRendering/Renderer.h"
 
-
-namespace Orion 
+namespace Orion
 {
-
-
-
 	struct Material {
 		Shared<Texture2D> diffuseMap;
 		Shared<Texture2D> specularMap;
 		float shininess;
 	};
 
-	
-	struct MeshVertex 
+	struct MeshVertex
 	{
 		glm::vec3 Position;
 		glm::vec3 Normal;
@@ -28,11 +23,9 @@ namespace Orion
 		glm::vec4 Color;
 		glm::vec2 TextureCoord;
 		float TextureSlot;
-
 	};
 	class Mesh
 	{
-
 	public:
 		Mesh() = default;
 
@@ -42,7 +35,6 @@ namespace Orion
 		}
 
 		Mesh(const Shared<Mesh>& mesh);
-		
 
 		inline MeshVertex* GetVerticesData() { return m_Vertices.data(); }
 		inline uint32_t* GetIndicesData() { return m_Indices.data(); }
@@ -59,7 +51,5 @@ namespace Orion
 		std::vector<MeshVertex> m_Vertices;
 		std::vector<uint32_t> m_Indices;
 		Material m_Material;
-
-
 	};
 }

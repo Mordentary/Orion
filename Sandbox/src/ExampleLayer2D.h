@@ -17,7 +17,7 @@ public:
 	{
 		Orion::Renderer2D::Init();
 
-		m_Camera = Orion::CreateShared<Orion::OrthographicCamera>(-1.6, 1.6, -0.9, 0.9);
+		m_Camera = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
 
 		Orion::CamerasController::AddCamera("PrimaryCamera", m_Camera);
 

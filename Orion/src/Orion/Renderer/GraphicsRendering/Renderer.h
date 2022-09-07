@@ -27,12 +27,13 @@ class Model;
 		static void AddLight(const Shared<LightSource> light);
 		static void AppendMesh(const Shared<Mesh> mesh, const glm::mat4& modelMatrix);
 		static void DrawCube(const glm::mat4& modelMatrix, const Material& material);
+		static void DrawSphere(const glm::mat4& modelMatrix, const Material& material);
 		static void DrawModel(const glm::mat4&  modelMatrix, const Shared<Model>& model);
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
 		friend struct RendererData3D;
 		static RendererData3D s_RenData3D;
-		static void LoadAllLights();
+		static void LoadLights();
 		static void ResetBatch();
 		static int32_t GetTextureSlot(const Shared<Texture2D>& textures);
 		

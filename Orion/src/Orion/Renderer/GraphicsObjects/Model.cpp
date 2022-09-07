@@ -23,7 +23,6 @@ namespace Orion
             aiProcess_SortByPType |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_PreTransformVertices |
-            aiProcess_GenUVCoords |
             aiProcess_OptimizeMeshes |
             aiProcess_OptimizeGraph |
             aiProcess_GenBoundingBoxes | 
@@ -31,7 +30,8 @@ namespace Orion
             aiProcess_FixInfacingNormals |
             aiProcess_FindInvalidData |
             aiProcess_ValidateDataStructure | 
-          //  aiProcess_FlipUVs | 
+           // aiProcess_FlipUVs | 
+            aiProcess_GenUVCoords |
             aiProcess_CalcTangentSpace);
       
 
@@ -141,14 +141,11 @@ namespace Orion
             vertices.push_back(vertex);
         }
 
-        // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+        // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
         for (uint32_t i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
-            if (face.mNumIndices < 3) {
-                continue;
-            }
-            assert(face.mNumIndices == 3);
+           
             for (uint32_t j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }

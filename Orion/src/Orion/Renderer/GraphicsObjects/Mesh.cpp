@@ -21,6 +21,7 @@ namespace Orion
 
 	void Mesh::Render(Shared<Shader>& shader)
 	{
+		 shader->Bind();
 		 if (m_Material.diffuseMap)
 		 shader->SetInt("u_Material.diffuse", m_Material.diffuseMap->GetCurrentSlot());
 		 else shader->SetInt("u_Material.diffuse", 0);
@@ -31,6 +32,9 @@ namespace Orion
 
 		 shader->SetFloat("u_Material.shininess", m_Material.shininess);
 
+
+		// RenderCommand::DrawArray(m_MeshVertexArray, m_Vertices.size());
+
 		RenderCommand::DrawIndexed(m_MeshVertexArray, m_Indices.size());
 	}
 
@@ -38,11 +42,12 @@ namespace Orion
 	{
 
 		m_MeshVertexArray = VertexArray::Create();
+		m_MeshVertexArray->Bind();
 		Shared<IndexBuffer> indexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size());
 		m_MeshVertexArray->SetIndexBuffer(indexBuffer);
 
 
-		Shared<VertexBuffer> vertexBuffer = VertexBuffer::Create((float*)m_Vertices.data(), (uint32_t)m_Vertices.size() * sizeof(MeshVertex));
+		Shared<VertexBuffer> vertexBuffer = VertexBuffer::Create((float*)m_Vertices.data(), m_Vertices.size() * sizeof(MeshVertex));
 		vertexBuffer->SetLayout({
 		{Orion::ShaderDataType::Float3, "a_Position"},
 		{Orion::ShaderDataType::Float3, "a_Normal"},

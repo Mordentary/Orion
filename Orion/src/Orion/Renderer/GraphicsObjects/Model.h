@@ -22,10 +22,12 @@ namespace Orion
             uint32_t index = 3;
             for (auto& mesh : m_Meshes)
             {
-                if (mesh->GetMaterial().diffuseMap || mesh->GetMaterial().specularMap) {
+                if (mesh->GetMaterial().diffuseMap) {
                     mesh->GetMaterial().diffuseMap->Bind(index);
-                  //  mesh->GetMaterial().specularMap->Bind(4);
 
+                }
+                if (mesh->GetMaterial().specularMap) {
+                    mesh->GetMaterial().specularMap->Bind(++index);
                 }
                 index++;
               

@@ -81,9 +81,10 @@ namespace Orion
 
 			offset += 4;
 		}
-		Shared<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_RenData2D.MaxIndices_Quad);
 
 		s_RenData2D.QuadVertexArray = VertexArray::Create();
+		s_RenData2D.QuadVertexArray->Bind();
+		Shared<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_RenData2D.MaxIndices_Quad);
 		s_RenData2D.QuadVertexArray->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
@@ -101,6 +102,8 @@ namespace Orion
 		//Line prepare
 
 		s_RenData2D.LineVertexArray = VertexArray::Create();
+		s_RenData2D.LineVertexArray->Bind();
+
 		s_RenData2D.LineVertexBuffer = VertexBuffer::Create(s_RenData2D.MaxVertices_Line * (sizeof(LineVertex)));
 		s_RenData2D.LineVertexBuffer->SetLayout
 		(
@@ -162,7 +165,6 @@ namespace Orion
 		ORI_PROFILE_FUNCTION();
 
 		if (s_RenData2D.QuadIndexCount) {
-
 			uint32_t dataSize = (uint8_t*)s_RenData2D.QuadVertexIterator - (uint8_t*)s_RenData2D.QuadVertexBufferBase;
 			s_RenData2D.QuadVertexBuffer->SetData(s_RenData2D.QuadVertexBufferBase, dataSize);
 
