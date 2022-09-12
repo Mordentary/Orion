@@ -159,6 +159,9 @@
     <ClInclude Include="src\Orion\Renderer\GraphicsCore\Buffer.h">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsCore\Framebuffer.h">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
+    </ClInclude>
     <ClInclude Include="src\Orion\Renderer\GraphicsCore\Shader.h">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClInclude>
@@ -211,6 +214,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLFramebuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
@@ -1523,6 +1529,9 @@
     <ClCompile Include="src\Orion\Renderer\GraphicsCore\Buffer.cpp">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsCore\Framebuffer.cpp">
+      <Filter>src\Orion\Renderer\GraphicsCore</Filter>
+    </ClCompile>
     <ClCompile Include="src\Orion\Renderer\GraphicsCore\Shader.cpp">
       <Filter>src\Orion\Renderer\GraphicsCore</Filter>
     </ClCompile>
@@ -1574,6 +1583,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLFramebuffer.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1600,6 +1612,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
@@ -1609,6 +1624,5 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
-    <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl" />
   </ItemGroup>
 </Project>

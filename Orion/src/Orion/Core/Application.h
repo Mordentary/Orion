@@ -20,7 +20,7 @@ namespace Orion {
 	class ORION_API Application
 	{
 		public: 
-		Application();
+		Application(const std::string& name = "OrionApp");
 		virtual ~Application();
 
 		void Run();

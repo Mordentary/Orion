@@ -31,6 +31,7 @@
 #include"Orion/Renderer/GraphicsCore/Shader.h"
 #include"Orion/Renderer/GraphicsCore/VertexArray.h"
 #include"Orion/Renderer/GraphicsCore/Texture.h"
+#include"Orion/Renderer/GraphicsCore/Framebuffer.h"
 #include"Orion/Renderer/GraphicsCore/SubTexture.h"
 
 

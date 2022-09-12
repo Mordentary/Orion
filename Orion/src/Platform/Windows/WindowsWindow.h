@@ -61,7 +61,7 @@ namespace Orion {
 		struct WindowData 
 		{
 			std::string Title;
-			unsigned int Width, Height;
+			uint32_t Width, Height;
 			bool VSync;
 			EventCallbackFn EventCallback;
 		};

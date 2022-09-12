@@ -36,7 +36,14 @@ public:
 		Orion::Renderer::AddLight(m_PointLight);
 		Orion::Renderer::AddLight(m_DirLight);
 		m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
-	
+
+		Orion::FramebufferSpecification specFB;
+		specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
+		specFB.Height = Orion::Application::Get().GetWindow().GetHeight();
+		
+
+
+		m_Framebuffer = Orion::Framebuffer::Create(specFB);
 
 	}
 
@@ -72,19 +79,20 @@ public:
 
 		m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
+
 		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
-		m_ModelMatrix =  glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-		Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
+		m_ModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 	
+		Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
 
 		Orion::Material mat =
 		{
 			m_DiffuseMap, m_SpecularMap, 2.f
 		};
 
-		Orion::Renderer::DrawCube(m_ModelMatrix,mat);
+		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);
 
 
 		Orion::Renderer::EndScene();
@@ -134,8 +142,13 @@ public:
 		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
 		ImGui::Text("FPS: %f", ts.GetFPS());
 
-		/*auto& stats = Orion::Renderer::GetStats();
+	
+		ImGui::End();
+	
 
+
+		/*auto& stats = Orion::Renderer::GetStats();
+		
 
 		ImGui::Text("DrawCalls: %d", stats.GetTotalDrawCalls());
 		ImGui::Text("Quads: %d", stats.GetTotalQuadCount());
@@ -145,7 +158,7 @@ public:
 
 
 
-		ImGui::End();
+		
 
 	}
 private:
@@ -158,6 +171,7 @@ private:
 
 	std::vector<float> dirCat;
 	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+	Orion::Shared<Orion::Framebuffer> m_Framebuffer;
 	Orion::Shared<Orion::Model> m_Model;
 	Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 	Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap;

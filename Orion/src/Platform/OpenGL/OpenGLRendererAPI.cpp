@@ -9,7 +9,7 @@ namespace Orion {
 	{
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+		glEnable(GL_STENCIL_TEST);
 		glEnable(GL_DEPTH_TEST);
 	}
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
@@ -19,7 +19,7 @@ namespace Orion {
 
 	void OpenGLRendererAPI::Clear()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Shared<VertexArray>& vertexArray, uint32_t indexCount)

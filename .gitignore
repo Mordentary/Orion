@@ -3,8 +3,8 @@
 !vendor/bin/premake/
 bin-int/
 #Pictures
-**/assets/**.png
-**/assets/**.obj
+**/assets/
+
 #Heavy lib
 **/assimp/lib/
 # Visual Studio files and folder

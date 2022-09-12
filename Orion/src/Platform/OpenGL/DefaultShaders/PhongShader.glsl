@@ -133,7 +133,7 @@ void main()
 
     if(result.a < 0.1f) discard;
 
-    f_Color =  result;
+    f_Color = result;
 
 } 
 

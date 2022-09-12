@@ -13,7 +13,7 @@ namespace Orion
         
 	}
 
-    //For retrieveing scene 
+    //For retrieving scene 
 	void Model::LoadModel(const std::string& path)
 	{
 		Assimp::Importer import;
@@ -30,6 +30,7 @@ namespace Orion
             aiProcess_FixInfacingNormals |
             aiProcess_FindInvalidData |
             aiProcess_ValidateDataStructure | 
+           
            // aiProcess_FlipUVs | 
             aiProcess_GenUVCoords |
             aiProcess_CalcTangentSpace);
@@ -72,8 +73,9 @@ namespace Orion
         std::vector<uint32_t> indices;
         std::vector<Shared<Texture2D>> textures;
         // walk through each of the mesh's vertices
-       // auto vec = mesh->mAABB.mMax - mesh->mAABB.mMin;
-       
+        auto MinMax = (mesh->mAABB.mMax - mesh->mAABB.mMin);
+        glm::vec3 scale = glm::vec3(1.0f) / glm::vec3(MinMax.x, MinMax.x, MinMax.x);
+
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
             MeshVertex vertex;

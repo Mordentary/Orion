@@ -39,7 +39,7 @@ namespace Orion
 			s_CamerasController.s_ActiveCamera = name;
 		}else
 		{
-			ORI_CORE_ASSERT(false, "Camera doesnt exist!");
+			ORI_CORE_ASSERT(false, "Camera doesn't exist!");
 		}
 	}
 
@@ -92,16 +92,17 @@ namespace Orion
 
 	bool CamerasController::OnWindowResized(WindowResizeEvent& e)
 	{
-		auto& cam = *s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera];
-		float aspect = ((float)e.GetWidth() / (float)e.GetHeight());
+		//auto& cam = *s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera];
+		if (e.GetWidth() && e.GetHeight() != 0) {
+			float aspect = ((float)e.GetWidth() / (float)e.GetHeight());
 
-		for (auto& cam : s_CamerasController.s_CamerasStorage)
-		{
-			cam.second->SetAspectRatio(aspect);
-			cam.second->SetScreenSize(glm::vec2(e.GetWidth() ,e.GetHeight()));
+			for (auto& cam : s_CamerasController.s_CamerasStorage)
+			{
+				cam.second->SetAspectRatio(aspect);
+				cam.second->SetScreenSize(glm::vec2(e.GetWidth(), e.GetHeight()));
+				cam.second->RecalculateProjection();
+			}
 		}
-		cam.RecalculateProjection();
-
 		return false;
 	}
 

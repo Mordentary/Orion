@@ -1,6 +1,6 @@
 workspace "Orion"
 	architecture "x86_64"
-	startproject "Sandbox"
+	startproject "Orion-Editor"
 
 	configurations
 	{
@@ -90,8 +90,7 @@ project "Orion"
 
 	postbuildcommands
 	{
-		("{COPY}../vendor/assimp/Release/*.dll ../bin/" .. outputdir ..  "/Sandbox/")
-
+		("{COPY}../vendor/assimp/Release/*.dll ../bin/" .. outputdir ..  "/Orion-Editor/")
 	}
 	
 	filter "system:windows"
@@ -109,9 +108,9 @@ project "Orion"
 
 	filter "configurations:Debug"
 		defines "ORI_DEBUG"
-	
 		runtime "Debug"
 		symbols "on"
+		
 	filter "configurations:Release"
 		defines "ORI_REALESE"
 		runtime "Release"
@@ -173,3 +172,55 @@ project "Sandbox"
 		defines "ORI_DIST"
 		runtime "Release"
 		optimize "on"
+
+
+
+project "Orion-Editor"
+	location"Orion-Editor"
+	kind"ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir("bin/" .. outputdir ..  "/%{prj.name}")
+	objdir("bin-int/" .. outputdir ..  "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/assets/**.glsl"
+	}
+
+	includedirs
+	{
+		"Orion/vendor/spdlog/include",
+		"Orion/src",
+		"Orion/vendor",
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.glm}"
+	}
+
+	links
+	{
+		"Orion"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		defines "ORI_DEBUG"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines "ORI_REALESE"
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines "ORI_DIST"
+		runtime "Release"
+		optimize "on"
+

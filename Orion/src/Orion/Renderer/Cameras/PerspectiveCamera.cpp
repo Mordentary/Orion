@@ -153,7 +153,7 @@ namespace Orion
 
 	inline void PerspectiveCamera::RecalculateProjection()
 	{
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg + m_ZoomLevel), (float)m_AspectRatio, 0.1f, 100.0f);
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg + m_ZoomLevel), (float)m_AspectRatio, 0.1f, 10000.0f);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
