@@ -24,9 +24,9 @@ namespace Orion
 		);
 		
 		virtual void Update(Orion::Timestep deltaTime) {}
-		virtual void RecalculateView() {}
-		virtual void RecalculateViewProjection() {}
-		virtual void RecalculateProjection() {}
+		virtual void RecalculateView() = 0;
+		virtual void RecalculateViewProjection() = 0;
+		virtual void RecalculateProjection() = 0;
 
 		const inline glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionViewMatrix; }
 		const inline glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
@@ -45,7 +45,7 @@ namespace Orion
 
 		inline const float IsRotation() const { return m_Rotation; }
 		
-
+		inline void OnViewportResize(const glm::vec2& size) { SetScreenSize(size); RecalculateProjection();}
 		inline void SetPosition(const glm::vec3& position) { m_Position = position; }
 		inline void SetScreenSize(const glm::vec2& size) { m_ScreenSize = size;}
 		inline void SetZoomLevel(float zoom) { m_ZoomLevel = zoom;}

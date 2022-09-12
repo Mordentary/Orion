@@ -61,7 +61,7 @@ namespace Orion {
 
 			static float rotation = 0;
 			//	rotation += deltaTime * 100.f;
-			ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
+			//ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
 
 
 
@@ -238,15 +238,41 @@ namespace Orion {
 
 				ImGui::EndMenuBar();
 			}
-
 			ImGui::Begin("Setting");
+
 			ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 			ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
 			ImGui::Text("FPS: %f", ts.GetFPS());
-			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), { 1280,720 }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
-
+			
 
 			ImGui::End();
+
+
+
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});
+			ImGui::Begin("Viewport");
+
+			ImVec2& size = ImGui::GetContentRegionAvail();
+			if (m_ViewportSize != *(glm::vec2*)&size)
+			{
+				m_ViewportSize = { size.x,size.y };
+				m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+				CamerasController::OnViewportResize(m_ViewportSize);
+			}
+			m_ViewportSize = {size.x,size.y};
+
+
+			//ORI_INFO("ViewportAvaible: {0},{1}", size.x, size.y);
+			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+			ImGui::End();
+
+			ImGui::PopStyleVar();
+
+
+
+
 
 			ImGui::End();
 
@@ -273,8 +299,9 @@ namespace Orion {
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0,0,0 };
 
+		glm::vec2 m_ViewportSize;
 
-		std::vector<float> dirCat;
+
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_Framebuffer;
 		Orion::Shared<Orion::Model> m_Model;

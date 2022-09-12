@@ -1,22 +1,33 @@
 #pragma once
 #include <numeric>
+#include <math.h>
 namespace Orion
 {
 	class MathHelper
 	{
 	public:
-        static std::pair<uint32_t, uint32_t> ReduceFraction(uint32_t x, uint32_t y)
+        static std::pair<float, float> ReduceFraction(float x, float y)
         {
-            int d;
-            d = std::gcd(x, y);
+            float d = MathHelper::gcd(x, y);
 
-            x = x / d;
-            y = y / d;
+            float newX = x / d;
+            float newY = y / d;
 
-            return  {x, y};
+            return  { newX, newY};
         }
        
+        static double gcd(double a, double b)
+        {
+            if (a < b)
+                return gcd(b, a);
 
+            // base case
+            if (fabs(b) < 0.001)
+                return a;
+
+            else
+                return (gcd(b, a - floor(a / b) * b));
+        }
 	};
 }
 

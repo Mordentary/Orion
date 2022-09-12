@@ -13,10 +13,14 @@ namespace Orion
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
+		glDeleteTextures(1, &m_ColorAttachment);
+		glDeleteTextures(1, &m_DepthAttachment);
+
 	}
 	inline void OpenGLFramebuffer::Bind(uint32_t width, uint32_t height)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 
 	}
 	inline void OpenGLFramebuffer::Unbind() 
@@ -26,6 +30,9 @@ namespace Orion
 	}
 	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer) 
 	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+		Invalidate();
 
 	}
 	inline void OpenGLFramebuffer::ClearFBOTexture(int32_t index, int value) 
@@ -34,6 +41,21 @@ namespace Orion
 	}
 	void OpenGLFramebuffer::Invalidate(const FramebufferSpecification& spec)
 	{
+		m_Specification = spec;
+		Invalidate();
+	}
+	void OpenGLFramebuffer::Invalidate()
+	{
+		if(m_RendererID)
+		{
+			glDeleteFramebuffers(1, &m_RendererID);
+			glDeleteTextures(1, &m_ColorAttachment);
+			glDeleteTextures(1, &m_DepthAttachment);
+		}
+
+
+
+
 		glCreateFramebuffers(1, &m_RendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 

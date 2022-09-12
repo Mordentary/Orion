@@ -71,9 +71,23 @@ namespace Orion
 			return;
 		}
 
-		auto& [width, height] = static_cast<std::pair<float, float>>(MathHelper::ReduceFraction(m_ScreenSize.x, m_ScreenSize.y));
 
-		m_ProjectionMatrix = glm::ortho(-width * m_ZoomLevel , width * m_ZoomLevel, -height * m_ZoomLevel, height * m_ZoomLevel, -1.0f, 1.0f);
+		float aspectWidth;
+		float aspectHeight;
+
+		if (m_ScreenSize.y < m_ScreenSize.x) 
+		{
+			 aspectWidth = (m_ScreenSize.x) / (m_ScreenSize.y / m_ZoomLevel);
+			 aspectHeight = (m_ScreenSize.y) / (m_ScreenSize.y / m_ZoomLevel);
+		}else
+		{
+			aspectWidth = (m_ScreenSize.x) / (m_ScreenSize.x / m_ZoomLevel);
+			aspectHeight = (m_ScreenSize.y) / (m_ScreenSize.x / m_ZoomLevel);
+		}
+
+		//ORI_INFO("ORTO: {0},{1}", aspectWidth, aspectHeight);
+
+		m_ProjectionMatrix = glm::ortho(-aspectWidth , aspectWidth , -aspectHeight, aspectHeight , -1.0f, 1.0f);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 }

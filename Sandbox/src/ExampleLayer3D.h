@@ -141,11 +141,9 @@ public:
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 		ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
 		ImGui::Text("FPS: %f", ts.GetFPS());
-
 	
 		ImGui::End();
 	
-
 
 		/*auto& stats = Orion::Renderer::GetStats();
 		

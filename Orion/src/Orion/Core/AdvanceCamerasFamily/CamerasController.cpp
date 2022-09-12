@@ -50,6 +50,14 @@ namespace Orion
 	}
 
 
+	void CamerasController::OnViewportResize(const glm::vec2& size)
+	{
+		for (auto& cam : s_CamerasController.s_CamerasStorage)
+		{
+			cam.second->OnViewportResize(size);
+		}
+	}
+
 	const Shared<DummyCamera> CamerasController::GetActiveCamera()
 	{
 		auto camType = s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]->Get();

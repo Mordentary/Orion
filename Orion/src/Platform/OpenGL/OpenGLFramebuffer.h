@@ -21,13 +21,14 @@ namespace Orion
 			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) override;
 			virtual void ClearFBOTexture(int32_t index, int value) override;
 
+			void Invalidate();
 			void Invalidate(const FramebufferSpecification& spec);
 
 
 
 		private:
-			uint32_t m_ColorAttachment, m_DepthAttachment;
-			uint32_t m_RendererID;
+			uint32_t m_ColorAttachment = 0 , m_DepthAttachment = 0;
+			uint32_t m_RendererID = 0;
 			FramebufferSpecification m_Specification;
 	};
 
