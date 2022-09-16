@@ -61,34 +61,25 @@ namespace Orion
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
+
 	inline void OrthographicCamera::RecalculateProjection()
 	{
 		if (m_ProjMatchesPixelByPixel)
 		{
-			
+
 			m_ProjectionMatrix = glm::ortho(0.f, m_ScreenSize.x, 0.f, m_ScreenSize.y, -1.0f, 1.0f);
 			m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 			return;
 		}
 
 
-		float aspectWidth;
-		float aspectHeight;
+		m_AspectRatio = m_ScreenSize.x / m_ScreenSize.y;
 
-		if (m_ScreenSize.y < m_ScreenSize.x) 
-		{
-			 aspectWidth = (m_ScreenSize.x) / (m_ScreenSize.y / m_ZoomLevel);
-			 aspectHeight = (m_ScreenSize.y) / (m_ScreenSize.y / m_ZoomLevel);
-		}else
-		{
-			aspectWidth = (m_ScreenSize.x) / (m_ScreenSize.x / m_ZoomLevel);
-			aspectHeight = (m_ScreenSize.y) / (m_ScreenSize.x / m_ZoomLevel);
-		}
+		m_ProjectionMatrix = glm::ortho(-m_ZoomLevel * m_AspectRatio, m_ZoomLevel * m_AspectRatio, -m_ZoomLevel, m_ZoomLevel, -1.0f, 1.0f);
 
-		//ORI_INFO("ORTO: {0},{1}", aspectWidth, aspectHeight);
-
-		m_ProjectionMatrix = glm::ortho(-aspectWidth , aspectWidth , -aspectHeight, aspectHeight , -1.0f, 1.0f);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
+
+	
 }
 
