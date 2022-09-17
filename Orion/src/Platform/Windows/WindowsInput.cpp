@@ -1,13 +1,11 @@
 #include "oripch.h"
-#include "WindowsInput.h"
+#include "Orion/Core/Input.h"
 
 #include "GLFW/glfw3.h"
 #include"Orion/Core/Application.h"
 namespace Orion {
 
-	Input* Input::s_Instance = new WindowsInput();
-
-	bool WindowsInput::IsKeyPressedImpl(int keycode)
+	bool Input::IsKeyPressed(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keycode);
@@ -15,28 +13,28 @@ namespace Orion {
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 
 	}
-	bool WindowsInput::IsMouseButtonPressedImpl(int keycode)
+	bool Input::IsMouseButtonPressed(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, keycode);
 
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
-	bool WindowsInput::IsKeyReleasedImpl(int keycode)
+	bool Input::IsKeyReleased(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetKey(window, keycode);
 
 		return state == GLFW_RELEASE;
 	}
-	bool WindowsInput::IsMouseButtonReleasedImpl(int keycode)
+	bool Input::IsMouseButtonReleased(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, keycode);
 
 		return state == GLFW_RELEASE;
 	}
-	std::pair<float, float> WindowsInput::GetMousePositionImpl()
+	std::pair<float, float> Input::GetMousePosition()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xPos, yPos;
@@ -44,15 +42,15 @@ namespace Orion {
 
 		return {xPos,yPos};
 	}
-	float WindowsInput::GetMouseXImpl()
+	float Input::GetMouseX()
 	{
-		auto [x, y] = GetMousePositionImpl();
+		auto [x, y] = GetMousePosition();
 
 		return (float)x;
 	}
-	float WindowsInput::GetMouseYImpl()
+	float Input::GetMouseY()
 	{
-		auto [x, y] = GetMousePositionImpl();
+		auto [x, y] = GetMousePosition();
 
 		return (float)y;
 	}
