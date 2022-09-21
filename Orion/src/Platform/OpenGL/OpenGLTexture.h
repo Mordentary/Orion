@@ -9,13 +9,17 @@ namespace Orion
 	{
 	public:
 
-		OpenGLTexture2D(const std::string& path);
-		OpenGLTexture2D(uint32_t width, uint32_t height);
+
+		OpenGLTexture2D(const std::string& path, const Texture2DParameters& spec); //Creates texture from path
+		OpenGLTexture2D(uint32_t width, uint32_t height); //Creates clean RGBA texture
 		virtual ~OpenGLTexture2D();
 
 		virtual inline uint32_t GetWidth() const override { return m_Width; }
 		virtual inline uint32_t GetHeight() const override { return m_Height; }
+
 		virtual inline uint32_t GetRendererID() const override { return m_RendererID; };
+		virtual inline uint32_t& GetRendererID() override { return m_RendererID; };
+
 		inline uint32_t GetCurrentSlot() const override { return m_CurrentSlot; }
 
 
@@ -28,9 +32,12 @@ namespace Orion
 	private: 
 		std::string m_Path;
 		uint32_t m_Width, m_Height;
-		uint32_t m_RendererID;
 		GLenum m_InternalFormat, m_DataFormat;
+		uint32_t m_RendererID;
 		uint32_t m_CurrentSlot;
+		Texture2DParameters m_TextureParam;
+
+		
 	};
 }
 

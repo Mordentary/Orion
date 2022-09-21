@@ -20,16 +20,31 @@ namespace Orion {
 			virtual void Bind(uint32_t slot = 0)  = 0;
 			virtual void Unbind(uint32_t slot = 0)  = 0;
 			virtual uint32_t GetRendererID() const = 0;
+			virtual uint32_t& GetRendererID() = 0;
+
 			virtual uint32_t GetCurrentSlot() const = 0;
 
 			virtual bool operator==(Texture& other) = 0;
 		};
 
+
+
+		struct Texture2DParameters
+		{
+			bool Flip = true;
+			int32_t TEXTURE_WRAP	   = 0x2901; // DEFAULT VALUE REPRESENTS GL_REPEAT
+			int32_t TEXTURE_FILTER_MIN = 0x2601; // DEFAULT VALUE REPRESENTS GL_LINEAR
+			int32_t TEXTURE_FILTER_MAX = 0x2601; // DEFAULT VALUE REPRESENTS GL_LINEAR
+			//TODO: MIPMAP ABSTRACTION
+
+		};
+
 		class Texture2D : public Texture 
 		{
 		public: 
+			virtual ~Texture2D() = default;
+			static Shared<Texture2D> Create(const std::string& path, const Texture2DParameters& spec = {});
 			static Shared<Texture2D> Create(uint32_t width, uint32_t height);
-			static Shared<Texture2D> Create(const std::string& path);
 
 		};
 }

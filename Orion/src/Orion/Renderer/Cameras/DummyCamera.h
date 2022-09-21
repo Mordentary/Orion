@@ -9,6 +9,7 @@ namespace Orion
 		Uknown = 0,
 		Perspective = 1,
 		Orthographic = 2
+
 	};
 	class DummyCamera
 	{
@@ -34,7 +35,7 @@ namespace Orion
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
 
-		virtual const Cameras Get() { return Cameras::Perspective; }
+		virtual const Cameras Get() = 0;
 
 
 	    inline const float& GetAspectRatio() const { return m_AspectRatio; }

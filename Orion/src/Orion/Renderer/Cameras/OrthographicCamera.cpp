@@ -77,6 +77,9 @@ namespace Orion
 
 		m_ProjectionMatrix = glm::ortho(-m_ZoomLevel * m_AspectRatio, m_ZoomLevel * m_AspectRatio, -m_ZoomLevel, m_ZoomLevel, -1.0f, 1.0f);
 
+
+		//ORI_CORE_INFO("AR: {0}", m_AspectRatio);
+
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 

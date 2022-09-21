@@ -7,7 +7,7 @@
 namespace Orion {
 
 
-	Shared<Texture2D> Texture2D::Create(const std::string& path)
+	Shared<Texture2D> Texture2D::Create(const std::string& path, const Texture2DParameters& spec)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -16,7 +16,7 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return CreateShared<OpenGLTexture2D>(path);
+			return CreateShared<OpenGLTexture2D>(path, spec);
 
 		}
 	}

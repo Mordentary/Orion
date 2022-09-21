@@ -6,11 +6,11 @@
 namespace Orion
 {
 
-	OpenGLTexture2D::OpenGLTexture2D(const std::string& path) : m_Path(path)
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& path, const Texture2DParameters& spec) : m_TextureParam(spec)
 	{
 		
 		int width  , height , channels;
-		stbi_set_flip_vertically_on_load(true);
+		stbi_set_flip_vertically_on_load(m_TextureParam.Flip);
 		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
 
@@ -42,17 +42,17 @@ namespace Orion
 
 		m_InternalFormat = internalFormat;
 		m_DataFormat = dataFormat;
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 		ORI_CORE_ASSERT(internalFormat & dataFormat, "Format not supported");
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);// Create ID for texture
 		glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height); // Allocate memory for texture
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Param for texture (magnification, minification settings)
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_TextureParam.TEXTURE_FILTER_MIN);//Param for texture (magnification, minification settings)
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_TextureParam.TEXTURE_FILTER_MAX);
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_TextureParam.TEXTURE_WRAP);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_TextureParam.TEXTURE_WRAP);
 
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
@@ -61,8 +61,11 @@ namespace Orion
 
 	}
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
-		: m_Width(width), m_Height(height)
 	{
+
+		m_Width  = width;
+		m_Height = height;
+
 		m_InternalFormat = GL_RGBA8;
 		m_DataFormat = GL_RGBA;
 
@@ -72,11 +75,13 @@ namespace Orion
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height); // Allocate memory for texture
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Param for texture (magnification, minification settings)
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	}
+
+
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
 		ORI_PROFILE_FUNCTION();
