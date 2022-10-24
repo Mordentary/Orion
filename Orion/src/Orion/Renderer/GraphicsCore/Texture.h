@@ -38,13 +38,15 @@ namespace Orion {
 			//TODO: MIPMAP ABSTRACTION
 
 		};
-
+		class Framebuffer;
 		class Texture2D : public Texture 
 		{
 		public: 
 			virtual ~Texture2D() = default;
 			static Shared<Texture2D> Create(const std::string& path, const Texture2DParameters& spec = {});
 			static Shared<Texture2D> Create(uint32_t width, uint32_t height);
+
+			static Shared<Texture2D> Create(const Shared<Framebuffer>& fb);
 
 		};
 }

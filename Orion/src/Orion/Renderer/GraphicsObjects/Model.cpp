@@ -79,7 +79,8 @@ namespace Orion
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
             MeshVertex vertex;
-            glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+            glm::vec3 vector; 
+            //we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
             vector.x = mesh->mVertices[i].x;
             vector.y = mesh->mVertices[i].y;
@@ -173,7 +174,7 @@ namespace Orion
         // 3. normal maps
         std::vector<Shared<Texture2D>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        // 4. sheneness maps
+        // 4. shineness maps
         std::vector<Shared<Texture2D>> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
         textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
         // 4. base color maps
@@ -183,7 +184,7 @@ namespace Orion
 
 
 
-        if (!diffuseMaps.empty())
+        if (!diffuseMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
           mat.diffuseMap = diffuseMaps[0];
        if(!specularMaps.empty())
             mat.specularMap = specularMaps[0];

@@ -35,4 +35,19 @@ namespace Orion {
 
 		}
 	}
+
+	Shared<Texture2D> Texture2D::Create(const Shared<Framebuffer>& fb)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+
+		case RendererAPI::API::OpenGL:
+			return CreateShared<OpenGLTexture2D>(fb);
+
+		}
+	}
+
 }

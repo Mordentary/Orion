@@ -8,7 +8,6 @@ namespace Orion
 
 	class OpenGLFramebuffer :  public Framebuffer
 	{
-
 		public: 
 
 
@@ -23,7 +22,8 @@ namespace Orion
 
 			virtual uint32_t GetColorAttachmentID()const override { return m_ColorAttachment; }
 
-
+			virtual const FramebufferSpecification& GetFramebufferSpec() const { return m_Specification; }
+			virtual FramebufferSpecification& GetFramebufferSpec() { return m_Specification; }
 
 			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) override;
 			virtual void ClearFBOTexture(int32_t index, int value) override;
@@ -36,7 +36,6 @@ namespace Orion
 		private:
 			uint32_t m_ColorAttachment = 0;         //TODO: MULTIPLE ATTACHMENTS DOESNT WORK!!
 			uint32_t m_DepthStencilAttachment = 0;
-
 
 			//uint32_t m_ColorAttachIndex = 0, m_DS_AttachIndex = 0;
 

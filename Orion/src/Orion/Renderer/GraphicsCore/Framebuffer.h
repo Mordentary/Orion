@@ -18,17 +18,20 @@ namespace Orion{
 
 	class Framebuffer
 	{
+		friend class Texture2D;
 
 		public:
-
-
 			virtual ~Framebuffer() = default;
 
 			virtual void Bind() = 0;
 			virtual void Unbind() = 0;
 
-
 			virtual uint32_t GetColorAttachmentID() const = 0;
+
+			virtual const FramebufferSpecification& GetFramebufferSpec() const = 0;
+			virtual FramebufferSpecification& GetFramebufferSpec() = 0 ;
+
+
 
 			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) = 0;
 			virtual void ClearFBOTexture(int32_t index, int value) = 0;

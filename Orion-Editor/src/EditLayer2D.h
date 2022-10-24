@@ -17,9 +17,12 @@ namespace Orion {
 		{
 			Orion::Renderer2D::Init();
 
-			m_Camera = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
+			m_Camera = Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.f, 0.f, 1.0f), glm::vec3(0.f, 0.f, -1.f));
+			Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 
-			Orion::CamerasController::AddCamera("PrimaryCamera", m_Camera);
+			m_Camera = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
+			Orion::CamerasController::AddCamera("OrthoCamera", m_Camera);
+
 
 
 			m_TextureJoker = Orion::Texture2D::Create("assets/textures/joker.png");
@@ -72,16 +75,19 @@ namespace Orion {
 
 			Orion::Renderer2D::BeginScene(Orion::CamerasController::GetActiveCamera());
 
-			Orion::Renderer2D::DrawQuad(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec2(0.5f, 0.5f), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
-			for (size_t i = 0; i < 300; i++)
-			{
-				for (size_t j = 0; j < 300; j++)
+			//Orion::Renderer2D::DrawQuad(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec2(0.5f, 0.5f), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
+			//float time = 90 * cos(Orion::CurrentTime::GetCurrentTimeInSec());
+				for (int32_t  j = 0; j < 10000; j++)
 				{
-					Orion::Renderer2D::DrawBorderedQuad(glm::vec3(i, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
-				}
-			}
+					
+					
 
-			m_Skeleton->Update(deltaTime, m_Color);
+					Orion::Renderer2D::DrawQuad(glm::vec3(-j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+					//Orion::Renderer2D::DrawBorderedQuad(glm::vec3(j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+				}
+			
+
+				m_Skeleton->Update(deltaTime, m_Color);
 
 
 
@@ -142,11 +148,11 @@ namespace Orion {
 		{
 			if (e.GetKeyCode() == ORI_KEY_1)
 			{
-				Orion::CamerasController::SetActiveCamera("PrimaryCamera");
+				Orion::CamerasController::SetActiveCamera("PerspectiveCamera");
 			}
 			if (e.GetKeyCode() == ORI_KEY_2)
 			{
-				Orion::CamerasController::SetActiveCamera("SecondaryCamera");
+				Orion::CamerasController::SetActiveCamera("OrthoCamera");
 			}
 
 
@@ -185,7 +191,7 @@ namespace Orion {
 		Orion::Shared<Orion::AnimationLibrary> m_AnimLibrary;
 		Orion::Shared<Orion::Texture2D> m_TextureJoker, m_TextureJokersFace, m_Chess, m_SpriteSheet, m_SkeletonSheet;
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
-		Orion::Shared<Orion::OrthographicCamera> m_Camera;
+		Orion::Shared<Orion::DummyCamera> m_Camera;
 		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

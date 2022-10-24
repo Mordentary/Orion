@@ -78,7 +78,6 @@ namespace Orion
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
 
-
 		//////////////////////////////
 		//////COLOR ATTACHMENT///////
 		////////////////////////////

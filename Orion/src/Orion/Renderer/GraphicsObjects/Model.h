@@ -16,7 +16,7 @@ namespace Orion
             LoadModel(path);
         }
         void Render(Shared<Shader>& shader);
-        void BindAllTexture()
+        void BindAllTexture() //TODO: REMOVE THIS SHIT
         {
 
             uint32_t index = 3;

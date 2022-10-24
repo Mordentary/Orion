@@ -47,13 +47,15 @@ namespace Orion {
 
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
-			m_Framebuffer_lol = Orion::Framebuffer::Create(specFB);
+			
 
 
 		}
 
 		void OnUpdate(Orion::Timestep deltaTime) override
 		{
+			
+
 			ORI_PROFILE_FUNCTION();
 			m_Framebuffer_Refra->Bind();
 				{
@@ -106,6 +108,9 @@ namespace Orion {
 				}
 			m_Framebuffer_Refra->Unbind();
 
+
+			sceneTexture = Orion::Texture2D::Create(m_Framebuffer_Refra);
+
 			m_Framebuffer->Bind();
 			{
 				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
@@ -145,12 +150,12 @@ namespace Orion {
 				Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
 				Orion::Renderer::DrawModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -0.8, 0.0)), m_ModelOcean);
 
-
 				Orion::Material mat =
 				{
 					m_DiffuseMap, m_SpecularMap, 2.f
 				};
 
+				
 				Orion::Renderer::DrawCube(glm::mat4(1.0f), mat);
 
 
@@ -158,13 +163,6 @@ namespace Orion {
 				Orion::Renderer::EndScene();
 			}
 			m_Framebuffer->Unbind();
-
-
-
-
-
-
-
 
 
 
@@ -338,7 +336,9 @@ namespace Orion {
 
 
 			//ORI_INFO("ViewportAvaible: {0},{1}", size.x, size.y);
-			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+			
+			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{0,1}, ImVec2{1,0});
 
 			ImGui::End();
 
@@ -377,9 +377,9 @@ namespace Orion {
 
 
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		Orion::Shared<Orion::Framebuffer> m_Framebuffer, m_Framebuffer_Refra, m_Framebuffer_lol;
+		Orion::Shared<Orion::Framebuffer> m_Framebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_Model, m_ModelOcean;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
-		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap;
+		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, sceneTexture;
 	};
 }

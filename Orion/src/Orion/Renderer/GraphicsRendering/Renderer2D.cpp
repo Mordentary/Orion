@@ -30,7 +30,7 @@ namespace Orion
 		Shared<VertexBuffer> QuadVertexBuffer;
 		Shared<Texture2D> WhiteTexture;
 
-		const uint32_t MaxLines = 1000;
+		const uint32_t MaxLines = 2000;
 		const uint32_t MaxVertices_Line = MaxLines * 2;
 		float LineWidth = 2.5f;
 
@@ -65,7 +65,7 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 
-		//Quad prepare
+		//Quad preparation
 
 		uint32_t* quadIndices = new uint32_t[s_RenData2D.MaxIndices_Quad];
 		uint32_t offset = 0;
@@ -80,6 +80,7 @@ namespace Orion
 			quadIndices[i + 5] = offset + 0;
 
 			offset += 4;
+
 		}
 
 		s_RenData2D.QuadVertexArray = VertexArray::Create();
@@ -88,7 +89,7 @@ namespace Orion
 		s_RenData2D.QuadVertexArray->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
-		s_RenData2D.QuadVertexBuffer = VertexBuffer::Create(s_RenData2D.MaxLines * sizeof(QuadVertex));
+		s_RenData2D.QuadVertexBuffer = VertexBuffer::Create(s_RenData2D.MaxVertices_Quad * sizeof(QuadVertex));
 		s_RenData2D.QuadVertexBuffer->SetLayout({
 			{Orion::ShaderDataType::Float3, "a_Position"},
 			{Orion::ShaderDataType::Float4, "a_Color"},
@@ -99,7 +100,7 @@ namespace Orion
 		s_RenData2D.QuadVertexArray->AddVertexBuffer(s_RenData2D.QuadVertexBuffer);
 		s_RenData2D.QuadVertexBufferBase = new QuadVertex[s_RenData2D.MaxVertices_Quad];
 
-		//Line prepare
+		//Line preparation
 
 		s_RenData2D.LineVertexArray = VertexArray::Create();
 		s_RenData2D.LineVertexArray->Bind();
@@ -116,7 +117,7 @@ namespace Orion
 		s_RenData2D.LineVertexArray->AddVertexBuffer(s_RenData2D.LineVertexBuffer);
 		s_RenData2D.LineVertexBufferBase = new LineVertex[s_RenData2D.MaxVertices_Line];
 
-		//Texture prepare
+		//Texture preparation
 
 		s_RenData2D.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
@@ -126,7 +127,7 @@ namespace Orion
 		for (uint32_t i = 0; i < s_RenData2D.MaxTextureSlots; i++)
 			samples[i] = i;
 
-		//Shader preparing
+		//Shader preparation
 
 		s_RenData2D.QuadShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/QuadShader.glsl");
 		s_RenData2D.LineShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/LineShader.glsl");
@@ -164,14 +165,17 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 
-		if (s_RenData2D.QuadIndexCount) {
-			uint32_t dataSize = (uint8_t*)s_RenData2D.QuadVertexIterator - (uint8_t*)s_RenData2D.QuadVertexBufferBase;
+		if (s_RenData2D.QuadIndexCount) 
+		{
+
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_RenData2D.QuadVertexIterator - (uint8_t*)s_RenData2D.QuadVertexBufferBase);
 			s_RenData2D.QuadVertexBuffer->SetData(s_RenData2D.QuadVertexBufferBase, dataSize);
 
 			for (uint32_t i = 0; i < s_RenData2D.TextureSlotsIndex; i++)
 			{
 				s_RenData2D.TextureSlots[i]->Bind(i);
 			}
+
 			s_RenData2D.QuadShader->Bind();
 			RenderCommand::DrawIndexed(s_RenData2D.QuadVertexArray, s_RenData2D.QuadIndexCount);
 			s_RenData2D.DrawCalls++;
@@ -180,7 +184,8 @@ namespace Orion
 			s_RenData2D.QuadVertexBuffer->SetData(s_RenData2D.QuadVertexBufferBase, dataSize);
 		}
 
-		if (s_RenData2D.LineVertexCount) {
+		if (s_RenData2D.LineVertexCount) 
+		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_RenData2D.LineVertexIterator - (uint8_t*)s_RenData2D.LineVertexBufferBase);
 			s_RenData2D.LineVertexBuffer->SetData(s_RenData2D.LineVertexBufferBase, dataSize);
 
@@ -416,13 +421,13 @@ namespace Orion
 		s_RenData2D.QuadVertexIterator->Color = color;
 		s_RenData2D.QuadVertexIterator->TextureCoord = textureCoord;
 		s_RenData2D.QuadVertexIterator->TextureSlot = textureSlot;
-		s_RenData2D.QuadVertexIterator++;
+		++s_RenData2D.QuadVertexIterator;
 	}
 	inline void Renderer2D::AddLineVertexToBatch(const glm::vec3& point, const glm::vec4& color)
 	{
 		s_RenData2D.LineVertexIterator->Position = { point.x, point.y , 0.0f };;
 		s_RenData2D.LineVertexIterator->Color = color;
-		s_RenData2D.LineVertexIterator++;
+		++s_RenData2D.LineVertexIterator;
 	}
 
 	int32_t Renderer2D::GetTextureSlot(const Shared<Texture2D>& texture)

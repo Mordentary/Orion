@@ -3,15 +3,18 @@
 #include<glad/glad.h>
 #include"Orion/Renderer/GraphicsCore/Texture.h"
 
+
 namespace Orion 
 {
+	class Framebuffer;
 	class OpenGLTexture2D : public Texture2D
 	{
 	public:
 
-
 		OpenGLTexture2D(const std::string& path, const Texture2DParameters& spec); //Creates texture from path
 		OpenGLTexture2D(uint32_t width, uint32_t height); //Creates clean RGBA texture
+		OpenGLTexture2D(const Shared<Framebuffer>& fb); //Creates clean RGBA texture
+
 		virtual ~OpenGLTexture2D();
 
 		virtual inline uint32_t GetWidth() const override { return m_Width; }
@@ -31,10 +34,10 @@ namespace Orion
 
 	private: 
 		std::string m_Path;
-		uint32_t m_Width, m_Height;
-		GLenum m_InternalFormat, m_DataFormat;
-		uint32_t m_RendererID;
-		uint32_t m_CurrentSlot;
+		uint32_t m_Width = 0, m_Height = 0;
+		GLenum m_InternalFormat = 0, m_DataFormat = 0;
+		uint32_t m_RendererID = 0;
+		uint32_t m_CurrentSlot = 0;
 		Texture2DParameters m_TextureParam;
 
 		

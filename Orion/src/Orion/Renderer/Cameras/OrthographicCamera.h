@@ -13,7 +13,10 @@ namespace Orion {
 		//OrthographicCamera() = default;
 		OrthographicCamera(glm::vec3& position, bool rotation = false, bool pixelByPixel = false);
 		OrthographicCamera(float left, float right, float bottom, float top, bool rotation = false);
-	
+		virtual ~OrthographicCamera() = default;
+
+
+
 		virtual void Update(Timestep deltaTime) override;
 
 		virtual const Cameras Get() { return Cameras::Orthographic; }

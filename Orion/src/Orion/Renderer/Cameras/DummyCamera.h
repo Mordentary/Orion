@@ -23,7 +23,10 @@ namespace Orion
 			const glm::mat4& projectionMatrix = glm::mat4(1.0f),
 			const glm::mat4& projectionViewMatrix = glm::mat4(1.0f)
 		);
-		
+		virtual ~DummyCamera() = default;
+
+
+
 		virtual void Update(Orion::Timestep deltaTime) {}
 		virtual void RecalculateView() = 0;
 		virtual void RecalculateViewProjection() = 0;

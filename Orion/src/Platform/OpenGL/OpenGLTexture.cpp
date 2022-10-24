@@ -1,5 +1,6 @@
 #include "oripch.h"
 #include "OpenGLTexture.h"
+#include"Orion/Renderer/GraphicsCore/Framebuffer.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -79,6 +80,14 @@ namespace Orion
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	}
+
+	OpenGLTexture2D::OpenGLTexture2D(const Shared<Framebuffer>& fb)
+	{
+		m_Width = fb->GetFramebufferSpec().Width;
+		m_Height = fb->GetFramebufferSpec().Height;
+
+		m_RendererID = fb->GetColorAttachmentID();
 	}
 
 
