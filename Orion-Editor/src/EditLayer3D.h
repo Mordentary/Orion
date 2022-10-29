@@ -47,7 +47,7 @@ namespace Orion {
 
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
-			
+			sceneTexture = Orion::Texture2D::Create(m_Framebuffer_Refra);
 
 
 		}
@@ -55,67 +55,14 @@ namespace Orion {
 		void OnUpdate(Orion::Timestep deltaTime) override
 		{
 			
+			Orion::CamerasController::OnUpdate(deltaTime);
 
 			ORI_PROFILE_FUNCTION();
 			m_Framebuffer_Refra->Bind();
 				{
-					Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
-					Orion::RenderCommand::Clear();
-					Orion::CamerasController::OnUpdate(deltaTime);
-
-					//Orion::Renderer2D::ResetStats();
-
-					static float rotation = 0;
-					//	rotation += deltaTime * 100.f;
-					//ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
-
-
-
-					float time = Orion::CurrentTime::GetCurrentTimeInSec();
-					m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 4, -1.0f, sin(time) / 4);
-
-
-					glm::vec3 lightPos;
-					lightPos.x = sin(time) * 1.0f;
-					lightPos.y = 2.f;
-					lightPos.z = cos(time) * 1.0f;
-					
-					m_PointLight->GetLightProperties().Position = lightPos;
-					m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
-
-
-					m_DirLight->GetLightProperties().Direction = m_SunDirection;
-
-
-					Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
-
-
-					m_ModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f,-0.1,0.1));
-					
-
-					Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
-
-					Orion::Material mat =
-					{
-						m_DiffuseMap, m_SpecularMap, 2.f
-					};
-
-					Orion::Renderer::DrawCube(glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f)), mat);
-
-
-
-					Orion::Renderer::EndScene();
-				}
-			m_Framebuffer_Refra->Unbind();
-
-
-			sceneTexture = Orion::Texture2D::Create(m_Framebuffer_Refra);
-
-			m_Framebuffer->Bind();
-			{
+				Orion::RenderCommand::Init();
 				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 				Orion::RenderCommand::Clear();
-				Orion::CamerasController::OnUpdate(deltaTime);
 
 				//Orion::Renderer2D::ResetStats();
 
@@ -148,6 +95,8 @@ namespace Orion {
 
 
 				Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
+
+
 				Orion::Renderer::DrawModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -0.8, 0.0)), m_ModelOcean);
 
 				Orion::Material mat =
@@ -155,20 +104,63 @@ namespace Orion {
 					m_DiffuseMap, m_SpecularMap, 2.f
 				};
 
-				
+
+
 				Orion::Renderer::DrawCube(glm::mat4(1.0f), mat);
 
 
 
 				Orion::Renderer::EndScene();
+				}
+			m_Framebuffer_Refra->Unbind();
+
+
+
+			m_Framebuffer->Bind();
+			{
+				Orion::RenderCommand::Init();
+				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
+				Orion::RenderCommand::Clear();
+				//Orion::CamerasController::OnUpdate(deltaTime);
+
+
+				float time = Orion::CurrentTime::GetCurrentTimeInSec();
+				m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 4, -1.0f, sin(time) / 4);
+
+
+				glm::vec3 lightPos;
+				lightPos.x = sin(time) * 1.0f;
+				lightPos.y = 2.f;
+				lightPos.z = cos(time) * 1.0f;
+				m_PointLight->GetLightProperties().Position = lightPos;
+				m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
+
+
+				m_DirLight->GetLightProperties().Direction = m_SunDirection;
+
+
+				Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
+
+
+				m_ModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+
+				Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
+
+
+				Orion::Renderer::DrawModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -0.8, 0.0)), m_ModelOcean);
+
+				Orion::Material mat =
+				{
+					sceneTexture, m_SpecularMap, 2.f
+				};
+
+				Orion::Renderer::DrawCube(glm::mat4(1.0f), mat);
+
+				Orion::Renderer::EndScene();
 			}
+
 			m_Framebuffer->Unbind();
-
-
-
-
-
-
 
 		}
 
@@ -202,10 +194,6 @@ namespace Orion {
 
 			return false;
 		}
-
-
-
-
 
 
 		virtual void OnImGuiRender(Orion::Timestep ts) override
@@ -320,10 +308,17 @@ namespace Orion {
 
 
 
-
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});
 
 			ImGui::Begin("Viewport");
+
+			bool isHover = ImGui::IsWindowHovered();
+			bool isFocused = ImGui::IsWindowFocused();
+
+
+			Application::Get().GetImGuiLayer()->SetBlockEvent(!isFocused || !isHover);
+			CamerasController::SetBlockUpdate(!isFocused || !isHover);
+
 
 			ImVec2& size = ImGui::GetContentRegionAvail();
 			if (m_ViewportSize != *(glm::vec2*)&size)
@@ -335,10 +330,11 @@ namespace Orion {
 			m_ViewportSize = {size.x,size.y};
 
 
-			//ORI_INFO("ViewportAvaible: {0},{1}", size.x, size.y);
-
 			
+
+		
 			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{0,1}, ImVec2{1,0});
+			
 
 			ImGui::End();
 

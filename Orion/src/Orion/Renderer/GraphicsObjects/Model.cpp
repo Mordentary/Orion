@@ -178,14 +178,14 @@ namespace Orion
         std::vector<Shared<Texture2D>> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
         textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
         // 4. base color maps
-        std::vector<Shared<Texture2D>> colorMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_height");
+        std::vector<Shared<Texture2D>> colorMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_color");
         textures.insert(textures.end(), colorMaps.begin(), colorMaps.end());
 
 
 
 
         if (!diffuseMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
-          mat.diffuseMap = diffuseMaps[0];
+            mat.diffuseMap = diffuseMaps[0];
        if(!specularMaps.empty())
             mat.specularMap = specularMaps[0];
         

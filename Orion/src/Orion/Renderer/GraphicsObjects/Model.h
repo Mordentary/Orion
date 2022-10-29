@@ -19,7 +19,7 @@ namespace Orion
         void BindAllTexture() //TODO: REMOVE THIS SHIT
         {
 
-            uint32_t index = 3;
+            uint32_t index = 1;
             for (auto& mesh : m_Meshes)
             {
                 if (mesh->GetMaterial().diffuseMap) {

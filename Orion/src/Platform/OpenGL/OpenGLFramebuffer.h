@@ -21,6 +21,8 @@ namespace Orion
 			//virtual Shared<Texture2D> GetDepthS_Attachment(uint32_t index) {}
 
 			virtual uint32_t GetColorAttachmentID()const override { return m_ColorAttachment; }
+			virtual uint32_t GetDepthStencilAttachmentID() const override { return m_DepthStencilAttachment; }
+
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const { return m_Specification; }
 			virtual FramebufferSpecification& GetFramebufferSpec() { return m_Specification; }

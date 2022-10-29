@@ -14,13 +14,14 @@ namespace Orion {
 		static void Initiliaze();
 		static void OnUpdate(Timestep ts);
 		static void OnEvent(Event& e);
-	
 
+		
 		static void SetActiveCamera(std::string name);
 		static void AddCamera(std::string name, const Shared<DummyCamera>& camera);
+		static void SetBlockUpdate(bool block) { s_CamerasController.m_BlockUpdate = block; };
 
 		static void OnViewportResize(const glm::vec2& size);
-		static const std::string& GetActiveCameraName() { return s_CamerasController.s_ActiveCamera; }
+		static const std::string& GetActiveCameraName() { return s_CamerasController.m_ActiveCamera; }
 		static const Shared<DummyCamera> GetActiveCamera();
 
 		static const Shared<DummyCamera>& GetCamera(std::string name);
@@ -33,8 +34,9 @@ namespace Orion {
 		void OnEventImpl(Event& e);
 	private:
 		static CamerasController s_CamerasController;
-		std::string s_ActiveCamera;
-		std::unordered_map<std::string, Shared<DummyCamera>> s_CamerasStorage;
+		bool m_BlockUpdate = false;
+		std::string m_ActiveCamera;
+		std::unordered_map<std::string, Shared<DummyCamera>> m_CamerasStorage;
 
 
 

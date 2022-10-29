@@ -17,9 +17,12 @@ namespace Orion
 	}
 	void CamerasController::OnUpdate(Timestep ts)
 	{
-		auto& cam = s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera];
+		if (!s_CamerasController.m_BlockUpdate)
+		{
+			auto& cam = s_CamerasController.m_CamerasStorage[s_CamerasController.m_ActiveCamera];
 
-		cam->Update(ts);
+			cam->Update(ts);
+		}
 	}
 
 	void CamerasController::OnEvent(Event& e)
@@ -36,7 +39,7 @@ namespace Orion
 	void CamerasController::SetActiveCamera(std::string name)
 	{
 		if (IsCameraExist(name)) {
-			s_CamerasController.s_ActiveCamera = name;
+			s_CamerasController.m_ActiveCamera = name;
 		}else
 		{
 			ORI_CORE_ASSERT(false, "Camera doesn't exist!");
@@ -45,14 +48,14 @@ namespace Orion
 
 	void CamerasController::AddCamera(std::string name, const Shared<DummyCamera>& camera)
 	{
-		s_CamerasController.s_ActiveCamera = name;
-		s_CamerasController.s_CamerasStorage[name] = camera; 
+		s_CamerasController.m_ActiveCamera = name;
+		s_CamerasController.m_CamerasStorage[name] = camera; 
 	}
 
 
 	void CamerasController::OnViewportResize(const glm::vec2& size)
 	{
-		for (auto& cam : s_CamerasController.s_CamerasStorage)
+		for (auto& cam : s_CamerasController.m_CamerasStorage)
 		{
 			cam.second->OnViewportResize(size);
 		}
@@ -60,15 +63,15 @@ namespace Orion
 
 	const Shared<DummyCamera> CamerasController::GetActiveCamera()
 	{
-		auto camType = s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]->Get();
+		auto camType = s_CamerasController.m_CamerasStorage[s_CamerasController.m_ActiveCamera]->Get();
 	
 		if (camType == Cameras::Perspective)
 		{
-			return std::dynamic_pointer_cast<PerspectiveCamera>(s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]);
+			return std::dynamic_pointer_cast<PerspectiveCamera>(s_CamerasController.m_CamerasStorage[s_CamerasController.m_ActiveCamera]);
 		}
 		if (camType == Cameras::Orthographic)
 		{
-			return std::dynamic_pointer_cast<OrthographicCamera>(s_CamerasController.s_CamerasStorage[s_CamerasController.s_ActiveCamera]);
+			return std::dynamic_pointer_cast<OrthographicCamera>(s_CamerasController.m_CamerasStorage[s_CamerasController.m_ActiveCamera]);
 		}
 		ORI_ASSERT(false, "Uknown camera type!");
 	}
@@ -77,21 +80,21 @@ namespace Orion
 	{
 		if (IsCameraExist(name))
 		{
-			return s_CamerasController.s_CamerasStorage[name];
+			return s_CamerasController.m_CamerasStorage[name];
 		}
 		return nullptr;
 	}
 
 	bool CamerasController::IsCameraExist(std::string name)
 	{
-		bool isExist = s_CamerasController.s_CamerasStorage.find(name) != s_CamerasController.s_CamerasStorage.end();
+		bool isExist = s_CamerasController.m_CamerasStorage.find(name) != s_CamerasController.m_CamerasStorage.end();
 		ORI_CORE_ASSERT(isExist, "No camera with this name!")
 		return isExist;
 	}
 
 	bool CamerasController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
-		auto& cam = *s_CamerasStorage[s_ActiveCamera];
+		auto& cam = *m_CamerasStorage[m_ActiveCamera];
 
 		cam.SetZoomLevel(std::max(cam.GetZoomLevel() - e.GetYOffset() * 0.25f, 0.25f));
 		cam.RecalculateProjection();
@@ -104,7 +107,7 @@ namespace Orion
 		if (e.GetWidth() && e.GetHeight() != 0) {
 			float aspect = ((float)e.GetWidth() / (float)e.GetHeight());
 
-			for (auto& cam : s_CamerasController.s_CamerasStorage)
+			for (auto& cam : s_CamerasController.m_CamerasStorage)
 			{
 				cam.second->SetAspectRatio(aspect);
 				cam.second->SetScreenSize(glm::vec2(e.GetWidth(), e.GetHeight()));

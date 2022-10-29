@@ -30,6 +30,7 @@ namespace Orion {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
 		inline static Application& Get() { return *s_Instance; }
 
