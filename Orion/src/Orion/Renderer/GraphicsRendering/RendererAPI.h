@@ -25,6 +25,8 @@ namespace Orion
 		virtual void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void DrawArray(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void SetLineWidth(float width) = 0;
+		virtual void SetDepthMask(bool mode) = 0;
+
 		inline static API GetAPI() { return s_RendererAPI; }
 	private:
 		static API s_RendererAPI;

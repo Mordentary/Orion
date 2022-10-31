@@ -15,7 +15,6 @@ namespace Orion
 {
 	PerspectiveCamera::PerspectiveCamera(const glm::vec3& position, const glm::vec3& cameraTarget, float FOV) : DummyCamera(position), m_FOVdeg(FOV)
 	{
-		
 		if (position == cameraTarget) 
 		{
 			ORI_CORE_ASSERT(false, "Camera target and position are equal!");
@@ -23,7 +22,6 @@ namespace Orion
 		m_CameraSpaceAxisZ = -glm::normalize(position - cameraTarget);
 		m_CameraSpaceAxisX = glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY));
 		m_CameraSpaceAxisY = -glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisX);
-
 
 		m_ViewMatrix = glm::lookAt(position, position + m_CameraSpaceAxisZ, m_CameraSpaceAxisY);
 

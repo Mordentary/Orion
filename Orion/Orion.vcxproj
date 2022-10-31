@@ -670,6 +670,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl" />

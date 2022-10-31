@@ -40,7 +40,7 @@ namespace Orion{
 
 			static Scoped<Framebuffer> Create(const FramebufferSpecification& spec);
 
-		private:
+		
 
 
 	};

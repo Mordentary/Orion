@@ -13,6 +13,7 @@ namespace Orion {
 		virtual void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) override;
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const override;
 		virtual void SetLineWidth(float width) override;
+		virtual void SetDepthMask(bool mode) override;
 
 	};
 

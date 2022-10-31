@@ -11,6 +11,7 @@ namespace Orion {
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_STENCIL_TEST);
 		glEnable(GL_DEPTH_TEST);
+	//	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
@@ -52,6 +53,11 @@ namespace Orion {
 	void OpenGLRendererAPI::SetLineWidth(float width)
 	{
 		glLineWidth(width);
+	}
+
+	void OpenGLRendererAPI::SetDepthMask(bool mode)
+	{
+		glDepthMask(mode ? GL_TRUE : GL_FALSE);
 	}
 
 }

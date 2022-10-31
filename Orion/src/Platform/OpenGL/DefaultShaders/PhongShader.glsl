@@ -13,6 +13,7 @@ layout (location = 6) in float a_TextureSlot;
 
 out vec3 v_Normal;
 out vec4 v_Color;
+out vec3 v_CubeMapCoord;
 out vec2 v_TextCoord;
 flat out int v_TextSlot;
 
@@ -104,7 +105,8 @@ in vec2 v_TextCoord;
 flat in int v_TextSlot;
 
 in vec3 v_FragPos;
-  
+
+
 uniform sampler2D u_Texture[32];
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
@@ -120,6 +122,8 @@ uniform DirectionalLight u_Dirlight;
 
 void main()
 {
+
+
     vec3 norm = normalize(v_Normal);
     vec3 viewDir = normalize(u_CameraPos - v_FragPos);
     
@@ -133,7 +137,8 @@ void main()
 
     if(result.a < 0.1f) discard;
 
-    f_Color = result;
+   
+    f_Color = result  ;
 
 } 
 

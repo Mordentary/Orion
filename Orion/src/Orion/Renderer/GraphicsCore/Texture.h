@@ -3,7 +3,8 @@
 
 #include<string>
 #include"Orion/Core/Core.h"
-namespace Orion {
+namespace Orion 
+{
 
 
 		class Texture
@@ -17,8 +18,8 @@ namespace Orion {
 
 			virtual void SetData(void* data, uint32_t size) = 0;
 
-			virtual void Bind(uint32_t slot = 0)  = 0;
-			virtual void Unbind(uint32_t slot = 0)  = 0;
+			virtual void Bind(uint32_t slot = 1)  = 0;
+			virtual void Unbind()  = 0;
 			virtual uint32_t GetRendererID() const = 0;
 			virtual uint32_t& GetRendererID() = 0;
 
@@ -38,15 +39,22 @@ namespace Orion {
 			//TODO: MIPMAP ABSTRACTION
 
 		};
+
+
 		class Framebuffer;
+		
 		class Texture2D : public Texture 
 		{
 		public: 
 			virtual ~Texture2D() = default;
 			static Shared<Texture2D> Create(const std::string& path, const Texture2DParameters& spec = {});
 			static Shared<Texture2D> Create(uint32_t width, uint32_t height);
-
 			static Shared<Texture2D> Create(const Shared<Framebuffer>& fb);
 
+			static Shared<Texture2D> CreateCubemap(const std::vector<std::string>& paths);
+
+
+
 		};
+		
 }

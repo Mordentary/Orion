@@ -54,8 +54,8 @@ namespace Orion
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_TextureParam.TEXTURE_WRAP);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_TextureParam.TEXTURE_WRAP);
-
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
+
 
 		stbi_image_free(data);
 
@@ -86,10 +86,88 @@ namespace Orion
 	{
 		m_Width = fb->GetFramebufferSpec().Width;
 		m_Height = fb->GetFramebufferSpec().Height;
-
 		m_RendererID = fb->GetColorAttachmentID();
 	}
 
+	OpenGLTexture2D::OpenGLTexture2D(const std::vector<std::string>& paths)
+	{
+		
+		
+	
+		glGenTextures(1, &m_RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+
+		//glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_RendererID);
+
+	
+		stbi_set_flip_vertically_on_load(false);
+		GLenum internalFormat = 0, dataFormat = 0;
+		int width = 0, height = 0,channels = 0;
+		//stbi_uc* data = stbi_load(paths[0].c_str(), &width, &height, &channels, 0);
+
+		//if (channels == 4)
+		//{
+		//	internalFormat = GL_RGBA8;
+		//	dataFormat = GL_RGBA;
+		//}
+		//if (channels == 3)
+		//{
+		//	internalFormat = GL_RGB8;
+		//	dataFormat = GL_RGB;
+		//}
+		//if (channels == 1)
+		//{
+		//	internalFormat = GL_R8;
+		//	dataFormat = GL_RED;
+		//}
+		//glTexStorage2D(GL_TEXTURE_CUBE_MAP, 0, internalFormat, width, height);
+
+		for (uint32_t i = 0; i < paths.size(); i++)
+		{
+			stbi_uc* data = stbi_load(paths[i].c_str(), &width, &height, &channels, 0);
+			if (channels == 4)
+			{
+				internalFormat = GL_RGBA8;
+				dataFormat = GL_RGBA;
+			}
+			if (channels == 3)
+			{
+				internalFormat = GL_RGB8;
+				dataFormat = GL_RGB;
+			}
+			if (channels == 1)
+			{
+				internalFormat = GL_R8;
+				dataFormat = GL_RED;
+			}
+			if (data)
+			{
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,internalFormat,width, height,0, dataFormat, GL_UNSIGNED_BYTE, data);
+				stbi_image_free(data);
+			}
+			else
+			{
+				ORI_CORE_ASSERT(data, std::string("Failed to load image!") + " STB_IMAGE_FAILURE_REASON: " + stbi_failure_reason() + "! Path: " + paths[i]);
+				stbi_image_free(data);
+			}
+		}
+
+		m_Width = width;
+		m_Height = height;
+
+		m_InternalFormat = internalFormat;
+		m_DataFormat = dataFormat;
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		
+
+
+	}
+	
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{
@@ -102,13 +180,12 @@ namespace Orion
 		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
 		ORI_CORE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture");
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
-		
+	
 	}
 
-	void OpenGLTexture2D::Unbind(uint32_t slot) 
+	void OpenGLTexture2D::Unbind() 
 	{
-		m_CurrentSlot = 0;
-		glBindTextureUnit(slot, 0);
+		glBindTextureUnit(m_CurrentSlot, 0);
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) 

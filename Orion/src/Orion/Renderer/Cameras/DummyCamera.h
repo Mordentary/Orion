@@ -50,6 +50,7 @@ namespace Orion
 		inline const float IsRotation() const { return m_Rotation; }
 		
 		inline void OnViewportResize(const glm::vec2& size) { SetScreenSize(size); RecalculateProjection();}
+		inline void SetViewMatrix(const glm::mat4& view) { m_ViewMatrix = view; }
 		inline void SetPosition(const glm::vec3& position) { m_Position = position; }
 		inline void SetScreenSize(const glm::vec2& size) { m_ScreenSize = size;}
 		inline void SetZoomLevel(float zoom) { m_ZoomLevel = zoom;}

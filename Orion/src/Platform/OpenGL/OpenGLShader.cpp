@@ -24,7 +24,7 @@ namespace Orion
 
 	OpenGLShader::OpenGLShader(const std::string& srcPath)
 	{
-
+		
 		std::string shaderSource = ReadFile(srcPath);
 		auto shaderSources = PreProcess(shaderSource);
 		Compile(shaderSources);
@@ -60,6 +60,7 @@ namespace Orion
 	}
 	std::string OpenGLShader::ReadFile(const std::string& srcPath)
 	{
+		m_Path = srcPath;
 		std::string result;
 		std::ifstream in(srcPath, std::ios::in | std::ios::binary);
 		if (in)
@@ -138,7 +139,7 @@ namespace Orion
 
 
 				ORI_CORE_ERROR("{0}", infoLog.data());
-				ORI_CORE_ASSERT(false, "Shader compilation failure!!");
+				ORI_CORE_ASSERT(false, "Shader compilation failure!! Path: " + m_Path);
 				break;
 			}
 			glAttachShader(program, shader);

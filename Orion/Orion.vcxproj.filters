@@ -1621,5 +1621,6 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
   </ItemGroup>
 </Project>

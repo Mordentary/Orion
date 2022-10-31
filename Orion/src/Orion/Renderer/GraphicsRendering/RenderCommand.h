@@ -22,6 +22,12 @@ namespace Orion
 			s_RendererAPI->SetViewport( x,  y,  width,  height);
 		}
 
+		inline static void SetDepthMask(bool mode)
+		{
+			s_RendererAPI->SetDepthMask(mode);
+		}
+
+
 		inline static void SetClearColor(const glm::vec4& color)
 		{
 			s_RendererAPI->SetClearColor(color);

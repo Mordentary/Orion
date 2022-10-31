@@ -13,7 +13,6 @@ namespace Orion {
 		void Init() override
 		{
 			Orion::Renderer::Init();
-
 			m_Camera = Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 3.0f), glm::vec3(0.0f));
 			auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
 
@@ -22,6 +21,7 @@ namespace Orion {
 			Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 			m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
 			m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
+			m_SkyTexture = Orion::Texture2D::Create("E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg");
 
 
 
@@ -37,7 +37,17 @@ namespace Orion {
 			Orion::Renderer::AddLight(m_DirLight);
 			m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 			m_ModelOcean = Orion::CreateShared<Orion::Model>("assets/models/Ocean/Ocean.obj");
+			std::vector<std::string> cubeMapPaths
+			{
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/right.jpg",
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/left.jpg",
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg",
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/bottom.jpg",
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/front.jpg",
+					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/back.jpg"
+			};
 
+			m_CubeMap = Texture2D::CreateCubemap(cubeMapPaths);
 
 			Orion::FramebufferSpecification specFB;
 			specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
@@ -47,8 +57,9 @@ namespace Orion {
 
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
-			sceneTexture = Orion::Texture2D::Create(m_Framebuffer_Refra);
 
+			Orion::Renderer::SetSceneCubemap(m_CubeMap);
+			m_SceneTexture = Orion::Texture2D::Create(m_Framebuffer_Refra);
 
 		}
 
@@ -58,9 +69,11 @@ namespace Orion {
 			Orion::CamerasController::OnUpdate(deltaTime);
 
 			ORI_PROFILE_FUNCTION();
+			Shared<DummyCamera> cam = Orion::CamerasController::GetActiveCamera();
+			glm::mat4 view = cam->GetViewMatrix();
+
 			m_Framebuffer_Refra->Bind();
 				{
-				Orion::RenderCommand::Init();
 				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 				Orion::RenderCommand::Clear();
 
@@ -69,7 +82,7 @@ namespace Orion {
 
 				static float rotation = 0;
 				//	rotation += deltaTime * 100.f;
-				//ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPosition()));
+				//ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPositi()));
 
 
 
@@ -88,6 +101,8 @@ namespace Orion {
 				m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
 
+				//cam->SetViewMatrix((glm::rotate(glm::inverse(cam->GetViewMatrix()), glm::radians<float>(90), glm::vec3(0, 0.f, 1.0f))));
+
 				Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
@@ -97,7 +112,7 @@ namespace Orion {
 				Orion::Renderer::DrawModel(m_ModelMatrix, m_Model);
 
 
-				Orion::Renderer::DrawModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -0.8, 0.0)), m_ModelOcean);
+				Orion::Renderer::DrawModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, -0.8,0.0)),m_ModelOcean);
 
 				Orion::Material mat =
 				{
@@ -114,11 +129,11 @@ namespace Orion {
 				}
 			m_Framebuffer_Refra->Unbind();
 
-
+			cam->SetViewMatrix(view);
 
 			m_Framebuffer->Bind();
 			{
-				Orion::RenderCommand::Init();
+		
 				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 				Orion::RenderCommand::Clear();
 				//Orion::CamerasController::OnUpdate(deltaTime);
@@ -152,7 +167,7 @@ namespace Orion {
 
 				Orion::Material mat =
 				{
-					sceneTexture, m_SpecularMap, 2.f
+					m_SceneTexture, m_SpecularMap, 2.f
 				};
 
 				Orion::Renderer::DrawCube(glm::mat4(1.0f), mat);
@@ -317,7 +332,7 @@ namespace Orion {
 
 
 			Application::Get().GetImGuiLayer()->SetBlockEvent(!isFocused || !isHover);
-			CamerasController::SetBlockUpdate(!isFocused || !isHover);
+			CamerasController::SetBlockUpdate(!isHover);
 
 
 			ImVec2& size = ImGui::GetContentRegionAvail();
@@ -376,6 +391,6 @@ namespace Orion {
 		Orion::Shared<Orion::Framebuffer> m_Framebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_Model, m_ModelOcean;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
-		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, sceneTexture;
+		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_SceneTexture, m_CubeMap, m_SkyTexture;
 	};
 }

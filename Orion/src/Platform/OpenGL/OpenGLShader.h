@@ -79,7 +79,7 @@ namespace Orion
 
 	private:
 		uint32_t m_RendererID;
-        std::string m_Name;
+        std::string m_Name, m_Path;
         mutable std::unordered_map<std::string, uint32_t> m_UniformLocationCache;
 	};
 }

@@ -35,10 +35,13 @@ namespace Orion
 
 		Shared<Shader> PhongShader = nullptr;
 		Shared<Shader> LightShader = nullptr;
+		Shared<Shader> CubemapShader = nullptr;
 
 
 		Shared <Model> Cube = nullptr;
 		Shared <Model> Sphere = nullptr;
+
+		Shared<Texture2D> SceneCubeMap = nullptr;
 
 		Material DefaultMaterial;
 
@@ -82,7 +85,7 @@ namespace Orion
 
 		s_RenData3D.PhongShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/PhongShader.glsl");
 		s_RenData3D.LightShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl");
-
+		s_RenData3D.CubemapShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapShader.glsl");
 
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetIntArray("u_Texture", &samples[0], s_RenData3D.MaxTextureSlots);
@@ -137,9 +140,10 @@ namespace Orion
 
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
 	{
-		s_RenData3D.WhiteTexture->Bind();
+		if(s_RenData3D.SceneCubeMap)
+		LoadCubemap(camera);
 
-
+		s_RenData3D.WhiteTexture->Bind(0);
 
 		s_RenData3D.LightShader->Bind();
 		s_RenData3D.LightShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
@@ -148,8 +152,7 @@ namespace Orion
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
 	
-
-
+		
 
 		LoadLights();
 	}
@@ -163,6 +166,9 @@ namespace Orion
 	}
 	void Renderer::LoadLights()
 	{
+
+		
+
 		if (!s_RenData3D.LightSources.empty())
 		{
 			for (auto& lightSrc : s_RenData3D.LightSources)
@@ -185,8 +191,33 @@ namespace Orion
 		}
 
 	}
+	void Renderer::LoadCubemap(const Shared<DummyCamera>& camera)
+	{
 
-	void Renderer::AppendMesh(const Shared<Mesh> mesh, const glm::mat4& modelMatrix)
+
+		RenderCommand::SetDepthMask(false);
+
+
+		//glm::mat4 view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
+		s_RenData3D.CubemapShader->Bind();
+
+		s_RenData3D.SceneCubeMap->Bind(5);
+		s_RenData3D.CubemapShader->SetInt("u_Cubemap", s_RenData3D.SceneCubeMap->GetCurrentSlot());
+		s_RenData3D.CubemapShader->SetMat4("u_Proj", camera->GetProjectionMatrix());
+		s_RenData3D.CubemapShader->SetMat4("u_View",glm::mat4(glm::mat3(camera->GetViewMatrix())));
+
+		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, 0.0f });
+		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader);
+
+	
+
+		RenderCommand::SetDepthMask(true);
+
+		
+	
+
+	}
+	void Renderer::AppendMesh(const Shared<Mesh>& mesh, const glm::mat4& modelMatrix)
 	{
 		s_RenData3D.MeshIterator = &std::const_pointer_cast<Mesh>(mesh);
 
@@ -218,13 +249,19 @@ namespace Orion
 	}
 	void Renderer::DrawModel(const glm::mat4& modelMatrix, const Shared<Model>& model)
 	{
+
+		s_RenData3D.PhongShader->Bind();
+
 		model->BindAllTexture();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
 
 		model->Render(s_RenData3D.PhongShader);
 	}
-
+	void Renderer::SetSceneCubemap(const Shared<Texture2D>& cubeMap)
+	{
+		s_RenData3D.SceneCubeMap = cubeMap;
+	}
 	int32_t Renderer::GetTextureSlot(const Shared<Texture2D>& texture)
 	{
 		int32_t textureIndex = 0;

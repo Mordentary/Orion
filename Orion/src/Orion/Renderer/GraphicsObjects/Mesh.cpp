@@ -24,14 +24,15 @@ namespace Orion
 		 shader->Bind();
 		 if (m_Material.diffuseMap)
 		 shader->SetInt("u_Material.diffuse", m_Material.diffuseMap->GetCurrentSlot());
-		 else shader->SetInt("u_Material.diffuse", 0);
+		// else shader->SetInt("u_Material.diffuse", 0);
 
 		 if(m_Material.specularMap)
 		 shader->SetInt("u_Material.specular", m_Material.specularMap->GetCurrentSlot());
-		 else shader->SetInt("u_Material.specular", 0);
+		// else shader->SetInt("u_Material.specular", 0);
 
+		 if(m_Material.shininess)
 		 shader->SetFloat("u_Material.shininess", m_Material.shininess);
-
+		// else  shader->SetFloat("u_Material.shininess", 0.0f);
 
 		// RenderCommand::DrawArray(m_MeshVertexArray, m_Vertices.size());
 
