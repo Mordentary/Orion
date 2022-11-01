@@ -41,6 +41,7 @@ namespace Orion
 		ORI_PROFILE_FUNCTION();
 
 		m_Data.Title = props.Title;
+		m_Data.SamplesPerPixel = props.SamplesPerPixel;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 
@@ -58,13 +59,15 @@ namespace Orion
 		}
 
 
+		glfwWindowHint(GLFW_SAMPLES, m_Data.SamplesPerPixel);
+
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 
 
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
 
-	
+		glfwWindowHint(GLFW_SAMPLES, 4);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(false);
 		

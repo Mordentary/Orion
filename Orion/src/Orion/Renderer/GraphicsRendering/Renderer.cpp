@@ -46,6 +46,8 @@ namespace Orion
 		Material DefaultMaterial;
 
 		std::vector<Shared<LightSource>> LightSources;
+
+		Shared<DummyCamera> SceneCamera = nullptr;
 	};
 
 	RendererData3D Renderer::s_RenData3D;
@@ -97,8 +99,8 @@ namespace Orion
 			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture , 32.f
 		};
 
-		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("assets/models/PrimitiveShapes/Cube.obj");
-		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("assets/models/PrimitiveShapes/Sphere.obj");
+		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Cube.obj");
+		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Sphere.obj");
 
 		ResetBatch();
 	}
@@ -140,8 +142,7 @@ namespace Orion
 
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
 	{
-		if(s_RenData3D.SceneCubeMap)
-		LoadCubemap(camera);
+		s_RenData3D.SceneCamera = camera;
 
 		s_RenData3D.WhiteTexture->Bind(0);
 
@@ -151,14 +152,12 @@ namespace Orion
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
-	
-		
-
 		LoadLights();
 	}
 	void Renderer::EndScene()
 	{
-		
+		if (s_RenData3D.SceneCubeMap)
+			LoadCubemap(s_RenData3D.SceneCamera);
 	}
 	void Renderer::AddLight(const Shared<LightSource> light)
 	{
@@ -177,8 +176,6 @@ namespace Orion
 			}
 			s_RenData3D.PhongShader->SetFloat("u_PointLightCount", LightSource::GetCountOfPointLights());
 			s_RenData3D.PhongShader->SetFloat("u_SpotLightCount", LightSource::GetCountOfSpotLights());
-
-
 
 			s_RenData3D.LightShader->Bind();
 			for (auto& lightSrc : s_RenData3D.LightSources)
@@ -201,7 +198,7 @@ namespace Orion
 		//glm::mat4 view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
 		s_RenData3D.CubemapShader->Bind();
 
-		s_RenData3D.SceneCubeMap->Bind(5);
+		s_RenData3D.SceneCubeMap->Bind(1);
 		s_RenData3D.CubemapShader->SetInt("u_Cubemap", s_RenData3D.SceneCubeMap->GetCurrentSlot());
 		s_RenData3D.CubemapShader->SetMat4("u_Proj", camera->GetProjectionMatrix());
 		s_RenData3D.CubemapShader->SetMat4("u_View",glm::mat4(glm::mat3(camera->GetViewMatrix())));

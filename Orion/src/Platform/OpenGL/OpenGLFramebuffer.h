@@ -9,8 +9,6 @@ namespace Orion
 	class OpenGLFramebuffer :  public Framebuffer
 	{
 		public: 
-
-
 			OpenGLFramebuffer(const FramebufferSpecification& spec);
 			virtual ~OpenGLFramebuffer();
 			virtual void Bind() override;
@@ -22,7 +20,11 @@ namespace Orion
 
 			virtual uint32_t GetColorAttachmentID()const override { return m_ColorAttachment; }
 			virtual uint32_t GetDepthStencilAttachmentID() const override { return m_DepthStencilAttachment; }
+			virtual uint32_t GetRendererID() const override { return m_RendererID; };
 
+
+			virtual void BlitToDefaultBuffer() override;
+			virtual void BlitToBuffer(Orion::Shared<Framebuffer>& fb) override;
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const { return m_Specification; }
 			virtual FramebufferSpecification& GetFramebufferSpec() { return m_Specification; }

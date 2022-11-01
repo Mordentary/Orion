@@ -10,13 +10,16 @@ namespace Orion
 	struct WindowProps 
 	{
 		std::string Title;
+		uint32_t SamplesPerPixel;
 		unsigned int Width;
 		unsigned int Height;
 
+
 		WindowProps(
 			const std::string& title = "Orion Engine",
+			uint32_t samples = 1,
 			unsigned int width = 1280,
-			unsigned int height = 720) : Title(title), Width(width), Height(height) 
+			unsigned int height = 720) : Title(title), SamplesPerPixel(samples), Width(width), Height(height)
 		{
 		}
 	};
@@ -31,9 +34,9 @@ namespace Orion
 
 		virtual void OnUpdate() = 0;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
-
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
+		virtual uint32_t GetSamplesNum() const = 0;
 		//Window attributes
 		virtual void DisableCursor(bool IsHidden) = 0;
 		virtual void SetCursorPosition(float xPos, float yPos) = 0;

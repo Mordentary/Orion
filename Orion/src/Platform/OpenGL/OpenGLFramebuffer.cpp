@@ -13,17 +13,8 @@ namespace Orion
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
-		/*for (size_t i = 0; i < m_ColorAttachIndex; i++)
-		{
-			glDeleteTextures(1, &m_ColorAttachments[i]->GetRendererID());
-		}
-		for (size_t i = 0; i < m_DS_AttachIndex; i++)
-		{
-			glDeleteTextures(1, &m_DepthStencilAttachments[i]->GetRendererID());
-		}*/
-
 		glDeleteTextures(1, &m_ColorAttachment);
-		glDeleteTextures(1, &m_DepthStencilAttachment);
+		glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
 
 	}
 	inline void OpenGLFramebuffer::Bind()
@@ -37,7 +28,24 @@ namespace Orion
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
-	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer) 
+	void OpenGLFramebuffer::BlitToDefaultBuffer() 
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	}
+	void OpenGLFramebuffer::BlitToBuffer(Orion::Shared<Framebuffer>& fb)
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
+		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	}
+	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer)
 	{
 		m_Specification.Width = width;
 		m_Specification.Height = height;
@@ -58,31 +66,55 @@ namespace Orion
 		if(m_RendererID)
 		{
 			glDeleteFramebuffers(1, &m_RendererID);
-			/*for (size_t i = 0; i < m_ColorAttachIndex; i++)
-			{
-				glDeleteTextures(1, &m_ColorAttachments[i]->GetRendererID());
-			}
-			for (size_t i = 0; i < m_DS_AttachIndex; i++)
-			{
-				glDeleteTextures(1, &m_DepthStencilAttachments[i]->GetRendererID());
-			}*/
-
 			glDeleteTextures(1, &m_ColorAttachment);
-			glDeleteTextures(1, &m_DepthStencilAttachment);
-
-
+			glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
+			
 		}
 
 
-		glCreateFramebuffers(1, &m_RendererID);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+
+			glGenFramebuffers(1, &m_RendererID);
+			glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+
+		if (m_Specification.Samples > 1) 
+		{
+
+			//////////////////////////////
+			//////COLOR ATTACHMENT///////
+			////////////////////////////
+
+
+			glGenTextures(1, &m_ColorAttachment);
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
+
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Specification.Samples, GL_RGBA, m_Specification.Width, m_Specification.Height, GL_TRUE);
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
+
+			///////////////////////////////
+			///DEPTH STENCIL ATTACHMENT///
+			//////////////////////////////
+
+			glGenRenderbuffers(1, &m_DepthStencilAttachment);
+			glBindRenderbuffer(GL_RENDERBUFFER, m_DepthStencilAttachment);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_Specification.Samples, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
+
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			ORI_CORE_ASSERT(status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid:");
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+			return; //Exit!!!
+		}
 
 
 		//////////////////////////////
 		//////COLOR ATTACHMENT///////
 		////////////////////////////
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
+		glGenTextures(1, &m_ColorAttachment);
 		glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
@@ -93,25 +125,22 @@ namespace Orion
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
 
 
-
-
 		///////////////////////////////
 		///DEPTH STENCIL ATTACHMENT///
 		//////////////////////////////
 
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthStencilAttachment);
-		glBindTexture(GL_TEXTURE_2D, m_DepthStencilAttachment);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
-
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthStencilAttachment, 0);
-
+		glGenRenderbuffers(1, &m_DepthStencilAttachment);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_DepthStencilAttachment);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Specification.Width, m_Specification.Height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
 
 
 		ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid");
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	
 	}
 }

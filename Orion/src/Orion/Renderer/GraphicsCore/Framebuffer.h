@@ -1,5 +1,5 @@
 #pragma once
-
+#include"Orion/Core/Core.h"
 
 namespace Orion{
 
@@ -28,6 +28,10 @@ namespace Orion{
 
 			virtual uint32_t GetColorAttachmentID() const = 0;
 			virtual uint32_t GetDepthStencilAttachmentID() const = 0;
+			virtual uint32_t GetRendererID() const = 0;
+
+			virtual void BlitToDefaultBuffer() = 0;
+			virtual void BlitToBuffer(Orion::Shared<Framebuffer>& fb) = 0;
 
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const = 0;

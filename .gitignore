@@ -3,7 +3,8 @@
 !vendor/bin/premake/
 bin-int/
 #Pictures
-**/assets/
+Sandbox/assets/
+Orion-Editor/assets/
 
 #Heavy lib
 **/assimp/lib/

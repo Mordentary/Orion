@@ -17,8 +17,8 @@ out vec3 v_CubeMapCoord;
 
 void main()
 {
-	gl_Position = u_Proj * u_View *vec4(a_Position,1.0);
 	v_CubeMapCoord = a_Position;
+	gl_Position = vec4(u_Proj * u_View *vec4(a_Position,1.0)).xyww;
 }
 
 
