@@ -21,6 +21,6 @@ namespace Orion
 		inline float& GetOuterCutOff() { return m_OuterCutOff; }
 
 	private: 
-		float m_InnerCutOff = 1.f, m_OuterCutOff = 25.f;
+		float m_InnerCutOff = 0.5f, m_OuterCutOff = 5.f;
 	};
 }

@@ -11,7 +11,7 @@ namespace Orion
 		glm::vec3 Direction{ 0.0f,0.0f, -1.0f };
 
 		glm::vec3 AmbientLightColor{ 0.1f, 0.1f, 0.1f };
-		glm::vec3 DiffuseLightColor{ 0.5f, 0.5f, 0.5f};
+		glm::vec3 DiffuseLightColor{ 0.8f, 0.8f, 0.8f};
 		glm::vec3 SpecularLightColor{ 0.5f, 0.5f, 0.5f };
 
 		float ConstantAttenuation =  1.0f;

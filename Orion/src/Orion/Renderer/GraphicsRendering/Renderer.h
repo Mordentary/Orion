@@ -27,11 +27,13 @@ class Model;
 
 		static void BeginScene(const Shared<DummyCamera>& camera);
 		static void EndScene();
-		static void AddLight(const Shared<LightSource> light);
+		static void AddLight(const Shared<LightSource>& light, const Shared<Model>& lightModel = nullptr);
 		static void AppendMesh(const Shared<Mesh>& mesh, const glm::mat4& modelMatrix);
 		static void DrawCube(const glm::mat4& modelMatrix, const Material& material);
 		static void DrawSphere(const glm::mat4& modelMatrix, const Material& material);
 		static void DrawModel(const glm::mat4&  modelMatrix, const Shared<Model>& model);
+		static void LightSettings(float LinearAttenuation = 0.045, float QuadraticAttenuation = 0.0075);
+
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 		static void SetSceneCubemap(const Shared<Texture2D>& cubeMap);

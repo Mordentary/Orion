@@ -37,7 +37,6 @@ namespace Orion
 		Shared<Shader> LightShader = nullptr;
 		Shared<Shader> CubemapShader = nullptr;
 
-
 		Shared <Model> Cube = nullptr;
 		Shared <Model> Sphere = nullptr;
 
@@ -45,7 +44,7 @@ namespace Orion
 
 		Material DefaultMaterial;
 
-		std::vector<Shared<LightSource>> LightSources;
+		std::unordered_map<Shared<LightSource>,Shared<Model>> LightSources;
 
 		Shared<DummyCamera> SceneCamera = nullptr;
 	};
@@ -159,35 +158,59 @@ namespace Orion
 		if (s_RenData3D.SceneCubeMap)
 			LoadCubemap(s_RenData3D.SceneCamera);
 	}
-	void Renderer::AddLight(const Shared<LightSource> light)
+	void Renderer::AddLight(const Shared<LightSource>& light, const Shared<Model>& lightModel)
 	{
-		s_RenData3D.LightSources.push_back(light);
+		
+		if(s_RenData3D.LightSources.find(light) == s_RenData3D.LightSources.end())
+		{
+			if(lightModel)
+			s_RenData3D.LightSources[light] = lightModel;
+			else
+			s_RenData3D.LightSources[light] = s_RenData3D.Sphere;
+
+			return;
+		}
+
+		ORI_ASSERT(false, "Light already exists");
+		
 	}
 	void Renderer::LoadLights()
 	{
-
-		
-
 		if (!s_RenData3D.LightSources.empty())
 		{
-			for (auto& lightSrc : s_RenData3D.LightSources)
+			s_RenData3D.PhongShader->Bind();
+			for (auto&[lightSrc, model] : s_RenData3D.LightSources)
 			{
 				lightSrc->LoadToShader(s_RenData3D.PhongShader);
+				s_RenData3D.PhongShader->SetFloat("u_PointLightCount", LightSource::GetCountOfPointLights());
+				s_RenData3D.PhongShader->SetFloat("u_SpotLightCount", LightSource::GetCountOfSpotLights());
 			}
-			s_RenData3D.PhongShader->SetFloat("u_PointLightCount", LightSource::GetCountOfPointLights());
-			s_RenData3D.PhongShader->SetFloat("u_SpotLightCount", LightSource::GetCountOfSpotLights());
 
 			s_RenData3D.LightShader->Bind();
-			for (auto& lightSrc : s_RenData3D.LightSources)
+			for (auto&[lightSrc, model] : s_RenData3D.LightSources)
 			{
-				s_RenData3D.LightShader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f),lightSrc->GetLightProperties().Position) * glm::scale(glm::mat4(1.0f),glm::vec3(0.5f)));
-				s_RenData3D.LightShader->SetFloat3("u_LightColor",  lightSrc->GetLightProperties().DiffuseLightColor * 2.f);
 
-				s_RenData3D.Sphere->Render(s_RenData3D.LightShader);
+				//glm::mat4 ModelMatrix = glm::translate(glm::mat4(1.0f), lightSrc->GetLightProperties().Direction)
+				s_RenData3D.LightShader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f),lightSrc->GetLightProperties().Position) * glm::scale(glm::mat4(1.0f),glm::vec3(0.5f)));
+				s_RenData3D.LightShader->SetFloat3("u_LightColor",  lightSrc->GetLightProperties().DiffuseLightColor);
+
+				model->Render(s_RenData3D.LightShader);
 			}
 		}
 
 	}
+	void Renderer::LightSettings(float linearAttenuation, float quadraticAttenuation) 
+	{
+		if (!s_RenData3D.LightSources.empty())
+		{
+			for (auto& [lightSrc, model] : s_RenData3D.LightSources)
+			{
+				lightSrc->GetLightProperties().LinearAttenuation = linearAttenuation;
+				lightSrc->GetLightProperties().QuadraticAttenuation = quadraticAttenuation;
+			}
+		}
+	}
+
 	void Renderer::LoadCubemap(const Shared<DummyCamera>& camera)
 	{
 

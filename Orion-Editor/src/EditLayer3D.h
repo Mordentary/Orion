@@ -29,14 +29,20 @@ namespace Orion {
 			m_PointLight = Orion::CreateShared<Orion::PointLight>();
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
-			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
-			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 1.0f, 0.0f);
+			m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
+			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform.FBX");
+			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
 
-			Orion::Renderer::AddLight(m_SpotLight);
+			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
+
+			Orion::Renderer::AddLight(m_SpotLight, m_ModelLamp);
 			Orion::Renderer::AddLight(m_PointLight);
 			Orion::Renderer::AddLight(m_DirLight);
-			m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
-			m_ModelOcean = Orion::CreateShared<Orion::Model>("assets/models/Platform.FBX");
+
+
+
+
 			std::vector<std::string> cubeMapPaths
 			{
 					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/right.jpg",
@@ -71,34 +77,29 @@ namespace Orion {
 			
 			Orion::CamerasController::OnUpdate(deltaTime);
 
+			Orion::Renderer::LightSettings(m_LightSettings.x, m_LightSettings.y);
+
 			ORI_PROFILE_FUNCTION();
 
 
 			m_Framebuffer_Refra->Bind();
-				{
+			{
 				Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 				Orion::RenderCommand::Clear();
 
-				//Orion::Renderer2D::ResetStats();
-
-
-				static float rotation = 0;
-				//	rotation += deltaTime * 100.f;
-				//ORI_INFO("Pos: {0}", glm::to_string(Orion::CamerasController::GetActiveCamera()->GetPositi()));
-
-
 
 				float time = Orion::CurrentTime::GetCurrentTimeInSec();
-				m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 4, -1.0f, sin(time) / 4);
-
+				m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 5, -1.0f, sin(time) / 5);
 
 
 				glm::vec3 lightPos;
 				lightPos.x = sin(time) * 1.0f;
-				lightPos.y = 2.f;
+				lightPos.y = -1.f;
 				lightPos.z = cos(time) * 1.0f;
+
 				m_PointLight->GetLightProperties().Position = lightPos;
 				m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
+				m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
 
 				m_DirLight->GetLightProperties().Direction = m_SunDirection;
@@ -107,13 +108,10 @@ namespace Orion {
 				Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
-				m_ModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
+				
 
-
-				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 10.0)), m_Model);
-
-
-				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, -8.0, 0.0)), m_ModelOcean);
+				Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(10.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);
 
 				Orion::Material mat =
 				{
@@ -124,7 +122,7 @@ namespace Orion {
 
 
 				Orion::Renderer::EndScene();
-				}
+			}
 			
 			m_Framebuffer_Refra->Unbind();
 			m_Framebuffer_Refra->BlitToBuffer(m_Framebuffer);
@@ -137,15 +135,17 @@ namespace Orion {
 
 
 				float time = Orion::CurrentTime::GetCurrentTimeInSec();
-				m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 4, -1.0f, sin(time) / 4);
+				m_SpotLight->GetLightProperties().Direction = glm::vec3(cos(time) / 5, -1.0f, sin(time) / 5);
 
 
 				glm::vec3 lightPos;
 				lightPos.x = sin(time) * 1.0f;
-				lightPos.y = 2.f;
+				lightPos.y = -2.f;
 				lightPos.z = cos(time) * 1.0f;
 				m_PointLight->GetLightProperties().Position = lightPos;
 				m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
+				m_PointLight->GetLightProperties().SpecularLightColor = m_Color/2.f;
+
 
 
 				m_DirLight->GetLightProperties().Direction = m_SunDirection;
@@ -154,17 +154,18 @@ namespace Orion {
 				Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera());
 
 
-				m_ModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+			
 
 
-				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 10.0)),m_Model);
+				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
+
+				Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(10.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);
 
 
-				Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, -8.0, 0.0)), m_ModelOcean);
 
 				Orion::Material mat =
 				{
-					m_SceneTexture, nullptr, 2.f
+					m_SceneTexture, nullptr, 32.f
 				};
 
 				Orion::Renderer::DrawCube(glm::mat4(1.0f), mat);
@@ -313,6 +314,11 @@ namespace Orion {
 
 			ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 			ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -10.0f, 10.0f);
+			ImGui::SliderFloat("LinearAttenuation", &m_LightSettings.x, 0.0001f, 1.f);
+			ImGui::SliderFloat("QuadraticAttenuation", &m_LightSettings.y, 0.0001f, 1.0f);
+
+
+			
 			ImGui::Text("FPS: %f", ts.GetFPS());
 			
 
@@ -350,10 +356,6 @@ namespace Orion {
 
 			ImGui::PopStyleVar();
 
-
-
-
-
 			ImGui::End();
 
 		
@@ -380,12 +382,12 @@ namespace Orion {
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0,0,0 };
 
+		glm::vec2 m_LightSettings{0.15f,0.058f};
 		glm::vec2 m_ViewportSize;
-
 
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra;
-		Orion::Shared<Orion::Model> m_Model, m_ModelOcean;
+		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_SceneTexture, m_CubeMap, m_SkyTexture;
 	};

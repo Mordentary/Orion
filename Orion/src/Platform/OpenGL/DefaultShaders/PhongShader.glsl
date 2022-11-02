@@ -150,8 +150,12 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
+   // vec3 reflectDir = reflect(-lightDir, normal);
+
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
+    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
     // attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
@@ -181,8 +185,10 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         // diffuse shading
         float diff = max(dot(normal, lightDir), 0.0);
         // specular shading
-        vec3 reflectDir = reflect(-lightDir, normal);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
+       // vec3 reflectDir = reflect(-lightDir, normal);
+         vec3 halfwayDir = normalize(lightDir + viewDir);
+
+        float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
         // attenuation
         float distance    = length(light.position - fragPos);
         float attenuation = 1.0 / (light.constant + light.linear * distance + 
@@ -219,8 +225,10 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
+    //vec3 reflectDir = reflect(-lightDir, normal);
+      vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
     // combine results
     vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));

@@ -82,9 +82,9 @@ namespace Orion
             glm::vec3 vector; 
             //we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
-            vector.x = mesh->mVertices[i].x;
-            vector.y = mesh->mVertices[i].y;
-            vector.z = mesh->mVertices[i].z;
+            vector.x = mesh->mVertices[i].x * scale.x;
+            vector.y = mesh->mVertices[i].y * scale.y;
+            vector.z = mesh->mVertices[i].z * scale.z;
             vertex.Position = vector;
             // normals
             if (mesh->HasNormals())
@@ -161,7 +161,11 @@ namespace Orion
         // specular: texture_specularN
         // normal: texture_normalN
         aiColor3D color(0.f, 0.f, 0.f);
+        float shin = 0.f;
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+
+        material->Get(AI_MATKEY_SHININESS, shin);
+
         Material mat;
 
      
@@ -190,7 +194,7 @@ namespace Orion
             mat.specularMap = specularMaps[0];
         
 
-        mat.shininess = 32.f;
+        mat.shininess = 32.0f;
         
 
         // return a mesh object created from the extracted mesh data
