@@ -42,6 +42,11 @@ namespace Orion
 		{
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
+
+		inline static void CullBackFace(bool cull) //TODO: REMOVE
+		{
+			s_RendererAPI->CullBackFace(cull);
+		}
 	
 		inline static void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
 		{

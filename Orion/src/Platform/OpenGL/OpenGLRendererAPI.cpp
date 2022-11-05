@@ -14,6 +14,13 @@ namespace Orion {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 	}
+	void OpenGLRendererAPI::CullBackFace(bool cull)//TODO: REMOVE 
+	{
+		if (cull) {glCullFace(GL_BACK); return;}
+		glCullFace(GL_FRONT);
+	} 
+
+
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

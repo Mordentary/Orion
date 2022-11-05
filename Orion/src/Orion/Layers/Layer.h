@@ -5,8 +5,8 @@
 #include "Orion/Events/Event.h"
 #include "Orion/Core/TimeHelper.h"
 namespace Orion {
-
-	class ORION_API Layer
+	class DummyCamera;
+	class Layer
 	{
 
 	public:
@@ -15,8 +15,9 @@ namespace Orion {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(Timestep deltaTime) {}
 		virtual void Init()		{}
+		virtual void Update(Timestep deltaTime) {}
+		virtual void Render(const Shared<DummyCamera>& camera) {}
 		virtual void OnEvent(Event& event) {}
 		virtual void OnImGuiRender(Timestep deltaTime) {}
 

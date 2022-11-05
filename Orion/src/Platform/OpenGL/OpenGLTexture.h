@@ -13,7 +13,7 @@ namespace Orion
 
 		OpenGLTexture2D(const std::string& path, const Texture2DParameters& spec); //Creates texture from path
 		OpenGLTexture2D(uint32_t width, uint32_t height); //Creates clean RGBA texture
-		OpenGLTexture2D(const Shared<Framebuffer>& fb); //Copy color attachment from framebuffer
+		OpenGLTexture2D(const Shared<Framebuffer>& fb, bool depthAttach); //Copy color attachment from framebuffer
 
 		OpenGLTexture2D(const std::vector<std::string>& paths); // 
 

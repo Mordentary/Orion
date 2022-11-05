@@ -14,6 +14,8 @@ namespace Orion {
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const override;
 		virtual void SetLineWidth(float width) override;
 		virtual void SetDepthMask(bool mode) override;
+		virtual void CullBackFace(bool cull) override; //TODO: REMOVE
+
 
 	};
 

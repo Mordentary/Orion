@@ -18,10 +18,9 @@ namespace Orion
 
 		DummyCamera(
 			const glm::vec3& position,
-			bool rotation = true,
 			const glm::mat4& viewMatrix = glm::mat4(1.0f),
 			const glm::mat4& projectionMatrix = glm::mat4(1.0f),
-			const glm::mat4& projectionViewMatrix = glm::mat4(1.0f)
+			bool rotation = false
 		);
 		virtual ~DummyCamera() = default;
 
@@ -50,7 +49,7 @@ namespace Orion
 		inline const float IsRotation() const { return m_Rotation; }
 		
 		inline void OnViewportResize(const glm::vec2& size) { SetScreenSize(size); RecalculateProjection();}
-		inline void SetViewMatrix(const glm::mat4& view) { m_ViewMatrix = view; }
+		inline void SetViewMatrix(const glm::mat4& view) { m_ViewMatrix = view; RecalculateProjection(); }
 		inline void SetPosition(const glm::vec3& position) { m_Position = position; }
 		inline void SetScreenSize(const glm::vec2& size) { m_ScreenSize = size;}
 		inline void SetZoomLevel(float zoom) { m_ZoomLevel = zoom;}
@@ -66,12 +65,12 @@ namespace Orion
 		float m_CameraTranslationSpeed = 1.0f, m_CameraSensitivity = 180.0f;
 		bool m_Rotation = false;
 
-		glm::vec3 m_Position;
-		glm::mat4 m_ViewMatrix;
-		glm::mat4 m_ProjectionMatrix;
-		glm::mat4 m_ProjectionViewMatrix;
+		glm::vec3 m_Position{};
+		glm::mat4 m_ViewMatrix{};
+		glm::mat4 m_ProjectionMatrix{};
+		glm::mat4 m_ProjectionViewMatrix{};
 
-		glm::vec2 m_ScreenSize;
+		glm::vec2 m_ScreenSize{};
 
 	protected:
 

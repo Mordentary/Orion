@@ -52,13 +52,13 @@ public:
 
 	}
 
-	void OnUpdate(Orion::Timestep deltaTime) override
+	void Update(Orion::Timestep deltaTime) override
 	{
 		ORI_PROFILE_FUNCTION();
 
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 		Orion::RenderCommand::Clear();
-		Orion::CamerasController::OnUpdate(deltaTime);
+		Orion::CamerasController::Update(deltaTime);
 
 
 

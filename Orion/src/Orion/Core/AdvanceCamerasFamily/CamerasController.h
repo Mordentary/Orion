@@ -12,7 +12,7 @@ namespace Orion {
 	{
 	public:
 		static void Initiliaze();
-		static void OnUpdate(Timestep ts);
+		static void Update(Timestep ts);
 		static void OnEvent(Event& e);
 
 		
@@ -24,7 +24,7 @@ namespace Orion {
 		static const std::string& GetActiveCameraName() { return s_CamerasController.m_ActiveCamera; }
 		static const Shared<DummyCamera> GetActiveCamera();
 
-		static const Shared<DummyCamera>& GetCamera(std::string name);
+		static const Shared<DummyCamera> GetCamera(std::string name);
 		static bool IsCameraExist(std::string name);
 
 		//CamerasController() = default;

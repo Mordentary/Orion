@@ -20,6 +20,8 @@ namespace Orion
 
 			virtual uint32_t GetColorAttachmentID()const override { return m_ColorAttachment; }
 			virtual uint32_t GetDepthStencilAttachmentID() const override { return m_DepthStencilAttachment; }
+			virtual uint32_t GetDepthAttachmentID() const override { return m_DepthAttachment; }
+
 			virtual uint32_t GetRendererID() const override { return m_RendererID; };
 
 
@@ -40,6 +42,8 @@ namespace Orion
 		private:
 			uint32_t m_ColorAttachment = 0;         //TODO: MULTIPLE ATTACHMENTS DOESNT WORK!!
 			uint32_t m_DepthStencilAttachment = 0;
+			uint32_t m_DepthAttachment = 0;
+
 
 			//uint32_t m_ColorAttachIndex = 0, m_DS_AttachIndex = 0;
 

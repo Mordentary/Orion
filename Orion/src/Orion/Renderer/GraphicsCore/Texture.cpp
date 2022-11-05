@@ -36,7 +36,7 @@ namespace Orion {
 		}
 	}
 
-	Shared<Texture2D> Texture2D::Create(const Shared<Framebuffer>& fb)
+	Shared<Texture2D> Texture2D::Create(const Shared<Framebuffer>& fb, bool depthAttach)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -45,7 +45,7 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return CreateShared<OpenGLTexture2D>(fb);
+			return CreateShared<OpenGLTexture2D>(fb, depthAttach);
 
 		}
 	}

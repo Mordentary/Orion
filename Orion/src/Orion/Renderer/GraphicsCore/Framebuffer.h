@@ -7,13 +7,12 @@ namespace Orion{
 	struct FramebufferSpecification
 	{
 		uint32_t Width = 0 , Height = 0;
-
-		uint32_t ColorAttachmentsCount = 0;
-		uint32_t DepthStencilAttachmentsCount = 0;
-
 		uint32_t Samples = 1;
 
+
+		bool OnlyDepth = false;
 		bool SwapChainTarget = false;
+
 	};
 
 	class Framebuffer
@@ -28,6 +27,8 @@ namespace Orion{
 
 			virtual uint32_t GetColorAttachmentID() const = 0;
 			virtual uint32_t GetDepthStencilAttachmentID() const = 0;
+			virtual uint32_t GetDepthAttachmentID() const = 0;
+
 			virtual uint32_t GetRendererID() const = 0;
 
 			virtual void BlitToDefaultBuffer() = 0;

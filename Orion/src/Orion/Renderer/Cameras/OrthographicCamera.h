@@ -7,12 +7,16 @@
 
 namespace Orion {
 
-	class OrthographicCamera : public Orion::DummyCamera
+
+	class OrthographicCamera : public DummyCamera
 	{
 	public:
 		//OrthographicCamera() = default;
 		OrthographicCamera(glm::vec3& position, bool rotation = false, bool pixelByPixel = false);
+		OrthographicCamera(glm::vec3& position, glm::vec3& dir, glm::vec4& borders, glm::vec2& nearFarPlanes);
 		OrthographicCamera(float left, float right, float bottom, float top, bool rotation = false);
+
+
 		virtual ~OrthographicCamera() = default;
 
 

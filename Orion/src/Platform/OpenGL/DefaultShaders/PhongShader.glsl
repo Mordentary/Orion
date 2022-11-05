@@ -11,20 +11,23 @@ layout (location = 5) in vec2 a_TextureCoord;
 layout (location = 6) in float a_TextureSlot;
 
 
+
+
 out vec3 v_Normal;
 out vec4 v_Color;
 out vec3 v_CubeMapCoord;
 out vec2 v_TextCoord;
+out vec3 v_FragPos;
+out vec4 v_FragPosDirLight;
 flat out int v_TextSlot;
 
-out vec3 v_FragPos;
 
+uniform mat4 u_DirLightMatrix;
 uniform mat4 u_ViewProj;
 uniform mat4 u_ModelMatrix;
 
 void main()
 {
-   gl_Position =  u_ViewProj * u_ModelMatrix * vec4(a_Position, 1.0);
 
    v_Normal =  mat3(transpose(inverse(u_ModelMatrix))) * a_Normal; 
    v_Color = a_Color;
@@ -32,6 +35,10 @@ void main()
    v_TextSlot = int(a_TextureSlot);
 
    v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
+   v_FragPosDirLight = u_DirLightMatrix * vec4(v_FragPos, 1.0);
+
+   gl_Position =  u_ViewProj * vec4(v_FragPos, 1.0);
+
 
 }
 
@@ -99,15 +106,20 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 
+float ShadowCalculation(vec4 shadowFrag);
+
+
 in vec3 v_Normal;
 in vec4 v_Color;
 in vec2 v_TextCoord;
+in vec3 v_FragPos;
+in vec4 v_FragPosDirLight;
 flat in int v_TextSlot;
 
-in vec3 v_FragPos;
 
 
 uniform sampler2D u_Texture[32];
+uniform sampler2D u_ShadowMap;
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
 
@@ -129,18 +141,46 @@ void main()
     
     vec4 result = vec4(0.0f);
 
-  
+
     result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
     result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
     result += CalcSpotLight(u_Spotlight, norm, v_FragPos, viewDir);
 
-
+     
     if(result.a < 0.1f) discard;
 
-   
-    f_Color = result  ;
+    f_Color =  result * v_Color;
 
 } 
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(u_ShadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float bias = max(0.05 * (1.0 - dot(v_Normal, u_Dirlight.direction)), 0.005);
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+    for(int x = -2; x <= 2; ++x)
+    {
+        for(int y = -2; y <= 2; ++y)
+        {
+            float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 18.0;
+     if(projCoords.z > 1.0)
+        shadow = 0.0;
+    return shadow;
+}  
+
 
 
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -161,14 +201,16 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
   			     light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
+    vec3 ambient  = light.ambient;
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
-     return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
+
+
+    return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
 
 }
 
@@ -196,7 +238,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         float epsilon   = light.innerCutOff - light.outerCutOff;
         float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0); 
         // combine results
-        vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
+        vec3 ambient  = light.ambient;
         vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
         vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
@@ -230,10 +272,12 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
 
     float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
+    vec3 ambient  = light.ambient;
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
-   
-        return vec4(vec3(ambient + diffuse + specular), texture(u_Material.diffuse, v_TextCoord).w);
+
+    float shadow = ShadowCalculation(v_FragPosDirLight);
+
+    return vec4(vec3(diffuse + specular) * (1.f-shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 
 }  

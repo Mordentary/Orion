@@ -82,10 +82,15 @@ namespace Orion
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const Shared<Framebuffer>& fb)
+	OpenGLTexture2D::OpenGLTexture2D(const Shared<Framebuffer>& fb, bool depthAttach)
 	{
+
+
 		m_Width = fb->GetFramebufferSpec().Width;
 		m_Height = fb->GetFramebufferSpec().Height;
+
+		if (depthAttach) { m_RendererID = fb->GetDepthAttachmentID(); return; }
+
 		m_RendererID = fb->GetColorAttachmentID();
 	}
 

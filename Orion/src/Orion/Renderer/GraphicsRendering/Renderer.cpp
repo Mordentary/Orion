@@ -21,11 +21,12 @@ namespace Orion
 		uint32_t DrawCalls = 0;
 		uint32_t TotalSizeOfBatch = 0;
 
-		Shared<VertexArray> MeshVertexArray = nullptr;;
-		Shared<IndexBuffer> MeshIndexBuffer = nullptr;;
-		Shared<VertexBuffer> MeshVertexBuffer = nullptr;;
+		Shared<VertexArray> MeshVertexArray = nullptr;
+		Shared<IndexBuffer> MeshIndexBuffer = nullptr;
+		Shared<VertexBuffer> MeshVertexBuffer = nullptr;
 
-		Shared<Texture2D> WhiteTexture = nullptr;;
+		Shared<Texture2D> WhiteTexture = nullptr;
+		Shared<Texture2D> ShadowMap = nullptr;
 
 		Shared<Mesh>* MeshBufferBase = nullptr;
 		Shared<Mesh>* MeshIterator = nullptr;
@@ -137,6 +138,13 @@ namespace Orion
 
 		s_RenData3D.MeshVertexDataOffset = 0;
 		s_RenData3D.TextureSlotsIndex = 1;
+	}
+	void Renderer::SetShadowMaps(Shared<Texture2D>& shadowMap, const Shared<DummyCamera>& camera)
+	{
+		s_RenData3D.PhongShader->Bind();
+		shadowMap->Bind(4);
+		s_RenData3D.PhongShader->SetInt("u_ShadowMap", shadowMap->GetCurrentSlot());
+		s_RenData3D.PhongShader->SetMat4("u_DirLightMatrix", camera->GetProjectionViewMatrix());
 	}
 
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera)

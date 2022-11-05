@@ -78,7 +78,7 @@ namespace Orion
 			{
 				AnimationRenderer2D::SetDelta(deltaTime);
 				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate(deltaTime);
+					layer->Update(deltaTime);
 			}
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)

@@ -15,7 +15,7 @@ namespace Orion
 	{
 		
 	}
-	void CamerasController::OnUpdate(Timestep ts)
+	void CamerasController::Update(Timestep ts)
 	{
 		if (!s_CamerasController.m_BlockUpdate)
 		{
@@ -76,7 +76,7 @@ namespace Orion
 		ORI_ASSERT(false, "Uknown camera type!");
 	}
 
-	const Shared<DummyCamera>& CamerasController::GetCamera(std::string name)
+	const Shared<DummyCamera> CamerasController::GetCamera(std::string name)
 	{
 		if (IsCameraExist(name))
 		{

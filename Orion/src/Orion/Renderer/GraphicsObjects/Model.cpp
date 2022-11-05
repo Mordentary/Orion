@@ -24,6 +24,7 @@ namespace Orion
             aiProcess_RemoveRedundantMaterials |
             aiProcess_PreTransformVertices |
             aiProcess_OptimizeMeshes |
+            
             aiProcess_OptimizeGraph |
             aiProcess_GenBoundingBoxes | 
             aiProcess_GenSmoothNormals | 
@@ -70,11 +71,24 @@ namespace Orion
         // data to fill 
         
         std::vector<MeshVertex> vertices;
+        vertices.reserve(mesh->mNumVertices);
+
         std::vector<uint32_t> indices;
+         indices.reserve(mesh->mNumFaces * 3);
+
+         
         std::vector<Shared<Texture2D>> textures;
         // walk through each of the mesh's vertices
         auto MinMax = (mesh->mAABB.mMax - mesh->mAABB.mMin);
-        glm::vec3 scale = glm::vec3(1.0f) / glm::vec3(MinMax.x, MinMax.x, MinMax.x);
+        float scaleF = glm::max(glm::max(MinMax.x, MinMax.y), MinMax.z);
+        float scale = 1.0f / scaleF;
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        aiColor3D color(0.f, 0.f, 0.f);
+        material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        float shin = 0.f;
+        material->Get(AI_MATKEY_SHININESS, shin);
+
+
 
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
@@ -82,9 +96,9 @@ namespace Orion
             glm::vec3 vector; 
             //we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
-            vector.x = mesh->mVertices[i].x * scale.x;
-            vector.y = mesh->mVertices[i].y * scale.y;
-            vector.z = mesh->mVertices[i].z * scale.z;
+            vector.x = mesh->mVertices[i].x * scale;
+            vector.y = mesh->mVertices[i].y * scale;
+            vector.z = mesh->mVertices[i].z * scale;
             vertex.Position = vector;
             // normals
             if (mesh->HasNormals())
@@ -136,7 +150,7 @@ namespace Orion
                 vertex.Color.a = mesh->mColors[0][i].a;
                
             }
-            else vertex.Color = glm::vec4(1.0f);
+            else vertex.Color = glm::vec4(color.r, color.g, color.b, 1.0f);
 
 
             vertex.TextureSlot = 0;
@@ -153,20 +167,14 @@ namespace Orion
                 indices.push_back(face.mIndices[j]);
         }
         // process materials
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    
         // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
         // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
         // Same applies to other texture as the following list summarizes:
         // diffuse: texture_diffuseN
         // specular: texture_specularN
         // normal: texture_normalN
-        aiColor3D color(0.f, 0.f, 0.f);
-        float shin = 0.f;
-        material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-
-        material->Get(AI_MATKEY_SHININESS, shin);
-
-        Material mat;
+        Material mat{};
 
      
         // 1. diffuse maps
@@ -193,8 +201,8 @@ namespace Orion
        if(!specularMaps.empty())
             mat.specularMap = specularMaps[0];
         
-
-        mat.shininess = 32.0f;
+       if (!shin)mat.shininess = shin;
+       else mat.shininess = 32.f;
         
 
         // return a mesh object created from the extracted mesh data

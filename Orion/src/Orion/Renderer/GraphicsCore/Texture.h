@@ -49,7 +49,7 @@ namespace Orion
 			virtual ~Texture2D() = default;
 			static Shared<Texture2D> Create(const std::string& path, const Texture2DParameters& spec = {});
 			static Shared<Texture2D> Create(uint32_t width, uint32_t height);
-			static Shared<Texture2D> Create(const Shared<Framebuffer>& fb);
+			static Shared<Texture2D> Create(const Shared<Framebuffer>& fb, bool depthAttach = false);
 
 			static Shared<Texture2D> CreateCubemap(const std::vector<std::string>& paths);
 
