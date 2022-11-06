@@ -37,6 +37,8 @@ namespace Orion
 		Shared<Shader> PhongShader = nullptr;
 		Shared<Shader> LightShader = nullptr;
 		Shared<Shader> CubemapShader = nullptr;
+		Shared<Shader> CubemapDepthShader = nullptr;
+		Shared<Shader>  OnlyDepthShader = nullptr;
 
 		Shared <Model> Cube = nullptr;
 		Shared <Model> Sphere = nullptr;
@@ -44,10 +46,10 @@ namespace Orion
 		Shared<Texture2D> SceneCubeMap = nullptr;
 
 		Material DefaultMaterial;
-
 		std::unordered_map<Shared<LightSource>,Shared<Model>> LightSources;
-
 		Shared<DummyCamera> SceneCamera = nullptr;
+		bool OnlyDepthPass = false;  
+
 	};
 
 	RendererData3D Renderer::s_RenData3D;
@@ -88,6 +90,10 @@ namespace Orion
 		s_RenData3D.PhongShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/PhongShader.glsl");
 		s_RenData3D.LightShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl");
 		s_RenData3D.CubemapShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapShader.glsl");
+		s_RenData3D.CubemapDepthShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapDepthShader.glsl");
+		s_RenData3D.OnlyDepthShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/OnlyDepthShader.glsl");
+
+
 
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetIntArray("u_Texture", &samples[0], s_RenData3D.MaxTextureSlots);
@@ -147,10 +153,17 @@ namespace Orion
 		s_RenData3D.PhongShader->SetMat4("u_DirLightMatrix", camera->GetProjectionViewMatrix());
 	}
 
-	void Renderer::BeginScene(const Shared<DummyCamera>& camera)
+	void Renderer::BeginScene(const Shared<DummyCamera>& camera, bool onlyDepthPass)
 	{
 		s_RenData3D.SceneCamera = camera;
+		s_RenData3D.OnlyDepthPass = onlyDepthPass;
 
+		if (onlyDepthPass) 
+		{
+			s_RenData3D.OnlyDepthShader->Bind();
+			s_RenData3D.OnlyDepthShader->SetMat4("u_ViewProjMatrix", camera->GetProjectionViewMatrix());
+			return;
+		}
 		s_RenData3D.WhiteTexture->Bind(0);
 
 		s_RenData3D.LightShader->Bind();
@@ -163,7 +176,7 @@ namespace Orion
 	}
 	void Renderer::EndScene()
 	{
-		if (s_RenData3D.SceneCubeMap)
+		if (s_RenData3D.SceneCubeMap && !s_RenData3D.OnlyDepthPass)
 			LoadCubemap(s_RenData3D.SceneCamera);
 	}
 	void Renderer::AddLight(const Shared<LightSource>& light, const Shared<Model>& lightModel)
@@ -256,6 +269,14 @@ namespace Orion
 
 	void Renderer::DrawCube(const glm::mat4& modelMatrix, const Material& material)
 	{
+		if(s_RenData3D.OnlyDepthPass)
+		{
+			s_RenData3D.OnlyDepthShader->Bind();
+			s_RenData3D.OnlyDepthShader->SetMat4("u_ModelMatrix", modelMatrix);
+			s_RenData3D.Cube->Render(s_RenData3D.OnlyDepthShader);
+			return;
+
+		}
 		s_RenData3D.PhongShader->Bind();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
@@ -267,6 +288,16 @@ namespace Orion
 
 	void Renderer::DrawSphere(const glm::mat4& modelMatrix, const Material& material)
 	{
+
+		if (s_RenData3D.OnlyDepthPass)
+		{
+			s_RenData3D.OnlyDepthShader->Bind();
+			s_RenData3D.OnlyDepthShader->SetMat4("u_ModelMatrix", modelMatrix);
+			s_RenData3D.Sphere->Render(s_RenData3D.OnlyDepthShader);
+			return;
+
+		}
+
 		s_RenData3D.PhongShader->Bind();
 
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
@@ -277,11 +308,19 @@ namespace Orion
 	}
 	void Renderer::DrawModel(const glm::mat4& modelMatrix, const Shared<Model>& model)
 	{
+		if (s_RenData3D.OnlyDepthPass)
+		{
+			s_RenData3D.OnlyDepthShader->Bind();
+			s_RenData3D.OnlyDepthShader->SetMat4("u_ModelMatrix", modelMatrix);
+			model->BindAllTexture();
+			model->Render(s_RenData3D.OnlyDepthShader);
+			return;
+
+		}
 
 		s_RenData3D.PhongShader->Bind();
 
 		model->BindAllTexture();
-
 		s_RenData3D.PhongShader->SetMat4("u_ModelMatrix", modelMatrix);
 
 		model->Render(s_RenData3D.PhongShader);

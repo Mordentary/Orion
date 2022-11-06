@@ -1622,5 +1622,7 @@
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\OnlyDepthShader.glsl" />
   </ItemGroup>
 </Project>

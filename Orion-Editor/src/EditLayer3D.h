@@ -34,7 +34,7 @@ namespace Orion {
 			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform.FBX");
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
-
+			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 
 			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
 			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
@@ -70,8 +70,8 @@ namespace Orion {
 			specFB.Samples = 1;
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 
-			specFB.Width = 2048;
-			specFB.Height = 2048;
+			specFB.Width = 4096;
+			specFB.Height = 4096;
 			specFB.OnlyDepth = true;
 
 
@@ -112,17 +112,14 @@ namespace Orion {
 
 			auto& prop = m_PointLight->GetLightProperties();
 
+			const glm::vec3& pos = m_Camera->GetPosition();
 
-			glm::vec3 target = glm::vec3(lightPos.x, -5.0, lightPos.z);
-
-			glm::vec3 downVector = -glm::normalize(prop.Position - target);
-
-			auto cam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f, 0.f, 0.f), m_SunDirection, glm::vec4{ -10.f, 10.f, -10.f, 10.f }, glm::vec2{ -10.f, 10.f });
+			auto cam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f), m_SunDirection, glm::vec4{-20.f, 20.f, -20.f, 20.f}, glm::vec2{-20.f, 20.f});
 		
 			//auto cam = Orion::CreateShared<Orion::PerspectiveCamera>(m_SunDirection, glm::vec3(0.f, 0.f, 0.f));
 
 			//auto view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f) +  m_SunDirection, glm::vec3(0.f, 1.0f, 0.f));
-
+			m_DepthPass = true;
 			m_ShadowMapDir->Bind();
 			Render(cam);
 			m_ShadowMapDir->Unbind();
@@ -145,7 +142,7 @@ namespace Orion {
 			m_Framebuffer_Refra->BlitToBuffer(m_Framebuffer);*/
 
 			Orion::Renderer::SetShadowMaps(m_ShadowMapTexture, cam);
-
+			m_DepthPass = false;
 			m_FramebufferMS->Bind();
 			{
 				Render(Orion::CamerasController::GetActiveCamera());
@@ -160,13 +157,19 @@ namespace Orion {
 			Orion::RenderCommand::Clear();
 
 
-			Orion::Renderer::BeginScene(camera);
+			Orion::Renderer::BeginScene(camera, m_DepthPass);
 
 
 			Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
 
 			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.1, -0.3, 0.2)), m_ModelTree);
 
+
+			auto matrix = glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2))  * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f));
+			
+
+
+			Orion::Renderer::DrawModel(matrix, m_ModelCar);
 
 
 			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f,50.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);
@@ -395,15 +398,15 @@ namespace Orion {
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
 		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
 		glm::vec3 m_Position{ 0,0,0 };
-		glm::vec3 m_SunDirection{ 0,-1,0 };
+		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
 		glm::vec2 m_LightSettings{0.15f,0.058f};
 		glm::vec2 m_ViewportSize;
-
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra, m_ShadowMapDir, m_ShadowMapPoint, m_ShadowMapSpot;
-		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree;
+		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_SceneTexture, m_CubeMap, m_SkyTexture, m_ShadowMapTexture;
+		bool m_DepthPass = false;
 	};
 }

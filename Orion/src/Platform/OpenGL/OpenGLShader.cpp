@@ -45,6 +45,18 @@ namespace Orion
 		Compile(sources);
 
 	}
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometryShader) : m_Name(name)
+	{
+		std::unordered_map<GLenum, std::string> sources;
+		sources[GL_VERTEX_SHADER] = vertexSrc;
+		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		sources[GL_GEOMETRY_SHADER] = geometryShader;
+
+		Compile(sources);
+
+	}
+
+
 	OpenGLShader::~OpenGLShader()
 	{
 		glDeleteShader(m_RendererID);
@@ -105,8 +117,8 @@ namespace Orion
 	{
 		ORI_PROFILE_FUNCTION();
 		GLuint program = glCreateProgram();
-		ORI_CORE_ASSERT(2 <= shaderSources.size(), "Orion supports only 2 types of shaders!");
-		std::array<GLuint, 2> glShaderIDs{};
+		ORI_CORE_ASSERT(3 >= shaderSources.size(), "Orion supports only 3 types of shaders!");
+		std::array<GLuint, 3> glShaderIDs{};
 		int glShaderIDIndex = 0;
 
 		auto iterator = glShaderIDs.begin();

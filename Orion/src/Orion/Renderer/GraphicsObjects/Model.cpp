@@ -44,12 +44,38 @@ namespace Orion
 		}
 		m_Directory = path.substr(0, path.find_last_of('/'));
 
-		processNode(scene->mRootNode, scene);
+        FindGreastestMinMax(scene->mRootNode, scene);
+
+		ProcessNode(scene->mRootNode, scene);
 
 	}
 
-	void Model::processNode(aiNode* node, const aiScene* scene)
+    void Model::FindGreastestMinMax(aiNode* node, const aiScene* scene)
+    {
+
+       
+
+        for (unsigned int i = 0; i < node->mNumMeshes; i++)
+        {
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+            aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
+            float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
+
+            if (scaleF > m_MaxScale) m_MaxScale = scaleF;
+        } 
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            FindGreastestMinMax(node->mChildren[i], scene);
+        }
+
+
+    }
+
+	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
+            
+          
+
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
             {
@@ -57,16 +83,17 @@ namespace Orion
                 // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
              
-                m_Meshes.push_back(processMesh(mesh, scene));
+                m_Meshes.push_back(ProcessMesh(mesh, scene));
             }
             // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
             for (unsigned int i = 0; i < node->mNumChildren; i++)
             {
-                processNode(node->mChildren[i], scene);
+                ProcessNode(node->mChildren[i], scene);
             }
+           
 	}
 
-    Shared<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene)
+    Shared<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     {
         // data to fill 
         
@@ -79,9 +106,9 @@ namespace Orion
          
         std::vector<Shared<Texture2D>> textures;
         // walk through each of the mesh's vertices
-        auto MinMax = (mesh->mAABB.mMax - mesh->mAABB.mMin);
-        float scaleF = glm::max(glm::max(MinMax.x, MinMax.y), MinMax.z);
-        float scale = 1.0f / scaleF;
+        
+       
+        float scale = 1.0f / m_MaxScale;
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
@@ -178,19 +205,19 @@ namespace Orion
 
      
         // 1. diffuse maps
-        std::vector<Shared<Texture2D>> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        std::vector<Shared<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Shared<Texture2D>> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        std::vector<Shared<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Shared<Texture2D>> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
+        std::vector<Shared<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. shineness maps
-        std::vector<Shared<Texture2D>> shininessMaps = loadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
+        std::vector<Shared<Texture2D>> shininessMaps = LoadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
         textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
         // 4. base color maps
-        std::vector<Shared<Texture2D>> colorMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_color");
+        std::vector<Shared<Texture2D>> colorMaps = LoadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_color");
         textures.insert(textures.end(), colorMaps.begin(), colorMaps.end());
 
 
@@ -209,7 +236,7 @@ namespace Orion
         return CreateShared<Mesh>(vertices, indices, mat);
     }
 
-    std::vector<Shared<Texture2D>> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+    std::vector<Shared<Texture2D>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
             std::vector<Shared<Texture2D>> textures;
             for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)

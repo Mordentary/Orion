@@ -190,6 +190,9 @@ project "Orion-Editor"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/assets/**.glsl"
+
+
+
 	}
 
 	includedirs

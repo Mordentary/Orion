@@ -34,6 +34,20 @@ namespace Orion
 		}
 	}
 
+	Scoped<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+			break;
+		case RendererAPI::API::OpenGL:
+			return CreateScoped<OpenGLShader>(name, vertexSrc, fragmentSrc, geometrySrc);
+			break;
+		}
+	}
+
 	void ShaderLibrary::Add(const Shared<Shader>& shader)
 	{
 		auto& name = shader->GetName();

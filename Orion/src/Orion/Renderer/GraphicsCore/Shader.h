@@ -20,6 +20,7 @@ namespace Orion {
 
 		static Scoped<Shader> Create(const std::string& srcPath);
 		static Scoped<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Scoped<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometrySrc);
 
 
 

@@ -39,11 +39,12 @@ namespace Orion
         // model data
         std::vector<Shared<Mesh>> m_Meshes;
         std::string m_Directory;
-
+        float m_MaxScale = 0.f;
         void LoadModel(const std::string& path);
-        void processNode(aiNode* node, const aiScene* scene);
-       Shared<Mesh> processMesh(aiMesh* mesh, const aiScene* scene);
-        std::vector<Shared<Texture2D>> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
+        void FindGreastestMinMax(aiNode* rootNode, const aiScene* scene);
+        void ProcessNode(aiNode* node, const aiScene* scene);
+       Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+        std::vector<Shared<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type,
             std::string typeName);
     };
 }

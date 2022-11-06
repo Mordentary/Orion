@@ -25,7 +25,7 @@ class Model;
 		static void Init();
 		static void Flush();
 
-		static void BeginScene(const Shared<DummyCamera>& camera);
+		static void BeginScene(const Shared<DummyCamera>& camera, bool onlyDepthPass = false);
 		static void EndScene();
 		static void AddLight(const Shared<LightSource>& light, const Shared<Model>& lightModel = nullptr);
 		static void AppendMesh(const Shared<Mesh>& mesh, const glm::mat4& modelMatrix);

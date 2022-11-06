@@ -13,6 +13,8 @@ namespace Orion
 	public:
         OpenGLShader(const std::string& srcPath);
 		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+        OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const std::string& geometryShader);
+
 		~OpenGLShader();
 
 		virtual void Bind() const override;
