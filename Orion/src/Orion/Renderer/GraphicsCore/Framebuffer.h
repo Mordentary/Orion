@@ -10,8 +10,9 @@ namespace Orion{
 		uint32_t Samples = 1;
 
 
-		bool OnlyDepth = false;
+		bool OnlyDepthPass = false;
 		bool SwapChainTarget = false;
+		bool CubemapBuffer = false;
 
 	};
 
@@ -29,6 +30,9 @@ namespace Orion{
 			virtual uint32_t GetDepthStencilAttachmentID() const = 0;
 			virtual uint32_t GetDepthAttachmentID() const = 0;
 
+			virtual Shared<Texture2D> GetColorAttachmentTexture() const = 0;
+			virtual Shared<Texture2D> GetDepthAttachmentTexture() const = 0;
+			
 			virtual uint32_t GetRendererID() const = 0;
 
 			virtual void BlitToDefaultBuffer() = 0;

@@ -22,6 +22,21 @@ namespace Orion {
 	}
 
 
+	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+
+		case RendererAPI::API::OpenGL:
+			return CreateShared<OpenGLTexture2D>(width, height, samples, depthTexture);
+
+		}
+	}
+
+
 	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
 	{
 		switch (Renderer::GetAPI())
@@ -36,7 +51,8 @@ namespace Orion {
 		}
 	}
 
-	Shared<Texture2D> Texture2D::Create(const Shared<Framebuffer>& fb, bool depthAttach)
+
+	Shared<Texture2D> Texture2D::CreateCubemap(uint32_t width, uint32_t height, bool depthCubemap)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -45,10 +61,12 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return CreateShared<OpenGLTexture2D>(fb, depthAttach);
+			return CreateShared<OpenGLTexture2D>(width, height, depthCubemap);
 
 		}
 	}
+
+
 	Shared<Texture2D> Texture2D::CreateCubemap(const std::vector<std::string>& paths)
 	{
 		switch (Renderer::GetAPI())

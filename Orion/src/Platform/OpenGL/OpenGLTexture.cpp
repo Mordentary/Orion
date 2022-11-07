@@ -82,17 +82,75 @@ namespace Orion
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(const Shared<Framebuffer>& fb, bool depthAttach)
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture)
 	{
 
+		m_Width = width;
+		m_Height = height;
 
-		m_Width = fb->GetFramebufferSpec().Width;
-		m_Height = fb->GetFramebufferSpec().Height;
+	
+		if (depthTexture) 
+		{
+			glGenTextures(1, &m_RendererID);
+			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
-		if (depthAttach) { m_RendererID = fb->GetDepthAttachmentID(); return; }
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-		m_RendererID = fb->GetColorAttachmentID();
+			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+			m_InternalFormat = GL_DEPTH_COMPONENT;
+			m_DataFormat = GL_DEPTH_COMPONENT;
+
+			return; //Exit!!
+		}
+
+		if (samples > 1)
+		{
+
+			//////////////////////////////////////////
+			//////COLOR ATTACHMENT MULTISAMPLED///////
+			//////////////////////////////////////////
+			glGenTextures(1, &m_RendererID);
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_RendererID);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA, width, height, GL_TRUE);
+
+
+
+			m_InternalFormat = GL_RGBA;
+			m_DataFormat = GL_RGBA;
+
+
+			
+
+			return; //Exit!!!
+		}
+
+
+		//////////////////////////////
+		//////COLOR ATTACHMENT///////
+		////////////////////////////
+		glGenTextures(1, &m_RendererID);
+		glBindTexture(GL_TEXTURE_2D, m_RendererID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		m_InternalFormat = GL_RGBA8;
+		m_DataFormat = GL_RGBA;
+
 	}
+
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, bool depthCubemap)
+	{
+
+	}
+
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::vector<std::string>& paths)
 	{

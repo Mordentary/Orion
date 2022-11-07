@@ -11,19 +11,19 @@ namespace Orion
 		public: 
 			OpenGLFramebuffer(const FramebufferSpecification& spec);
 			virtual ~OpenGLFramebuffer();
+
 			virtual void Bind() override;
 			virtual void Unbind() override;
 
-			
-			//virtual Shared<Texture2D> GetColorAttachment(uint32_t index) {}
-			//virtual Shared<Texture2D> GetDepthS_Attachment(uint32_t index) {}
-
-			virtual uint32_t GetColorAttachmentID()const override { return m_ColorAttachment; }
-			virtual uint32_t GetDepthStencilAttachmentID() const override { return m_DepthStencilAttachment; }
-			virtual uint32_t GetDepthAttachmentID() const override { return m_DepthAttachment; }
 
 			virtual uint32_t GetRendererID() const override { return m_RendererID; };
 
+			virtual uint32_t GetColorAttachmentID() const override { return m_ColorAttachment->GetRendererID(); }
+			virtual uint32_t GetDepthAttachmentID() const override { return m_DepthAttachment->GetRendererID(); }
+			virtual uint32_t GetDepthStencilAttachmentID() const override { return m_DepthStencilAttachment; }
+
+			virtual Shared<Texture2D> GetColorAttachmentTexture() const override { return m_ColorAttachment; }
+			virtual Shared<Texture2D> GetDepthAttachmentTexture() const override { return m_DepthAttachment; }
 
 			virtual void BlitToDefaultBuffer() override;
 			virtual void BlitToBuffer(Orion::Shared<Framebuffer>& fb) override;
@@ -38,17 +38,14 @@ namespace Orion
 			void Invalidate(const FramebufferSpecification& spec);
 
 
-
 		private:
-			uint32_t m_ColorAttachment = 0;         //TODO: MULTIPLE ATTACHMENTS DOESNT WORK!!
+			FramebufferSpecification m_Specification;
+
+			Shared<Texture2D> m_DepthAttachment = nullptr;
+			Shared<Texture2D> m_ColorAttachment = nullptr;
 			uint32_t m_DepthStencilAttachment = 0;
-			uint32_t m_DepthAttachment = 0;
-
-
-			//uint32_t m_ColorAttachIndex = 0, m_DS_AttachIndex = 0;
 
 			uint32_t m_RendererID = 0;
-			FramebufferSpecification m_Specification;
 	};
 
 }

@@ -24,8 +24,6 @@ namespace Orion {
 			m_SkyTexture = Orion::Texture2D::Create("E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg");
 
 
-
-
 			m_SpotLight = Orion::CreateShared<Orion::SpotLight>();
 			m_PointLight = Orion::CreateShared<Orion::PointLight>();
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
@@ -67,23 +65,22 @@ namespace Orion {
 
 			m_FramebufferMS = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
+
 			specFB.Samples = 1;
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 
 			specFB.Width = 4096;
 			specFB.Height = 4096;
-			specFB.OnlyDepth = true;
+			specFB.OnlyDepthPass = true;
 
 
 			m_ShadowMapDir = Orion::Framebuffer::Create(specFB);
-			m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
-			m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
+			//m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
+			//m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
 
 
 			Orion::Renderer::SetSceneCubemap(m_CubeMap);
-			m_SceneTexture = Orion::Texture2D::Create(m_Framebuffer);
-			m_ShadowMapTexture = Orion::Texture2D::Create(m_ShadowMapDir, true);
-
+	
 
 			 m_LightDirCam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f, 0.f, 0.f), m_SunDirection, glm::vec4{ -10.f, 10.f, -10.f, 10.f }, glm::vec2{ -10.f, 10.f });
 		}
@@ -141,7 +138,8 @@ namespace Orion {
 			m_Framebuffer_Refra->Unbind();
 			m_Framebuffer_Refra->BlitToBuffer(m_Framebuffer);*/
 
-			Orion::Renderer::SetShadowMaps(m_ShadowMapTexture, cam);
+
+			Orion::Renderer::SetShadowMaps(m_ShadowMapDir->GetDepthAttachmentTexture(), cam);
 			m_DepthPass = false;
 			m_FramebufferMS->Bind();
 			{
@@ -329,9 +327,6 @@ namespace Orion {
 			ImGui::Text("FPS: %f", ts.GetFPS());
 
 
-			
-			
-
 			ImGui::End();
 
 			ImGui::Begin("ShadowMap");
@@ -365,10 +360,8 @@ namespace Orion {
 				CamerasController::OnViewportResize(m_ViewportSize);
 			}
 			m_ViewportSize = {size.x,size.y};
-		
+				
 			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{0,1}, ImVec2{1,0});
-
-
 
 			ImGui::End();
 
@@ -406,7 +399,7 @@ namespace Orion {
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra, m_ShadowMapDir, m_ShadowMapPoint, m_ShadowMapSpot;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
-		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_SceneTexture, m_CubeMap, m_SkyTexture, m_ShadowMapTexture;
+		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
 		bool m_DepthPass = false;
 	};
 }

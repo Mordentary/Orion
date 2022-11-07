@@ -13,7 +13,9 @@ namespace Orion
 	OpenGLFramebuffer::~OpenGLFramebuffer()
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
-		glDeleteTextures(1, &m_ColorAttachment);
+		if(m_ColorAttachment) glDeleteTextures(1, &m_ColorAttachment->GetRendererID()); m_ColorAttachment = nullptr;;
+		if (m_DepthAttachment) glDeleteTextures(1, &m_DepthAttachment->GetRendererID()); m_DepthAttachment = nullptr;;
+
 		glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
 
 	}
@@ -42,15 +44,12 @@ namespace Orion
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
 		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
 	}
 	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer)
 	{
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 		Invalidate();
-
 	}
 	inline void OpenGLFramebuffer::ClearFBOTexture(int32_t index, int value) 
 	{
@@ -65,67 +64,75 @@ namespace Orion
 	{
 			if(m_RendererID)
 			{
+				uint32_t id = m_ColorAttachment->GetRendererID();
 				glDeleteFramebuffers(1, &m_RendererID);
-				glDeleteTextures(1, &m_ColorAttachment);
+				if (m_ColorAttachment) glDeleteTextures(1, &m_ColorAttachment->GetRendererID()); m_ColorAttachment = nullptr;
+				if (m_DepthAttachment) glDeleteTextures(1, &m_DepthAttachment->GetRendererID()); m_DepthAttachment = nullptr;
 				glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
-			
 			}
 
 
 			glGenFramebuffers(1, &m_RendererID);
 			glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
-			if (!m_Specification.OnlyDepth) {
+
+			if (m_Specification.OnlyDepthPass) 
+			{
 
 
-				if (m_Specification.Samples > 1)
+
+				if (m_Specification.CubemapBuffer) 
 				{
-
-					//////////////////////////////
-					//////COLOR ATTACHMENT///////
-					////////////////////////////
-
-
-					glGenTextures(1, &m_ColorAttachment);
-					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
-
-					glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Specification.Samples, GL_RGBA, m_Specification.Width, m_Specification.Height, GL_TRUE);
-
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
-
-					///////////////////////////////
-					///DEPTH STENCIL ATTACHMENT///
-					//////////////////////////////
-
-					glGenRenderbuffers(1, &m_DepthStencilAttachment);
-					glBindRenderbuffer(GL_RENDERBUFFER, m_DepthStencilAttachment);
-					glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_Specification.Samples, GL_DEPTH32F_STENCIL8, m_Specification.Width, m_Specification.Height);
-					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
-
-					GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-					ORI_CORE_ASSERT(status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid:");
-
+					m_DepthAttachment = Orion::Texture2D::CreateCubemap(m_Specification.Width, m_Specification.Height, true);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0);
+					glDrawBuffer(GL_NONE);
+					glReadBuffer(GL_NONE);
+					ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid");
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-					return; //Exit!!!
+					return;
 				}
+				
+				m_DepthAttachment = Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples ,true);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0);
+				glDrawBuffer(GL_NONE);
+				glReadBuffer(GL_NONE);
 
+				ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid");
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-				//////////////////////////////
-				//////COLOR ATTACHMENT///////
-				////////////////////////////
+				return;
+			}
 
-				glGenTextures(1, &m_ColorAttachment);
-				glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+			m_ColorAttachment = Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples, false);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_Specification.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, m_ColorAttachment->GetRendererID(), 0);
+		
+			///////////////////////////////
+			///RENDEROBJECT ATTACHMENT////
+			//////////////////////////////
 
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				
 
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			if (m_Specification.Samples > 1)
+			{
 
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
+				///////////////////////////////////
+				///DEPTH STENCIL MULTISAMPLED//////
+				///////////////////////////////////
 
+				glGenRenderbuffers(1, &m_DepthStencilAttachment);
+				glBindRenderbuffer(GL_RENDERBUFFER, m_DepthStencilAttachment);
+				glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_Specification.Samples, GL_DEPTH32F_STENCIL8, m_Specification.Width, m_Specification.Height);
+
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
+
+				ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid:");
+
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			}
+			else
+			{
 
 				///////////////////////////////
 				///DEPTH STENCIL ATTACHMENT///
@@ -135,39 +142,13 @@ namespace Orion
 				glBindRenderbuffer(GL_RENDERBUFFER, m_DepthStencilAttachment);
 				glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH32F_STENCIL8, m_Specification.Width, m_Specification.Height);
 				glBindRenderbuffer(GL_RENDERBUFFER, 0);
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
 
+				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_DepthStencilAttachment);
 
 				ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid");
 
-
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-				return; //Exit
 			}
-
-
-
-			glGenTextures(1, &m_DepthAttachment);
-			glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-				m_Specification.Width, m_Specification.Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
-			glDrawBuffer(GL_NONE);
-			glReadBuffer(GL_NONE);
-
-			ORI_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is invalid");
-
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
 	}
 }
