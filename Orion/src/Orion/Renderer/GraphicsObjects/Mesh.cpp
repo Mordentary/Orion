@@ -32,7 +32,7 @@ namespace Orion
 
 		 if(m_Material.shininess)
 		 shader->SetFloat("u_Material.shininess", m_Material.shininess);
-		 else  shader->SetFloat("u_Material.shininess", 0.0f);
+		 else  shader->SetFloat("u_Material.shininess", 16.0f);
 
 		// RenderCommand::DrawArray(m_MeshVertexArray, m_Vertices.size());
 

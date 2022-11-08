@@ -48,6 +48,8 @@ namespace Orion
 		}
 	}
 
+	std::unordered_map<std::string, Shared<Shader>> ShaderLibrary::m_Shaders;
+
 	void ShaderLibrary::Add(const Shared<Shader>& shader)
 	{
 		auto& name = shader->GetName();
@@ -75,7 +77,7 @@ namespace Orion
 		return shader;
 	}
 
-	bool ShaderLibrary::Exists(const std::string& name) const
+	bool ShaderLibrary::Exists(const std::string& name)
 	{
 		return m_Shaders.find(name) != m_Shaders.end();
 	}

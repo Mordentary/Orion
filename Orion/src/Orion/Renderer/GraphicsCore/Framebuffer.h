@@ -40,8 +40,7 @@ namespace Orion{
 
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const = 0;
-			virtual FramebufferSpecification& GetFramebufferSpec() = 0 ;
-
+			virtual FramebufferSpecification& GetFramebufferSpec() = 0;
 
 
 			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) = 0;

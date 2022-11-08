@@ -17,7 +17,7 @@ namespace Orion {
 		virtual void OnDetach() {}
 		virtual void Init()		{}
 		virtual void Update(Timestep deltaTime) {}
-		virtual void Render(const Shared<DummyCamera>& camera) {}
+		virtual void Render() {}
 		virtual void OnEvent(Event& event) {}
 		virtual void OnImGuiRender(Timestep deltaTime) {}
 

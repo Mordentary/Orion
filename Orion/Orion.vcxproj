@@ -169,6 +169,7 @@
     <ClInclude Include="src\Orion\Core\Log.h" />
     <ClInclude Include="src\Orion\Core\MathHelper.h" />
     <ClInclude Include="src\Orion\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Orion\Core\OpenGLDefines.h" />
     <ClInclude Include="src\Orion\Core\TimeHelper.h" />
     <ClInclude Include="src\Orion\Core\Window.h" />
     <ClInclude Include="src\Orion\Events\ApplicationEvent.h" />
@@ -674,7 +675,7 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\OnlyDepthShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl" />
   </ItemGroup>

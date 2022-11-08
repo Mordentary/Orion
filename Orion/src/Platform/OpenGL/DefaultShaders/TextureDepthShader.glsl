@@ -39,12 +39,7 @@ uniform Material u_Material;
 
 void main()
 {
-
-
-    vec4 textureColor = texture(u_Material.diffuse, v_TextCoord);
-
-    if(textureColor.a < 0.1f) discard;
+    if(texture(u_Material.diffuse, v_TextCoord).a < 0.1f) discard;
     
-    //f_Color =  gl_FragCoord.z;
 
 } 

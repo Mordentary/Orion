@@ -1,7 +1,7 @@
 #pragma once
-#include"Mesh.h"
+#include"Model.h"
 #include"../GraphicsCore/Shader.h"
-
+#include"../GraphicsCore/Framebuffer.h"
 namespace Orion
 {
 
@@ -18,36 +18,39 @@ namespace Orion
 		float LinearAttenuation =  0.045;
 		float QuadraticAttenuation =  0.0075;
 	};
-	class LightSource : Mesh
+	class LightSource 
 	{
 	public:
 
 		LightSource() = default;
+		virtual ~LightSource() = default;
 
-		LightSource(const std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material) : Mesh(vertices, indices, material) 
+
+		LightSource(const Shared<Model>& lightModel) : m_LightModel(lightModel)
 		{
 			
-			SetupLight();
 		}
+		virtual void LoadToLightShader() = 0;
+		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) = 0;
+		virtual void RenderLightModel(Shared<Shader>& shader) = 0;
 
-		LightSource(const Shared<Shader>& shader, const Shared<Mesh>& mesh) :Mesh(mesh)
-		{
-			SetupLight();
-		}
-		virtual void LoadToShader(const Shared<Shader>& shader) = 0;
-		
+
+		const Shared<Model> GetLightModel() const {return m_LightModel;}
+		void SetLightModel(Shared<Model> model) { m_LightModel = model; }
+
+
+		Shared<Texture2D> GetShadowmap() const { return m_ShadowMap->GetDepthAttachmentTexture(); }
+
 		LightProperties& GetLightProperties() { return m_LightProp; }
+		const LightProperties GetLightProperties() const { return m_LightProp; }
 
-		 static uint32_t& GetCountOfSpotLights();
-		 static uint32_t& GetCountOfPointLights();
 
 	protected:
+		Shared<Framebuffer> m_ShadowMap = nullptr;
+		Shared<Model> m_LightModel = nullptr;
 		LightProperties m_LightProp;
-		static uint32_t s_SpotLightIndex;
-		static uint32_t s_PointLightIndex;
-
-		virtual void SetupLight() = 0;
-
+		glm::mat4 m_ProjMatrix{};
+		glm::mat4 m_ViewMatrix{};
 
 	};
 		

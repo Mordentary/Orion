@@ -33,9 +33,9 @@ namespace Orion
 			s_RendererAPI->SetClearColor(color);
 		}
 
-		inline static void Clear() 
+		inline static void Clear(int32_t mode) 
 		{
-			s_RendererAPI->Clear();
+			s_RendererAPI->Clear(mode);
 		}
 
 		inline static void DrawIndexed(const Shared<VertexArray>& vertexArray, uint32_t indexCount = 0)

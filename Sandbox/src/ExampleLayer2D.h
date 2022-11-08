@@ -181,7 +181,6 @@ public:
 	}
 private:
 	Orion::Shared<Test::Skeleton> m_Skeleton;
-	Orion::ShaderLibrary m_ShaderLibrary;
 	Orion::Shared<Orion::AnimationLibrary> m_AnimLibrary;
 	Orion::Shared<Orion::Texture2D> m_TextureJoker, m_TextureJokersFace, m_Chess, m_SpriteSheet, m_SkeletonSheet;
 	Orion::Shared<Orion::EventDispatcher> m_Dispatcher;

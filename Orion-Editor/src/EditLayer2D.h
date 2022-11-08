@@ -60,7 +60,7 @@ namespace Orion {
 			ORI_PROFILE_FUNCTION();
 
 			Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
-			Orion::RenderCommand::Clear();
+			Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH);
 			Orion::CamerasController::Update(deltaTime);
 
 
@@ -187,7 +187,6 @@ namespace Orion {
 		}
 	private:
 		Orion::Shared<Test::Skeleton> m_Skeleton;
-		Orion::ShaderLibrary m_ShaderLibrary;
 		Orion::Shared<Orion::AnimationLibrary> m_AnimLibrary;
 		Orion::Shared<Orion::Texture2D> m_TextureJoker, m_TextureJokersFace, m_Chess, m_SpriteSheet, m_SkeletonSheet;
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;

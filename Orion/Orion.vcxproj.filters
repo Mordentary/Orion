@@ -1485,6 +1485,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Core\OpenGLDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
@@ -1623,6 +1624,6 @@
     </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\OnlyDepthShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl" />
   </ItemGroup>
 </Project>

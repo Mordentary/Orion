@@ -5,18 +5,36 @@ namespace Orion
 	class DirectionalLight : public LightSource
 	{
 	public:
-		DirectionalLight() = default;
-
-		DirectionalLight(const std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material) : LightSource(vertices, indices, material)
+		DirectionalLight()
 		{
+			FramebufferSpecification fb;
+			fb.OnlyDepthPass = true;
+			fb.Width = 4096;
+			fb.Height = 4096;
+
+			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
+			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
+
+			m_ShadowMap = Framebuffer::Create(fb);
+		};
+
+		DirectionalLight(uint32_t shadowWidth, uint32_t shadowHeight) 
+		{
+			FramebufferSpecification fb;
+			fb.OnlyDepthPass = true;
+			fb.Width = shadowWidth;
+			fb.Height = shadowHeight;
+
+			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
+			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
+
+			m_ShadowMap = Framebuffer::Create(fb);
 		}
-		
 
-		virtual void SetupLight() override;
-		virtual void LoadToShader(const Shared<Shader>& shader) override;
 
-	private:
-		
+		virtual void RenderLightModel(Shared<Shader>& shader) override;
+		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
+		virtual void LoadToLightShader() override;
 
 	};
 }

@@ -25,7 +25,7 @@ namespace Orion
 		const uint32_t MaxIndices_Quad = MaxQuads * 6;
 		static const uint32_t MaxTextureSlots = 32;
 
-		Scoped<Shader> QuadShader;
+		Shared<Shader> QuadShader;
 		Shared<VertexArray> QuadVertexArray;
 		Shared<VertexBuffer> QuadVertexBuffer;
 		Shared<Texture2D> WhiteTexture;
@@ -34,7 +34,7 @@ namespace Orion
 		const uint32_t MaxVertices_Line = MaxLines * 2;
 		float LineWidth = 2.5f;
 
-		Scoped<Shader> LineShader;
+		Shared<Shader> LineShader;
 		Shared<VertexArray> LineVertexArray;
 		Shared<VertexBuffer> LineVertexBuffer;
 
@@ -129,8 +129,8 @@ namespace Orion
 
 		//Shader preparation
 
-		s_RenData2D.QuadShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/QuadShader.glsl");
-		s_RenData2D.LineShader = Shader::Create("../Orion/src/Platform/OpenGL/DefaultShaders/LineShader.glsl");
+		s_RenData2D.QuadShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/QuadShader.glsl");
+		s_RenData2D.LineShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LineShader.glsl");
 
 		s_RenData2D.QuadShader->Bind();
 		s_RenData2D.QuadShader->SetIntArray("u_Texture", &samples[0], s_RenData2D.MaxTextureSlots);

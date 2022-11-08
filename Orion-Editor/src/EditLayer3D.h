@@ -24,9 +24,6 @@ namespace Orion {
 			m_SkyTexture = Orion::Texture2D::Create("E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg");
 
 
-			m_SpotLight = Orion::CreateShared<Orion::SpotLight>();
-			m_PointLight = Orion::CreateShared<Orion::PointLight>();
-			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
 			m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform.FBX");
@@ -34,14 +31,16 @@ namespace Orion {
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 
+			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
+			m_PointLight = Orion::CreateShared<Orion::PointLight>();
+			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
+
 			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
 			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
 
-			Orion::Renderer::AddLight(m_SpotLight, m_ModelLamp);
+			Orion::Renderer::AddLight(m_SpotLight);
 			Orion::Renderer::AddLight(m_PointLight);
 			Orion::Renderer::AddLight(m_DirLight);
-
-
 
 
 			std::vector<std::string> cubeMapPaths
@@ -73,9 +72,10 @@ namespace Orion {
 			specFB.Height = 4096;
 			specFB.OnlyDepthPass = true;
 
-
 			m_ShadowMapDir = Orion::Framebuffer::Create(specFB);
-			//m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
+
+			specFB.CubemapBuffer = true;
+			m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
 			//m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
 
 
@@ -87,7 +87,7 @@ namespace Orion {
 
 		void Update(Orion::Timestep deltaTime) override
 		{
-			
+
 			Orion::CamerasController::Update(deltaTime);
 			Orion::Renderer::LightSettings(m_LightSettings.x, m_LightSettings.y);
 
@@ -104,60 +104,25 @@ namespace Orion {
 			m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
 			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
-			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) / 5, 3.0f, sin(time) / 5);
+			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) * 4, 5.0f, sin(time) * 4);
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
-			auto& prop = m_PointLight->GetLightProperties();
 
-			const glm::vec3& pos = m_Camera->GetPosition();
-
-			auto cam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f), m_SunDirection, glm::vec4{-20.f, 20.f, -20.f, 20.f}, glm::vec2{-20.f, 20.f});
-		
-			//auto cam = Orion::CreateShared<Orion::PerspectiveCamera>(m_SunDirection, glm::vec3(0.f, 0.f, 0.f));
-
-			//auto view = glm::lookAt(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f) +  m_SunDirection, glm::vec3(0.f, 1.0f, 0.f));
-			m_DepthPass = true;
-			m_ShadowMapDir->Bind();
-			Render(cam);
-			m_ShadowMapDir->Unbind();
-
-
-
-		/*	m_ShadowMapPoint->Bind();
-			Render(Orion::CamerasController::GetActiveCamera());
-			m_ShadowMapPoint->Unbind();
-
-			m_ShadowMapSpot->Bind();
-			Render(Orion::CamerasController::GetActiveCamera());
-			m_ShadowMapSpot->Unbind();*/
+			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render();});
 			
-		/*	m_Framebuffer_Refra->Bind();
-			{
-				Render(Orion::CamerasController::GetActiveCamera());
-			}
-			m_Framebuffer_Refra->Unbind();
-			m_Framebuffer_Refra->BlitToBuffer(m_Framebuffer);*/
+				Render();
+			
+			Orion::Renderer::EndScene();
 
-
-			Orion::Renderer::SetShadowMaps(m_ShadowMapDir->GetDepthAttachmentTexture(), cam);
-			m_DepthPass = false;
-			m_FramebufferMS->Bind();
-			{
-				Render(Orion::CamerasController::GetActiveCamera());
-			}
-			m_FramebufferMS->Unbind();
+		
 			m_FramebufferMS->BlitToBuffer(m_Framebuffer);
 
+
 		}
-		void Render(const Shared<DummyCamera>& camera) override 
+		void Render() override 
 		{
-			Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
-			Orion::RenderCommand::Clear();
-
-
-			Orion::Renderer::BeginScene(camera, m_DepthPass);
-
-
+	
+			
 			Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
 
 			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.1, -0.3, 0.2)), m_ModelTree);
@@ -180,10 +145,6 @@ namespace Orion {
 			Orion::Renderer::DrawSphere(glm::mat4(1.0f),{nullptr,nullptr,0});
 			Orion::Renderer::DrawCube(glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-3.0f,0.f)), mat);
 
-
-
-
-			Orion::Renderer::EndScene();
 		}
 
 
@@ -333,7 +294,7 @@ namespace Orion {
 
 			ImVec2& sizeSha = ImGui::GetContentRegionAvail();
 			
-			ImGui::Image((void*)m_ShadowMapDir->GetDepthAttachmentID(), sizeSha, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+			ImGui::Image((void*)m_DirLight->GetShadowmap()->GetRendererID(), sizeSha, ImVec2{0,1}, ImVec2{1,0});
 
 			ImGui::End();
 
@@ -400,6 +361,5 @@ namespace Orion {
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
-		bool m_DepthPass = false;
 	};
 }

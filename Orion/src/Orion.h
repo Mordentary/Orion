@@ -17,6 +17,7 @@
 			   
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
+#include"Orion/Core/OpenGLDefines.h"
 #include"Orion/Core/MouseButtonCodes.h"
 #include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
 

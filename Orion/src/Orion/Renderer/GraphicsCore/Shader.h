@@ -64,16 +64,18 @@ namespace Orion {
 	class ShaderLibrary 
 	{
 	public:
-		void Add(const Shared<Shader>& shader);
-		void Add(const std::string& name,const Shared<Shader>& shader);
-		Shared<Shader> Load(const std::string& filepath);
-		Shared<Shader> Load(const std::string& name, const std::string& filepath);
+		static void Add(const Shared<Shader>& shader);
+		static void Add(const std::string& name,const Shared<Shader>& shader);
+		static Shared<Shader> Load(const std::string& filepath);
+		static Shared<Shader> Load(const std::string& name, const std::string& filepath);
 
-		Shared<Shader> Get(const std::string& name);
-		bool Exists(const std::string& name) const;
+		static Shared<Shader> Get(const std::string& name);
+		static bool Exists(const std::string& name);
 
 	private:
-		std::unordered_map<std::string, Shared<Shader>> m_Shaders;
+		static std::unordered_map<std::string, Shared<Shader>> m_Shaders;
 	};
+
+
 }
 

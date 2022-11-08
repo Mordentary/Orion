@@ -1,0 +1,6 @@
+#pragma once
+
+
+#define ORI_CLEAR_DEPTH 0x00000100
+#define ORI_CLEAR_STENCIL 0x00000400
+#define ORI_CLEAR_COLOR 0x00004000
