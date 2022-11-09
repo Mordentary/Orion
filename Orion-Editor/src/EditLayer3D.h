@@ -33,10 +33,15 @@ namespace Orion {
 
 			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
 			m_PointLight = Orion::CreateShared<Orion::PointLight>();
+			//m_PointLight2 = Orion::CreateShared<Orion::PointLight>();
+			//m_PointLight3 = Orion::CreateShared<Orion::PointLight>();
+
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
 			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
 			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
+
+
 
 			Orion::Renderer::AddLight(m_SpotLight);
 			Orion::Renderer::AddLight(m_PointLight);
@@ -75,12 +80,13 @@ namespace Orion {
 			m_ShadowMapDir = Orion::Framebuffer::Create(specFB);
 
 			specFB.CubemapBuffer = true;
-			m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
-			//m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
+			//m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
+			m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
 
 
+			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
 			Orion::Renderer::SetSceneCubemap(m_CubeMap);
-	
+
 
 			 m_LightDirCam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f, 0.f, 0.f), m_SunDirection, glm::vec4{ -10.f, 10.f, -10.f, 10.f }, glm::vec2{ -10.f, 10.f });
 		}
@@ -97,12 +103,21 @@ namespace Orion {
 			float time = Orion::CurrentTime::GetCurrentTimeInSec();
 
 			lightPos.x = sin(time) * 2.0f;
-			lightPos.y = 0.0f;
+			lightPos.y = 1.0f;
 			lightPos.z = cos(time) * 2.0f;
 
-			m_PointLight->GetLightProperties().Position = lightPos;
-			m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
-			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
+			m_PointLight->GetLightProperties().Position = lightPos / 3.f;
+			m_PointLight->GetLightProperties().DiffuseLightColor = glm::vec3(m_Color.r, 0.2f, 0.2f);
+			m_PointLight->GetLightProperties().SpecularLightColor = glm::vec3(m_Color.r, 0.2f, 0.2f)  / 2.f;
+
+			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
+			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
+			//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
+			//
+			//m_PointLight3->GetLightProperties().Position = lightPos * 4.f;
+			//m_PointLight3->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, 0.2f, m_Color.b);
+			//m_PointLight3->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
+
 
 			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) * 4, 5.0f, sin(time) * 4);
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
@@ -125,7 +140,7 @@ namespace Orion {
 			
 			Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
 
-			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.1, -0.3, 0.2)), m_ModelTree);
+			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.3, -0.3, 0.5)), m_ModelTree);
 
 
 			auto matrix = glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2))  * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -359,7 +374,7 @@ namespace Orion {
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra, m_ShadowMapDir, m_ShadowMapPoint, m_ShadowMapSpot;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar;
-		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight;
+		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
 	};
 }

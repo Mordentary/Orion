@@ -240,7 +240,6 @@ namespace Orion
 	void Renderer::LoadCubemap(const Shared<DummyCamera>& camera)
 	{
 
-
 		RenderCommand::SetDepthMask(false);
 
 

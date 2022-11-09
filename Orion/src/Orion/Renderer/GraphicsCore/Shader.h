@@ -55,6 +55,7 @@ namespace Orion {
  
 		virtual void SetMat4(const std::string& name, const glm::mat4& mat) = 0;
 		 
+		virtual void SetMat4Array(const std::string& name, const glm::mat4* mat, uint32_t count) = 0;
 
 
 	};

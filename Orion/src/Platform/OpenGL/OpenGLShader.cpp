@@ -196,7 +196,7 @@ namespace Orion
 	}
 
 
-	uint32_t OpenGLShader::GetUniformLocation(const std::string& name) const
+	int32_t OpenGLShader::GetUniformLocation(const std::string& name) const
 	{
 		ORI_PROFILE_FUNCTION();
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
@@ -204,7 +204,11 @@ namespace Orion
 			return m_UniformLocationCache[name];
 		}
 
-		m_UniformLocationCache[name] = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+
+		if (location == -1) return -1;
+
+		m_UniformLocationCache[name] = location;
 		return m_UniformLocationCache[name];
 
 	}
@@ -252,70 +256,96 @@ namespace Orion
 	{
 		UploadUniformMat4(name, mat);
 	}
+	void OpenGLShader::SetMat4Array(const std::string& name, const glm::mat4* mat, uint32_t count)
+	{
+		UploadUniformMat4Array(name, mat, count);
+	}
+
 	void OpenGLShader::UploadUniformBool(const std::string& uniformName, bool value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform1i(location, (int)value);
 	}
 	void OpenGLShader::UploadUniformIntArray(const std::string& uniformName, const int* values, uint32_t count)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform1iv(location, count, values);
 	}
 	void OpenGLShader::UploadUniformInt(const std::string& uniformName, int value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform1i(location, value);
 	}
 	void OpenGLShader::UploadUniformFloat(const std::string& uniformName, float value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform1f(location, value);
 	}
 	void OpenGLShader::UploadUniformFloat2(const std::string& uniformName, const glm::vec2& value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform2f(location, value.x, value.y);
 	}
 	void OpenGLShader::UploadUniformFloat2(const std::string& uniformName, float x, float y)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform2f(location, x, y);
 	}
 	void OpenGLShader::UploadUniformFloat3(const std::string& uniformName, const glm::vec3& value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform3f(location, value.x, value.y, value.z);
 	}
 	void OpenGLShader::UploadUniformFloat3(const std::string& uniformName, float x, float y, float z)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform3f(location, x, y, z);
 	}
 	void OpenGLShader::UploadUniformFloat4(const std::string& uniformName, const glm::vec4& value)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 	void OpenGLShader::UploadUniformFloat4(const std::string& uniformName, float x, float y, float z, float w)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniform4f(location, x,  y,  z, w);
 	}
 	void OpenGLShader::UploadUniformMat2(const std::string& uniformName, const glm::mat2& matrix)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 	void OpenGLShader::UploadUniformMat3(const std::string& uniformName, const glm::mat3& matrix)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 	void OpenGLShader::UploadUniformMat4(const std::string& uniformName, const glm::mat4& matrix)
 	{
 		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+	}
+
+	void OpenGLShader::UploadUniformMat4Array(const std::string& uniformName, const glm::mat4* matrix, uint32_t count)
+	{
+		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
+		glUniformMatrix4fv(location, count, GL_FALSE, glm::value_ptr(matrix[0]));
+
 	}
 	
 }

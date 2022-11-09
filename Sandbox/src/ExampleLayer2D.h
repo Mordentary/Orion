@@ -57,7 +57,7 @@ public:
 		ORI_PROFILE_FUNCTION();
 
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
-		Orion::RenderCommand::Clear();
+		Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 		Orion::CamerasController::Update(deltaTime);
 
 

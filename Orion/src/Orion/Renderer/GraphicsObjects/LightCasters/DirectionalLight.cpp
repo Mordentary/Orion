@@ -17,7 +17,10 @@ namespace Orion
 			m_LightModel->Render(shader);
 		}
 	}
-	void DirectionalLight::SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc)
+	void DirectionalLight::SetupLight(
+		Shared<Shader>& currentShader, 
+		std::vector<Shared<LightSource>>& otherLights, 
+		std::function<void()> renderFunc)
 	{
 		m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
 

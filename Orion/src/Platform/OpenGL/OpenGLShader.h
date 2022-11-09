@@ -22,7 +22,7 @@ namespace Orion
 	
         virtual inline std::string GetName() const { return m_Name; }
 
-        uint32_t GetUniformLocation(const std::string& name) const;
+        int32_t GetUniformLocation(const std::string& name) const;
 
 
 
@@ -45,6 +45,8 @@ namespace Orion
         virtual void SetFloat4(const std::string& name, float x, float y, float z, float w) override;
 
         virtual void SetMat4(const std::string& name, const glm::mat4& mat) override;
+
+        virtual void SetMat4Array(const std::string& name, const glm::mat4* mat, uint32_t count) override;
 
 
         // Uiform-functions 
@@ -73,6 +75,10 @@ namespace Orion
         void UploadUniformMat3(const std::string& name, const glm::mat3& mat);
 
         void UploadUniformMat4(const std::string& name, const glm::mat4& mat);
+
+        void UploadUniformMat4Array(const std::string& name, const glm::mat4* mat, uint32_t count);
+
+
 
     private:
         std::string ReadFile(const std::string& srcPath);
