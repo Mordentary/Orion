@@ -16,10 +16,29 @@ namespace Orion
 	}
 	void SpotLight::SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc)
 	{
-		auto& shader = Orion::ShaderLibrary::Get("CubemapDepthShader");
+	
+		m_ViewMatrix = glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::normalize(m_LightProp.Direction), glm::vec3(0.0, 0.0, 1.0));
 
-		shader->Bind();
-		shader->SetMat4("u_ViewProjMatrix", m_ViewMatrix * m_ProjMatrix);
+		auto& depthShader = Orion::ShaderLibrary::Get("TextureDepthShader");
+		depthShader->Bind();
+		depthShader->SetMat4("u_ViewProjMatrix", m_ProjMatrix * m_ViewMatrix);
+
+		currentShader = depthShader;
+
+		m_ShadowMap->Bind();
+		Orion::RenderCommand::Clear(ORI_CLEAR_DEPTH);
+
+		for (Shared<LightSource>& light : otherLights)
+		{
+			if (light.get() == this) continue;
+			light->RenderLightModel(depthShader);
+		}
+
+		renderFunc();
+
+		m_ShadowMap->Unbind();
+
+		
 	}
 	void SpotLight::LoadToLightShader()
 	{
@@ -41,7 +60,11 @@ namespace Orion
 		shader->SetFloat("u_Spotlight.linear", m_LightProp.LinearAttenuation);
 		shader->SetFloat("u_Spotlight.quadratic", m_LightProp.QuadraticAttenuation);
 
-		
+		m_ShadowMap->GetDepthAttachmentTexture()->Bind(6);
+		shader->SetInt("u_ShadowMapSpot", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
+
+		shader->SetMat4("u_SpotLightMatrix", m_ProjMatrix * m_ViewMatrix);
+
 	}
 
 

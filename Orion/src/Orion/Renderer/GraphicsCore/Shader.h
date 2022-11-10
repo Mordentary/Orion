@@ -26,14 +26,6 @@ namespace Orion {
 
 
 
-
-
-
-
-
-
-
-
 	
 		virtual void SetInt(const std::string& name, int value) = 0;
 

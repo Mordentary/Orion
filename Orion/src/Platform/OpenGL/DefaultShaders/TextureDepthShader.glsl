@@ -40,6 +40,9 @@ uniform Material u_Material;
 void main()
 {
     if(texture(u_Material.diffuse, v_TextCoord).a < 0.1f) discard;
-    
 
+   /* float ndc = gl_FragCoord.z * 2.0 - 1.0;
+    float linearDepth = (2.0 * 0.1f * 25.f) / (25.f + 0.1f - ndc * (25.f - 0.1f));
+
+    gl_FragDepth = linearDepth;*/
 } 

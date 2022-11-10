@@ -56,7 +56,7 @@ namespace Orion
 		shader->SetFloat3("u_Dirlight.specular", m_LightProp.SpecularLightColor / 2.f);
 
 		m_ShadowMap->GetDepthAttachmentTexture()->Bind(4);
-		shader->SetInt("u_ShadowMap", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
+		shader->SetInt("u_ShadowMapDir", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
 		shader->SetMat4("u_DirLightMatrix", m_ProjMatrix * m_ViewMatrix);
 
 	}

@@ -19,20 +19,7 @@ namespace Orion
 			float farPlane = 25.0f;
 			m_FarPlane = farPlane;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
-			std::vector<glm::mat4> shadowTransforms;
-			shadowTransforms.push_back(
-				m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-			shadowTransforms.push_back(m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
-			shadowTransforms.push_back(m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
-			shadowTransforms.push_back(m_ProjMatrix *
-				glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+		
 		}
 		PointLight(Shared<Model> model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512) : LightSource(model)
 		{
@@ -43,6 +30,12 @@ namespace Orion
 			fb.Height = shadowHeight;
 
 			m_ShadowMap = Framebuffer::Create(fb);
+
+			float nearPlane = 0.1f;
+			float farPlane = 25.0f;
+			m_FarPlane = farPlane;
+			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
+
 		}
 
 

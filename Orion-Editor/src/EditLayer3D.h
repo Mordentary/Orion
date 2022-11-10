@@ -44,8 +44,8 @@ namespace Orion {
 
 
 			Orion::Renderer::AddLight(m_SpotLight);
-			Orion::Renderer::AddLight(m_PointLight);
-			Orion::Renderer::AddLight(m_DirLight);
+			//Orion::Renderer::AddLight(m_PointLight);
+			//Orion::Renderer::AddLight(m_DirLight);
 
 
 			std::vector<std::string> cubeMapPaths
@@ -103,12 +103,12 @@ namespace Orion {
 			float time = Orion::CurrentTime::GetCurrentTimeInSec();
 
 			lightPos.x = sin(time) * 2.0f;
-			lightPos.y = 1.0f;
+			lightPos.y = 6.0f;
 			lightPos.z = cos(time) * 2.0f;
 
 			m_PointLight->GetLightProperties().Position = lightPos / 3.f;
-			m_PointLight->GetLightProperties().DiffuseLightColor = glm::vec3(m_Color.r, 0.2f, 0.2f);
-			m_PointLight->GetLightProperties().SpecularLightColor = glm::vec3(m_Color.r, 0.2f, 0.2f)  / 2.f;
+			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
+			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
 			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
 			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
@@ -119,7 +119,7 @@ namespace Orion {
 			//m_PointLight3->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
 
 
-			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) * 4, 5.0f, sin(time) * 4);
+			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time)) ;
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
 
@@ -305,11 +305,20 @@ namespace Orion {
 
 			ImGui::End();
 
-			ImGui::Begin("ShadowMap");
+			ImGui::Begin("ShadowMapDir");
 
-			ImVec2& sizeSha = ImGui::GetContentRegionAvail();
+			ImVec2& sizeDirView = ImGui::GetContentRegionAvail();
 			
-			ImGui::Image((void*)m_DirLight->GetShadowmap()->GetRendererID(), sizeSha, ImVec2{0,1}, ImVec2{1,0});
+			ImGui::Image((void*)m_DirLight->GetShadowmap()->GetRendererID(), sizeDirView, ImVec2{0,1}, ImVec2{1,0});
+
+			ImGui::End();
+
+
+			ImGui::Begin("ShadowMapSpot");
+
+			ImVec2& sizeSpitView = ImGui::GetContentRegionAvail();
+
+			ImGui::Image((void*)m_SpotLight->GetShadowmap()->GetRendererID(), sizeSpitView, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
 			ImGui::End();
 
