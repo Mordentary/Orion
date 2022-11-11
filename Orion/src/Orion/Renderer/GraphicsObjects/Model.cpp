@@ -5,12 +5,14 @@
 
 namespace Orion
 {
+    inline bool IsFileExists(const std::string& name);
 
 	void Model::Render(Shared<Shader>& shader)
 	{
 		for (auto& mesh : m_Meshes)
                  mesh->Render(shader);
         
+        Orion::Renderer2D::DrawLine(glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f) * m_ModelMatrix, glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z,1.0f) * m_ModelMatrix, glm::vec4(1.f,0.2f,0.2f,1.0f));
 	}
 
     //For retrieving scene 
@@ -44,13 +46,13 @@ namespace Orion
 		}
 		m_Directory = path.substr(0, path.find_last_of('/'));
 
-        FindGreastestMinMax(scene->mRootNode, scene);
+        FindGreastestCoord(scene->mRootNode, scene);
 
 		ProcessNode(scene->mRootNode, scene);
 
 	}
 
-    void Model::FindGreastestMinMax(aiNode* node, const aiScene* scene)
+    void Model::FindGreastestCoord(aiNode* node, const aiScene* scene)
     {
 
        
@@ -58,14 +60,16 @@ namespace Orion
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
             aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
             float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
 
-            if (scaleF > m_MaxScale) m_MaxScale = scaleF;
+            if (diff.Length() > (m_ModelAABB.mMax - m_ModelAABB.mMin).Length()) m_ModelAABB = mesh->mAABB;
+            if (scaleF > m_MaxCoord) m_MaxCoord = scaleF;
         } 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            FindGreastestMinMax(node->mChildren[i], scene);
+            FindGreastestCoord(node->mChildren[i], scene);
         }
 
 
@@ -108,15 +112,13 @@ namespace Orion
         // walk through each of the mesh's vertices
         
        
-        float scale = 1.0f / m_MaxScale;
+        float scale = 1.0f / m_MaxCoord;
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         float shin = 0.f;
         material->Get(AI_MATKEY_SHININESS, shin);
-
-
-
+     
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
             MeshVertex vertex;
@@ -219,7 +221,7 @@ namespace Orion
         // 4. base color maps
         std::vector<Shared<Texture2D>> colorMaps = LoadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_color");
         textures.insert(textures.end(), colorMaps.begin(), colorMaps.end());
-
+       
 
 
 
@@ -239,18 +241,100 @@ namespace Orion
     std::vector<Shared<Texture2D>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
             std::vector<Shared<Texture2D>> textures;
+            Shared<Texture2D> texture;
             for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
             {
                 aiString str;
                 mat->GetTexture(type, i, &str);
-                Shared<Texture2D> texture;
                 texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
                 textures.push_back(texture);
             }
+            if (!mat->GetTextureCount(type)) 
+            {
+                std::string path = this->m_Directory + '/' + "textures" + '/';
 
+                if (type == aiTextureType_DIFFUSE && IsFileExists(path + "diffuse.jpg"))
+                {
+                    texture = Texture2D::Create(path + "diffuse.jpg");
+                }
 
+                if (type == aiTextureType_DIFFUSE && IsFileExists(path + "diffuse.jpg"))
+                {
+                    texture = Texture2D::Create(path + "diffuse.jpg");
+                }
+
+                textures.push_back(texture);
+
+            }
+            
             return textures;
+            
 	}
 
+    void Model::BindAllTexture()
+    {
+
+        uint32_t index = 1;
+        for (auto& mesh : m_Meshes)
+        {
+            if (mesh->GetMaterial().diffuseMap) {
+                mesh->GetMaterial().diffuseMap->Bind(index);
+
+            }
+            if (mesh->GetMaterial().specularMap) {
+                mesh->GetMaterial().specularMap->Bind(++index);
+            }
+            index++;
+
+        }
+    }
+    bool Model::IsIntersect(const CameraRay& ray)
+    {
+
+        auto AABB = m_ModelAABB;
+
+
+        double tx1 = (AABB.mMin.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);
+        double tx2 = (AABB.mMax.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);
+
+        double tmin = std::min(tx1, tx2);
+        double tmax = std::max(tx1, tx2);
+
+        double ty1 = (AABB.mMin.y - ray.GetOrigin().y) * (1 / ray.GetDirection().y);
+        double ty2 = (AABB.mMax.y - ray.GetOrigin().y) * (1 / ray.GetDirection().y);
+
+        tmin = std::max(tmin, std::min(ty1, ty2));
+        tmax = std::min(tmax, std::max(ty1, ty2));
+
+        double tz1 = (AABB.mMin.z - ray.GetOrigin().z) * (1 / ray.GetDirection().z);
+        double tz2 = (AABB.mMax.z - ray.GetOrigin().z) * (1 / ray.GetDirection().z);
+
+        tmin = std::max(tmin, std::min(tz1, tz2));
+        tmax = std::min(tmax, std::max(tz1, tz2));
+
+
+        return tmax >= tmin;
+
+
+    }
+
+    void Model::DeduceModelName() 
+    {
+        std::string name = "";
+
+        // assets/shaders/Texture.glsl
+        auto lastSlash = m_Directory.find_last_of("/\\");
+        lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+        auto lastDot = m_Directory.rfind('.');
+        auto count = lastDot == std::string::npos ? m_Directory.size() - lastSlash : lastDot - lastSlash;
+        m_Name = m_Directory.substr(lastSlash, count);
+
+    }
+
+    inline bool Model::IsFileExists(const std::string& name)
+    {
+        struct stat buffer;
+        return (stat(name.c_str(), &buffer) == 0);
+    }
 
 }

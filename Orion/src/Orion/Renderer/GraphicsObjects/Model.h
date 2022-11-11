@@ -13,38 +13,37 @@ namespace Orion
     public:
         Model(const std::string& path)
         {
-            LoadModel(path);
+             LoadModel(path);
+             DeduceModelName();
         }
         void Render(Shared<Shader>& shader);
-        void BindAllTexture() //TODO: REMOVE THIS SHIT
-        {
+        bool IsIntersect(const CameraRay& ray);
 
-            uint32_t index = 1;
-            for (auto& mesh : m_Meshes)
-            {
-                if (mesh->GetMaterial().diffuseMap) {
-                    mesh->GetMaterial().diffuseMap->Bind(index);
-
-                }
-                if (mesh->GetMaterial().specularMap) {
-                    mesh->GetMaterial().specularMap->Bind(++index);
-                }
-                index++;
-              
-            }
-
-        }
+        void BindAllTexture(); //TODO: REMOVE THIS SHIT
+       
         Shared<Mesh>* GetMeshData() { return m_Meshes.data(); }
+        const glm::mat4& GetModelMatrix() { return m_ModelMatrix; }
+        void SetModelMatrix(const glm::mat4& mat) { m_ModelMatrix = mat; }
+        std::string GetModelName() { return m_Name; }
+
     private:
         // model data
-        std::vector<Shared<Mesh>> m_Meshes;
+        aiAABB m_ModelAABB;
+
         std::string m_Directory;
-        float m_MaxScale = 0.f;
+        std::string m_Name;
+
+        glm::mat4 m_ModelMatrix{1.0f};
+        std::vector<Shared<Mesh>> m_Meshes;
+        float m_MaxCoord = 0.f;
+      
+    private:
+        std::vector<Shared<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+        Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
         void LoadModel(const std::string& path);
-        void FindGreastestMinMax(aiNode* rootNode, const aiScene* scene);
+        void FindGreastestCoord(aiNode* rootNode, const aiScene* scene);
         void ProcessNode(aiNode* node, const aiScene* scene);
-       Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
-        std::vector<Shared<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type,
-            std::string typeName);
+        bool IsFileExists(const std::string& name);
+        void DeduceModelName();
     };
 }

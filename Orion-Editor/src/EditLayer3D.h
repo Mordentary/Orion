@@ -30,12 +30,33 @@ namespace Orion {
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
+			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Pig/source/model.dae");
 
-			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
-			m_PointLight = Orion::CreateShared<Orion::PointLight>();
+			m_ModelCat->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)));
+			m_Models.push_back(m_ModelCat);
+
+			m_ModelPlatform->SetModelMatrix(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f, 50.0f)), glm::vec3(0.0, -0.4f, 0.0)));
+			m_Models.push_back(m_ModelPlatform);
+
+
+			m_ModelTree->SetModelMatrix(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.3, -0.3, 0.5)));
+			m_Models.push_back(m_ModelTree);
+
+			m_ModelCar->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2)) * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f)));
+			m_Models.push_back(m_ModelCar);
+
+			m_ModelDragon->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(-0.3, -0.6, -6.2)) * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f)));
+			m_Models.push_back(m_ModelDragon);
+
+
+
+
+		
 			//m_PointLight2 = Orion::CreateShared<Orion::PointLight>();
 			//m_PointLight3 = Orion::CreateShared<Orion::PointLight>();
 
+			m_PointLight = Orion::CreateShared<Orion::PointLight>();
+			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
 			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
@@ -44,9 +65,9 @@ namespace Orion {
 
 
 			Orion::Renderer::AddLight(m_SpotLight);
-			//Orion::Renderer::AddLight(m_PointLight);
-			//Orion::Renderer::AddLight(m_DirLight);
-
+			Orion::Renderer::AddLight(m_PointLight);
+			Orion::Renderer::AddLight(m_DirLight);
+			
 
 			std::vector<std::string> cubeMapPaths
 			{
@@ -93,7 +114,7 @@ namespace Orion {
 
 		void Update(Orion::Timestep deltaTime) override
 		{
-
+			
 			Orion::CamerasController::Update(deltaTime);
 			Orion::Renderer::LightSettings(m_LightSettings.x, m_LightSettings.y);
 
@@ -122,6 +143,13 @@ namespace Orion {
 			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time)) ;
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
+			for (auto& model: m_Models)
+			{
+				if(model->IsIntersect(Orion::CamerasController::GetActiveCamera()->Raycast(m_ViewportMousePos.x, m_ViewportMousePos.y)))
+				{
+					ORI_INFO("Intersect:" + model->GetModelName());
+				}
+			}
 
 			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render();});
 			
@@ -137,8 +165,15 @@ namespace Orion {
 		void Render() override 
 		{
 	
-			
-			Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
+			for(auto& model : m_Models)
+			{
+				Orion::Renderer::DrawModel(model->GetModelMatrix(), model);
+
+			}
+
+
+			Orion::CamerasController::GetActiveCamera()->Raycast(m_ViewportMousePos.x, m_ViewportMousePos.y).DebugDraw();
+			/*Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
 
 			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.3, -0.3, 0.5)), m_ModelTree);
 
@@ -146,11 +181,13 @@ namespace Orion {
 			auto matrix = glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2))  * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f));
 			
 
+			
 
 			Orion::Renderer::DrawModel(matrix, m_ModelCar);
 
+			Orion::Renderer::DrawModel(glm::translate(matrix, glm::vec3(-0.1, -0.3, -3.2)), m_ModelDragon);
 
-			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f,50.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);
+			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f,50.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);*/
 
 			Orion::Material mat =
 			{
@@ -279,12 +316,29 @@ namespace Orion {
 					ImGui::MenuItem("Padding", NULL, &opt_padding);
 					ImGui::Separator();
 
-					if (ImGui::MenuItem("Flag: NoSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
-					if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-					if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
-					if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-					if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
+
+
+					if (ImGui::MenuItem("Close", NULL, false))
+						dockSpaceOpen = false;
+					ImGui::EndMenu();
+
+
+				}
+
+				ImGui::EndMenuBar();
+			}
+
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("Load"))
+				{
+					// Disabling fullscreen would allow the window to be moved to the front of other windows,
+					// which we can't undo at the moment without finer window depth/z control.
+					ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
+					ImGui::MenuItem("Padding", NULL, &opt_padding);
 					ImGui::Separator();
+
+
 
 					if (ImGui::MenuItem("Close", NULL, false))
 						dockSpaceOpen = false;
@@ -334,6 +388,11 @@ namespace Orion {
 			Application::Get().GetImGuiLayer()->SetBlockEvent(!isFocused || !isHover);
 			CamerasController::SetBlockUpdate(!isHover);
 
+			auto& mouse = ImGui::GetCursorPos();
+			ORI_INFO("X: {0}, Y: {1}", mouse.x, mouse.y);
+
+			m_ViewportMousePos = glm::vec2(mouse.x, mouse.y);
+
 
 			ImVec2& size = ImGui::GetContentRegionAvail();
 			if (m_ViewportSize != *(glm::vec2*)&size)
@@ -356,7 +415,7 @@ namespace Orion {
 
 		
 
-
+			
 			/*auto& stats = Orion::Renderer::GetStats();
 
 
@@ -378,12 +437,15 @@ namespace Orion {
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
+		glm::vec2 m_ViewportMousePos{0.0f};
+
 		glm::vec2 m_LightSettings{0.15f,0.058f};
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra, m_ShadowMapDir, m_ShadowMapPoint, m_ShadowMapSpot;
-		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar;
+		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
+		std::vector<Shared<Model>> m_Models;
 	};
 }

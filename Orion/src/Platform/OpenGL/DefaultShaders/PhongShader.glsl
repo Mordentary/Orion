@@ -158,8 +158,8 @@ void main()
 
 
     result += CalcSpotLight(u_Spotlight, norm, v_FragPos, viewDir);
-    //result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
-    //result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
+    result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
+    result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
 
      
     if(result.a < 0.1f) discard;

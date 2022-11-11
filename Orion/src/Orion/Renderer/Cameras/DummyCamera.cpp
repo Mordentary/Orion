@@ -1,6 +1,11 @@
 #include "oripch.h"
 #include "DummyCamera.h"
 #include"Orion/Core/Application.h"
+#include"Orion/Renderer/GraphicsRendering/Renderer2D.h"
+#include"Orion/Core/Input.h"
+#include"Orion/Core/KeyCodes.h"
+#include"Orion/Core/MouseButtonCodes.h"
+
 namespace Orion 
 {
 	DummyCamera::DummyCamera(
@@ -21,6 +26,49 @@ namespace Orion
 		m_ScreenSize.y = app.GetWindow().GetHeight();
 		m_AspectRatio = m_ScreenSize.x / m_ScreenSize.y;
 
+	}
+
+	const CameraRay& DummyCamera::Raycast(float xCoord, float yCoord)
+	{
+		float mouse_x = xCoord;
+		float mouse_y = yCoord;
+
+		ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
+		float x = (2.0f * mouse_x) / m_ScreenSize.x - 1.0f;
+		float y = 1.0f - (2.0f * mouse_y) / m_ScreenSize.y;
+		float z = 1.0f;
+		glm::vec3 ray_nds = glm::vec3(x, y, z);
+		glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+		glm::vec4 ray_eye = glm::inverse(m_ProjectionMatrix) * ray_clip;
+		glm::vec3 ray_wor = glm::vec3((inverse(m_ViewMatrix) * glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0f)));
+
+
+		return CameraRay(glm::normalize(ray_wor),m_Position,50.f);
+	}
+
+
+
+
+
+	CameraRay::CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength)
+		: m_Direction(direction), m_Origin(origin), m_Length(rayLength)
+	{
+		
+	}
+	void CameraRay::Update(glm::vec3 direction, glm::vec3 origin, float rayLength)
+	{
+		m_Origin = origin;
+		m_Direction = direction;
+		m_Length = rayLength;
+	}
+	void CameraRay::DebugDraw() const
+	{
+		Orion::Renderer2D::DrawLine(m_Origin, GetEndPoint(), glm::vec4(0.7f,0.2f,0.2f,1.0f));
+	}
+
+	glm::vec3 CameraRay::GetEndPoint() const
+	{
+		return m_Origin + (m_Direction * m_Length);
 	}
 
 

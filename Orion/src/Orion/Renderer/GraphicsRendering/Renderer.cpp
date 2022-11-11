@@ -165,6 +165,8 @@ namespace Orion
 
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& screenFB, std::function<void()> renderFunc)
 	{
+		Renderer2D::BeginScene(camera);
+
 		s_RenData3D.SceneCamera = camera;
 		s_RenData3D.SceneRenderFunc = renderFunc;
 		s_RenData3D.ScreenFramebuffer = screenFB;
@@ -192,6 +194,7 @@ namespace Orion
 	}
 	void Renderer::EndScene()
 	{
+		Renderer2D::EndScene();
 
 		if (s_RenData3D.SceneCubeMap && !false)
 			LoadCubemap(s_RenData3D.SceneCamera);

@@ -11,6 +11,42 @@ namespace Orion
 		Orthographic = 2
 
 	};
+
+
+	class CameraRay
+	{
+	public:
+		CameraRay() = default;
+		CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength);
+		void Update(glm::vec3 direction, glm::vec3 origin, float rayLength);
+		void DebugDraw() const;
+
+
+		const glm::vec3& GetDirection() const { return m_Direction; }
+		const glm::vec3& GetOrigin() const { return m_Origin; }
+		float GetLength() { return m_Length; }
+
+		glm::vec3 GetEndPoint() const;
+
+
+		CameraRay& operator=(const CameraRay& r) {
+			if (&r != this) {
+				m_Origin = r.m_Origin;
+				m_Direction = r.m_Direction;
+			}
+			return *this;
+		};
+
+	private:
+		glm::vec3 m_Origin;
+		glm::vec3 m_Direction;
+		float m_Length;
+	};
+
+
+
+
+
 	class DummyCamera
 	{
 
@@ -57,7 +93,7 @@ namespace Orion
 		inline void SetTraslationSpeed(float tranSpeed) { m_CameraTranslationSpeed = tranSpeed; }
 		inline void SetSensitivity(float rotSpeed) { m_CameraSensitivity = rotSpeed; }
 
-	
+		const CameraRay& Raycast(float xCoord, float yCoord);
 
 	protected: 
 		float m_AspectRatio = 1.7f;
@@ -69,6 +105,8 @@ namespace Orion
 		glm::mat4 m_ViewMatrix{};
 		glm::mat4 m_ProjectionMatrix{};
 		glm::mat4 m_ProjectionViewMatrix{};
+
+		CameraRay m_Ray;
 
 		glm::vec2 m_ScreenSize{};
 

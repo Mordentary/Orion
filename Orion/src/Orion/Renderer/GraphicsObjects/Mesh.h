@@ -5,6 +5,8 @@
 #include"../GraphicsCore/Buffer.h"
 #include "../GraphicsCore/Shader.h"
 #include "../GraphicsRendering/Renderer.h"
+#include "../GraphicsRendering/Renderer2D.h"
+
 
 namespace Orion
 {
