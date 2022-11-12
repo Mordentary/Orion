@@ -26,6 +26,7 @@ namespace Orion
 		Shared<VertexBuffer> MeshVertexBuffer = nullptr;
 
 		Shared<Texture2D> WhiteTexture = nullptr;
+
 		Shared<Texture2D> ShadowMap = nullptr;
 
 		Shared<Mesh>* MeshBufferBase = nullptr;
@@ -86,6 +87,7 @@ namespace Orion
 		uint32_t whiteTextureData = 0xffffffff;
 		s_RenData3D.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
+
 		int32_t  samples[s_RenData3D.MaxTextureSlots];
 		for (uint32_t i = 0; i < s_RenData3D.MaxTextureSlots; i++)
 			samples[i] = i;
@@ -107,7 +109,7 @@ namespace Orion
 
 		s_RenData3D.DefaultMaterial =
 		{
-			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture , 32.f
+			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture, s_RenData3D.WhiteTexture,  32.f
 		};
 
 		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Cube.obj");
@@ -165,6 +167,7 @@ namespace Orion
 
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& screenFB, std::function<void()> renderFunc)
 	{
+		
 		Renderer2D::BeginScene(camera);
 
 		s_RenData3D.SceneCamera = camera;
@@ -182,6 +185,7 @@ namespace Orion
 
 		s_RenData3D.WhiteTexture->Bind(0);
 
+
 		s_RenData3D.LightShader->Bind();
 		s_RenData3D.LightShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 
@@ -189,6 +193,8 @@ namespace Orion
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
 		LoadAndRenderLights();
+
+
 
 
 	}
@@ -253,7 +259,7 @@ namespace Orion
 		s_RenData3D.CubemapShader->SetMat4("u_Proj", camera->GetProjectionMatrix());
 		s_RenData3D.CubemapShader->SetMat4("u_View",glm::mat4(glm::mat3(camera->GetViewMatrix())));
 
-		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, 0.0f });
+		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, nullptr,  0.0f });
 		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader);
 
 		RenderCommand::SetDepthMask(true);
@@ -276,6 +282,8 @@ namespace Orion
 
 		s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", modelMatrix);
 		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial(material);
+		s_RenData3D.Cube->SetModelMatrix(modelMatrix);
+
 		s_RenData3D.Cube->BindAllTexture();
 
 		s_RenData3D.Cube->Render(s_RenData3D.CurrentShader);
@@ -288,6 +296,8 @@ namespace Orion
 		s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", modelMatrix);
 
 		s_RenData3D.Sphere->GetMeshData()[0]->SetMaterial(s_RenData3D.DefaultMaterial);
+		s_RenData3D.Sphere->SetModelMatrix(modelMatrix);
+
 		s_RenData3D.Sphere->BindAllTexture();
 
 		s_RenData3D.Sphere->Render(s_RenData3D.CurrentShader);

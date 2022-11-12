@@ -13,6 +13,8 @@ namespace Orion
 	struct Material {
 		Shared<Texture2D> diffuseMap;
 		Shared<Texture2D> specularMap;
+		Shared<Texture2D> normalMap;
+
 		float shininess;
 	};
 
@@ -36,7 +38,7 @@ namespace Orion
 			SetupMesh();
 		}
 
-		Mesh(const Shared<Mesh>& mesh);
+		Mesh(const Shared<Mesh>& mesh); 
 
 		inline MeshVertex* GetVerticesData() { return m_Vertices.data(); }
 		inline uint32_t* GetIndicesData() { return m_Indices.data(); }

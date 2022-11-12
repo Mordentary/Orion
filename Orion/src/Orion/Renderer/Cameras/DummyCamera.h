@@ -38,9 +38,9 @@ namespace Orion
 		};
 
 	private:
-		glm::vec3 m_Origin;
-		glm::vec3 m_Direction;
-		float m_Length;
+		glm::vec3 m_Origin{1.0f};
+		glm::vec3 m_Direction{ 1.0f };
+		float m_Length = 0.0f;
 	};
 
 

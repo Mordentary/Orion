@@ -84,9 +84,7 @@ namespace Orion {
 			Orion::FramebufferSpecification specFB;
 			specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
 			specFB.Height = Orion::Application::Get().GetWindow().GetHeight();
-			specFB.Samples = 6;
-
-
+			specFB.Samples = 4;
 
 			m_FramebufferMS = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
@@ -94,22 +92,9 @@ namespace Orion {
 			specFB.Samples = 1;
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 
-			specFB.Width = 4096;
-			specFB.Height = 4096;
-			specFB.OnlyDepthPass = true;
-
-			m_ShadowMapDir = Orion::Framebuffer::Create(specFB);
-
-			specFB.CubemapBuffer = true;
-			//m_ShadowMapPoint = Orion::Framebuffer::Create(specFB);
-			m_ShadowMapSpot = Orion::Framebuffer::Create(specFB);
-
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
 			Orion::Renderer::SetSceneCubemap(m_CubeMap);
-
-
-			 m_LightDirCam = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.f, 0.f, 0.f), m_SunDirection, glm::vec4{ -10.f, 10.f, -10.f, 10.f }, glm::vec2{ -10.f, 10.f });
 		}
 
 		void Update(Orion::Timestep deltaTime) override
@@ -191,7 +176,7 @@ namespace Orion {
 
 			Orion::Material mat =
 			{
-				m_DiffuseMap, m_SpecularMap, 2.f
+				m_DiffuseMap, m_SpecularMap, nullptr, 2.f
 			};
 
 			Orion::Renderer::DrawSphere(glm::mat4(1.0f),{nullptr,nullptr,0});
@@ -388,13 +373,27 @@ namespace Orion {
 			Application::Get().GetImGuiLayer()->SetBlockEvent(!isFocused || !isHover);
 			CamerasController::SetBlockUpdate(!isHover);
 
-			auto& mouse = ImGui::GetCursorPos();
-			ORI_INFO("X: {0}, Y: {1}", mouse.x, mouse.y);
+			ImVec2& size = ImGui::GetContentRegionAvail();
+
+			auto winA = ImGui::GetWindowPos();
+			auto mouseA = ImGui::GetMousePos();
+
+			
+			mouseA.y = size.y - (mouseA.y - winA.y)  ;
+			mouseA.x = (mouseA.x - winA.x);
+
+			if (mouseA.y > size.y) mouseA.y = size.y;
+			if (mouseA.y < 0) mouseA.y = 0;
+
+			if (mouseA.x > size.x) mouseA.x = size.x;
+			if (mouseA.x < 0) mouseA.x = 0;
+
+			auto& mouse =  glm::vec2(mouseA.x , mouseA.y);
+			//ORI_INFO("X: {0}, Y: {1}", mouse.x, mouse.y);
 
 			m_ViewportMousePos = glm::vec2(mouse.x, mouse.y);
 
 
-			ImVec2& size = ImGui::GetContentRegionAvail();
 			if (m_ViewportSize != *(glm::vec2*)&size)
 			{
 				m_ViewportSize = { size.x,size.y };
@@ -442,7 +441,7 @@ namespace Orion {
 		glm::vec2 m_LightSettings{0.15f,0.058f};
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra, m_ShadowMapDir, m_ShadowMapPoint, m_ShadowMapSpot;
+		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;

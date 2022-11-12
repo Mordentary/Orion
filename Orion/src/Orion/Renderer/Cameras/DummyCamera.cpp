@@ -33,17 +33,19 @@ namespace Orion
 		float mouse_x = xCoord;
 		float mouse_y = yCoord;
 
-		ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
+		//ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
 		float x = (2.0f * mouse_x) / m_ScreenSize.x - 1.0f;
 		float y = 1.0f - (2.0f * mouse_y) / m_ScreenSize.y;
 		float z = 1.0f;
 		glm::vec3 ray_nds = glm::vec3(x, y, z);
 		glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 		glm::vec4 ray_eye = glm::inverse(m_ProjectionMatrix) * ray_clip;
-		glm::vec3 ray_wor = glm::vec3((inverse(m_ViewMatrix) * glm::vec4(ray_eye.x, ray_eye.y, -1.0, 0.0f)));
+		glm::vec3 ray_wor = glm::vec3((inverse(m_ViewMatrix) * glm::vec4(ray_eye.x, -ray_eye.y, -1.0, 0.0f)));
 
 
-		return CameraRay(glm::normalize(ray_wor),m_Position,50.f);
+		m_Ray.Update(glm::normalize(ray_wor),m_Position,50.f);
+
+		return m_Ray;
 	}
 
 
@@ -63,7 +65,17 @@ namespace Orion
 	}
 	void CameraRay::DebugDraw() const
 	{
-		Orion::Renderer2D::DrawLine(m_Origin, GetEndPoint(), glm::vec4(0.7f,0.2f,0.2f,1.0f));
+		static glm::vec3 p1{ 0.0f };
+		static glm::vec3 p2{ 0.0f };
+
+
+		if(Orion::Input::IsKeyPressed(ORI_KEY_R))
+		{
+			p1 = GetOrigin();
+			p2 = GetEndPoint();
+
+		}
+		Orion::Renderer2D::DrawLine(p1, p2, glm::vec4(0.7f,0.2f,0.2f,1.0f));
 	}
 
 	glm::vec3 CameraRay::GetEndPoint() const

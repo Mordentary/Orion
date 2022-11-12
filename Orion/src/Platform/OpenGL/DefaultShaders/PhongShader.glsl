@@ -20,6 +20,7 @@ out vec2 v_TextCoord;
 out vec3 v_FragPos;
 out vec4 v_FragPosDirLight;
 out vec4 v_FragPosSpotLight;
+out mat3 v_TBN;
 
 
 flat out int v_TextSlot;
@@ -38,6 +39,12 @@ void main()
    v_Color = a_Color;
    v_TextCoord = a_TextureCoord;
    v_TextSlot = int(a_TextureSlot);
+
+   vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent, 0.0)));
+   vec3 B = normalize(vec3(u_ModelMatrix * vec4(a_Bitangent, 0.0)));
+   vec3 N = normalize(vec3(u_ModelMatrix * vec4(a_Normal, 0.0)));
+
+   v_TBN = mat3(T, B, N);
 
    v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
    v_FragPosDirLight = u_DirLightMatrix * vec4(v_FragPos, 1.0);
@@ -60,7 +67,9 @@ layout(location = 0) out vec4 f_Color;
 
 struct Material {
     sampler2D diffuse;
-    sampler2D specular;    
+    sampler2D specular;
+    sampler2D normals;
+
     float shininess;
 }; 
 
@@ -126,6 +135,9 @@ in vec2 v_TextCoord;
 in vec3 v_FragPos;
 in vec4 v_FragPosDirLight;
 in vec4 v_FragPosSpotLight;
+
+in mat3 v_TBN;
+
 flat in int v_TextSlot;
 
 
@@ -150,16 +162,24 @@ uniform DirectionalLight u_Dirlight;
 void main()
 {
 
-
-    vec3 norm = normalize(v_Normal);
-    vec3 viewDir = normalize(u_CameraPos - v_FragPos);
+    vec3 normal = texture(u_Material.normals, v_TextCoord).rgb;
+    if(normal != vec3(1.0f))
+    {
+        normal = normal * 2.0 - 1.0;
+        normal = normalize(v_TBN * normal);;
+    }
+    else 
+    {
+        normal = normalize(v_Normal);
+    }
     
+    vec3 viewDir = normalize(u_CameraPos - v_FragPos);
     vec4 result = vec4(0.0f);
 
 
-    result += CalcSpotLight(u_Spotlight, norm, v_FragPos, viewDir);
-    result += CalcPointLight(u_Pointlight, norm, v_FragPos, viewDir);
-    result += CalcDirectionalLight(u_Dirlight, norm, viewDir);
+    result += CalcSpotLight(u_Spotlight, normal, v_FragPos, viewDir);
+    result += CalcPointLight(u_Pointlight, normal, v_FragPos, viewDir);
+    result += CalcDirectionalLight(u_Dirlight, normal, viewDir);
 
      
     if(result.a < 0.1f) discard;

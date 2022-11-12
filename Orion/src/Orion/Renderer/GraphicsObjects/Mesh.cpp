@@ -22,13 +22,26 @@ namespace Orion
 	void Mesh::Render(Shared<Shader>& shader)
 	{
 		 shader->Bind();
-		 if (m_Material.diffuseMap)
-		 shader->SetInt("u_Material.diffuse", m_Material.diffuseMap->GetCurrentSlot());
+		 if (m_Material.diffuseMap) 
+		 {
+			 m_Material.diffuseMap->Bind(1);
+			 shader->SetInt("u_Material.diffuse", m_Material.diffuseMap->GetCurrentSlot());
+		 }
 		 else shader->SetInt("u_Material.diffuse", 0);
 
-		 if(m_Material.specularMap)
-		 shader->SetInt("u_Material.specular", m_Material.specularMap->GetCurrentSlot());
+		 if (m_Material.specularMap) 
+		 {
+			 m_Material.specularMap->Bind(2);
+			 shader->SetInt("u_Material.specular", m_Material.specularMap->GetCurrentSlot());
+		 }
 		 else shader->SetInt("u_Material.specular", 0);
+
+		 if (m_Material.normalMap)
+		 {
+			 m_Material.normalMap->Bind(3);
+			 shader->SetInt("u_Material.normals", m_Material.normalMap->GetCurrentSlot());
+		 }
+		 else shader->SetInt("u_Material.normals", 0);
 
 		 if(m_Material.shininess)
 		 shader->SetFloat("u_Material.shininess", m_Material.shininess);

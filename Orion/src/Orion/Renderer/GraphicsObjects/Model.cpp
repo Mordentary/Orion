@@ -9,10 +9,52 @@ namespace Orion
 
 	void Model::Render(Shared<Shader>& shader)
 	{
-		for (auto& mesh : m_Meshes)
-                 mesh->Render(shader);
+	
         
-        Orion::Renderer2D::DrawLine(glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f) * m_ModelMatrix, glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z,1.0f) * m_ModelMatrix, glm::vec4(1.f,0.2f,0.2f,1.0f));
+
+        auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
+     //   Orion::Renderer2D::DrawLine(glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f), glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z,1.0f), glm::vec4(1.f,0.2f,0.2f,1.0f));
+      
+
+
+        glm::vec4 min =  glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z, 1.0f);
+        glm::vec4 max = glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f);
+;
+
+   
+        
+
+
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, min.y, max.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, max.z), glm::vec3(min.x, min.y, max.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, min.y, min.z), color);
+
+
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, max.y, min.z), glm::vec3(max.x, max.y, min.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, max.y, min.z), glm::vec3(max.x, max.y, max.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, max.y, max.z), glm::vec3(min.x, max.y, max.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, max.y, max.z), glm::vec3(min.x, max.y, min.z), color);
+
+
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(min.x, max.y, min.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, max.y, min.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
+        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
+
+        for (auto& mesh : m_Meshes)
+            mesh->Render(shader);
+
+            //glm::vec3(min.x, min.y, min.z)// bottom left
+            //glm::vec3(max.x, min.y, min.z), //BOTTOM_RIGHT
+            //glm::vec3(max.x, min.y, max.z), //BOTTOM_RIGHT_INNER
+            //glm::vec3(min.x, min.y, max.z), //BOTTOM_LEFT_INNER
+            //glm::vec3(min.x, max.y, max.z),//TOP_LEFT_INNER
+            //glm::vec3(min.x, max.y, min.z),//TOP_LEFT
+            //glm::vec3(max.x, max.y, min.z), //TOP_RIGHT
+            ////
+            //glm::vec3(max.x, max.y, max.z) //TOP_RIGHT_INNER
+
 	}
 
     //For retrieving scene 
@@ -44,6 +86,8 @@ namespace Orion
 			ORI_ASSERT(false, (import.GetErrorString()));
 			return;
 		}
+
+        m_Path = path;
 		m_Directory = path.substr(0, path.find_last_of('/'));
 
         FindGreastestCoord(scene->mRootNode, scene);
@@ -55,8 +99,6 @@ namespace Orion
     void Model::FindGreastestCoord(aiNode* node, const aiScene* scene)
     {
 
-       
-
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -64,7 +106,14 @@ namespace Orion
             aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
             float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
 
-            if (diff.Length() > (m_ModelAABB.mMax - m_ModelAABB.mMin).Length()) m_ModelAABB = mesh->mAABB;
+            if (diff.x >= (m_ModelAABB.mMax - m_ModelAABB.mMin).x &&
+                diff.y >= (m_ModelAABB.mMax - m_ModelAABB.mMin).y &&
+                diff.z >= (m_ModelAABB.mMax - m_ModelAABB.mMin).z) 
+            {
+                m_ModelAABB = mesh->mAABB;
+            }
+
+          //  m_ModelAABB = mesh->mAABB;
             if (scaleF > m_MaxCoord) m_MaxCoord = scaleF;
         } 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -213,7 +262,7 @@ namespace Orion
         std::vector<Shared<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Shared<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
+        std::vector<Shared<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. shineness maps
         std::vector<Shared<Texture2D>> shininessMaps = LoadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
@@ -227,6 +276,8 @@ namespace Orion
 
         if (!diffuseMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
             mat.diffuseMap = diffuseMaps[0];
+        if (!normalMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
+            mat.normalMap = normalMaps[0];
        if(!specularMaps.empty())
             mat.specularMap = specularMaps[0];
         
@@ -258,9 +309,9 @@ namespace Orion
                     texture = Texture2D::Create(path + "diffuse.jpg");
                 }
 
-                if (type == aiTextureType_DIFFUSE && IsFileExists(path + "diffuse.jpg"))
+                if (type == aiTextureType_HEIGHT && IsFileExists(path + "normalMap.png"))
                 {
-                    texture = Texture2D::Create(path + "diffuse.jpg");
+                    texture = Texture2D::Create(path + "normalMap.png");
                 }
 
                 textures.push_back(texture);
@@ -274,7 +325,7 @@ namespace Orion
     void Model::BindAllTexture()
     {
 
-        uint32_t index = 1;
+      /*  uint32_t index = 1;
         for (auto& mesh : m_Meshes)
         {
             if (mesh->GetMaterial().diffuseMap) {
@@ -286,10 +337,11 @@ namespace Orion
             }
             index++;
 
-        }
+        }*/
     }
     bool Model::IsIntersect(const CameraRay& ray)
     {
+        
 
         auto AABB = m_ModelAABB;
 
@@ -323,11 +375,11 @@ namespace Orion
         std::string name = "";
 
         // assets/shaders/Texture.glsl
-        auto lastSlash = m_Directory.find_last_of("/\\");
+        auto lastSlash = m_Path.find_last_of("/\\");
         lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-        auto lastDot = m_Directory.rfind('.');
-        auto count = lastDot == std::string::npos ? m_Directory.size() - lastSlash : lastDot - lastSlash;
-        m_Name = m_Directory.substr(lastSlash, count);
+        auto lastDot = m_Path.rfind('.');
+        auto count = lastDot == std::string::npos ? m_Path.size() - lastSlash : lastDot - lastSlash;
+        m_Name = m_Path.substr(lastSlash, count);
 
     }
 

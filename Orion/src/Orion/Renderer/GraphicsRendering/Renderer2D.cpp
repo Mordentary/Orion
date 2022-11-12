@@ -425,7 +425,7 @@ namespace Orion
 	}
 	inline void Renderer2D::AddLineVertexToBatch(const glm::vec3& point, const glm::vec4& color)
 	{
-		s_RenData2D.LineVertexIterator->Position = { point.x, point.y , 0.0f };;
+		s_RenData2D.LineVertexIterator->Position = { point.x, point.y ,point.z };;
 		s_RenData2D.LineVertexIterator->Color = color;
 		++s_RenData2D.LineVertexIterator;
 	}
