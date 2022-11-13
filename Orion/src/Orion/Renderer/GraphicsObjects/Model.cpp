@@ -5,24 +5,44 @@
 
 namespace Orion
 {
-    inline bool IsFileExists(const std::string& name);
+    void Model::SetModelMatrix(const glm::mat4& mat)
+    {
+        m_ModelMatrix = mat;
+        m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
+        RecalculateAABBInModelSpace();
+    }
 
-	void Model::Render(Shared<Shader>& shader)
-	{
-	
-        
 
-        auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
-     //   Orion::Renderer2D::DrawLine(glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f), glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z,1.0f), glm::vec4(1.f,0.2f,0.2f,1.0f));
+    void Model::RecalculateAABBInModelSpace()
+    {
       
+        glm::vec4 min = m_ModelMatrix * glm::vec4(m_OriginModelAABB.mMin.x, m_OriginModelAABB.mMin.y, m_OriginModelAABB.mMin.z, 1.0f);
+        glm::vec4 max = m_ModelMatrix * glm::vec4(m_OriginModelAABB.mMax.x, m_OriginModelAABB.mMax.y, m_OriginModelAABB.mMax.z, 1.0f);
 
+        m_ModelAABB.mMax.x = max.x;
+        m_ModelAABB.mMin.x = min.x;
 
-        glm::vec4 min =  glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z, 1.0f);
+        m_ModelAABB.mMax.y = max.y;
+        m_ModelAABB.mMin.y = min.y;
+
+        m_ModelAABB.mMax.z = max.z;
+        m_ModelAABB.mMin.z = min.z;
+
+    }
+
+    void Model::RecalculateModelMatrix() 
+    {
+        m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) + glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) + glm::scale(glm::mat4(1.0f), m_Scale);
+        m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
+
+        RecalculateAABBInModelSpace(); 
+    }
+
+    void Model::RenderModelAABB()
+    {
+        glm::vec4 min = glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z, 1.0f);
         glm::vec4 max = glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f);
-;
-
-   
-        
+        auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
 
 
         Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
@@ -42,18 +62,14 @@ namespace Orion
         Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
         Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 
+    }
+	void Model::Render(Shared<Shader>& shader)
+	{
+	
         for (auto& mesh : m_Meshes)
             mesh->Render(shader);
 
-            //glm::vec3(min.x, min.y, min.z)// bottom left
-            //glm::vec3(max.x, min.y, min.z), //BOTTOM_RIGHT
-            //glm::vec3(max.x, min.y, max.z), //BOTTOM_RIGHT_INNER
-            //glm::vec3(min.x, min.y, max.z), //BOTTOM_LEFT_INNER
-            //glm::vec3(min.x, max.y, max.z),//TOP_LEFT_INNER
-            //glm::vec3(min.x, max.y, min.z),//TOP_LEFT
-            //glm::vec3(max.x, max.y, min.z), //TOP_RIGHT
-            ////
-            //glm::vec3(max.x, max.y, max.z) //TOP_RIGHT_INNER
+        RenderModelAABB();
 
 	}
 
@@ -92,6 +108,12 @@ namespace Orion
 
         FindGreastestCoord(scene->mRootNode, scene);
 
+        float scale = 1.0f / m_MaxCoord;
+
+        m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * scale;
+        m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * scale;
+
+
 		ProcessNode(scene->mRootNode, scene);
 
 	}
@@ -106,11 +128,11 @@ namespace Orion
             aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
             float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
 
-            if (diff.x >= (m_ModelAABB.mMax - m_ModelAABB.mMin).x &&
-                diff.y >= (m_ModelAABB.mMax - m_ModelAABB.mMin).y &&
-                diff.z >= (m_ModelAABB.mMax - m_ModelAABB.mMin).z) 
+            if (diff.x >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).x &&
+                diff.y >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).y &&
+                diff.z >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).z) 
             {
-                m_ModelAABB = mesh->mAABB;
+                m_OriginModelAABB = mesh->mAABB;
             }
 
           //  m_ModelAABB = mesh->mAABB;
@@ -339,12 +361,12 @@ namespace Orion
 
         }*/
     }
+
     bool Model::IsIntersect(const CameraRay& ray)
     {
         
 
-        auto AABB = m_ModelAABB;
-
+        auto AABB = m_OriginModelAABB;
 
         double tx1 = (AABB.mMin.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);
         double tx2 = (AABB.mMax.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);

@@ -116,6 +116,7 @@ namespace Orion {
 			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
 			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
+			m_ModelCar->SetPosition(m_ModelCar->GetPosition() + 0.001f);
 			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
 			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
 			//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
@@ -128,13 +129,17 @@ namespace Orion {
 			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time)) ;
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
+	
 			for (auto& model: m_Models)
 			{
 				if(model->IsIntersect(Orion::CamerasController::GetActiveCamera()->Raycast(m_ViewportMousePos.x, m_ViewportMousePos.y)))
 				{
 					ORI_INFO("Intersect:" + model->GetModelName());
+					
 				}
+
 			}
+		
 
 			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render();});
 			

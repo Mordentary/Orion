@@ -62,6 +62,9 @@ namespace Orion
 		m_Origin = origin;
 		m_Direction = direction;
 		m_Length = rayLength;
+		
+
+
 	}
 	void CameraRay::DebugDraw() const
 	{

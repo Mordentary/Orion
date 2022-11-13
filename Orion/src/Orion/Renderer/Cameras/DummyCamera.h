@@ -33,13 +33,15 @@ namespace Orion
 			if (&r != this) {
 				m_Origin = r.m_Origin;
 				m_Direction = r.m_Direction;
+				m_Length = r.m_Length;
+
 			}
 			return *this;
 		};
 
 	private:
 		glm::vec3 m_Origin{1.0f};
-		glm::vec3 m_Direction{ 1.0f };
+		glm::vec3 m_Direction{1.0f};
 		float m_Length = 0.0f;
 	};
 
