@@ -32,23 +32,21 @@ namespace Orion {
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Pig/source/model.dae");
 
-			m_ModelCat->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)));
-			m_Models.push_back(m_ModelCat);
-
-			m_ModelPlatform->SetModelMatrix(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f, 50.0f)), glm::vec3(0.0, -0.4f, 0.0)));
-			m_Models.push_back(m_ModelPlatform);
+			m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
 
-			m_ModelTree->SetModelMatrix(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.3, -0.3, 0.5)));
-			m_Models.push_back(m_ModelTree);
+			m_ModelPlatform->SetScale(glm::vec3(50.0f, 10.0f, 50.0f));
+			m_ModelPlatform->SetPosition(glm::vec3(0.0, -4.0f, 5.0));
 
-			m_ModelCar->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2)) * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f)));
-			m_Models.push_back(m_ModelCar);
+			m_ModelTree->SetScale(glm::vec3(20.0f, 15.0f, 20.0f));
+			m_ModelTree->SetPosition(glm::vec3(-0.3, -4.0f, 10.5));
 
-			m_ModelDragon->SetModelMatrix(glm::translate(m_ModelMatrix, glm::vec3(-0.3, -0.6, -6.2)) * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f)));
-			m_Models.push_back(m_ModelDragon);
+			m_ModelCar->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
+			m_ModelCar->SetPosition(glm::vec3(-0.7, -0.7, -5.2));
 
 
+			m_ModelDragon->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
+			m_ModelDragon->SetPosition(glm::vec3(-0.6, -0.6, -6.2));
 
 
 		
@@ -64,9 +62,16 @@ namespace Orion {
 
 
 
-			Orion::Renderer::AddLight(m_SpotLight);
-			Orion::Renderer::AddLight(m_PointLight);
-			Orion::Renderer::AddLight(m_DirLight);
+			Orion::Renderer::AddModelToScene(m_ModelCat);
+			Orion::Renderer::AddModelToScene(m_ModelPlatform);
+			Orion::Renderer::AddModelToScene(m_ModelTree);
+			Orion::Renderer::AddModelToScene(m_ModelCar);
+			Orion::Renderer::AddModelToScene(m_ModelDragon);
+
+
+			Orion::Renderer::AddLightToScene(m_SpotLight);
+			Orion::Renderer::AddLightToScene(m_PointLight);
+			Orion::Renderer::AddLightToScene(m_DirLight);
 			
 
 			std::vector<std::string> cubeMapPaths
@@ -129,17 +134,7 @@ namespace Orion {
 			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time)) ;
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
 
-	
-			for (auto& model: m_Models)
-			{
-				if(model->IsIntersect(Orion::CamerasController::GetActiveCamera()->Raycast(m_ViewportMousePos.x, m_ViewportMousePos.y)))
-				{
-					ORI_INFO("Intersect:" + model->GetModelName());
-					
-				}
-
-			}
-		
+			
 
 			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render();});
 			
@@ -154,30 +149,12 @@ namespace Orion {
 		}
 		void Render() override 
 		{
-	
-			for(auto& model : m_Models)
-			{
-				Orion::Renderer::DrawModel(model->GetModelMatrix(), model);
-
-			}
 
 
-			Orion::CamerasController::GetActiveCamera()->Raycast(m_ViewportMousePos.x, m_ViewportMousePos.y).DebugDraw();
-			/*Orion::Renderer::DrawModel(glm::translate(m_ModelMatrix, glm::vec3(0.0, 0.0, 1.0)), m_ModelCat);
+			Orion::Renderer::DrawScene();
 
-			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(20.0f, 15.0f, 20.0f)), glm::vec3(-0.3, -0.3, 0.5)), m_ModelTree);
-
-
-			auto matrix = glm::translate(m_ModelMatrix, glm::vec3(-0.1, -0.3, -3.2))  * glm::scale(m_ModelMatrix, glm::vec3(5.0f, 5.0f, 5.0f));
+			Orion::CamerasController::GetActiveCamera()->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY()).DebugDraw();
 			
-
-			
-
-			Orion::Renderer::DrawModel(matrix, m_ModelCar);
-
-			Orion::Renderer::DrawModel(glm::translate(matrix, glm::vec3(-0.1, -0.3, -3.2)), m_ModelDragon);
-
-			Orion::Renderer::DrawModel(glm::translate(glm::scale(m_ModelMatrix, glm::vec3(50.0f, 10.0f,50.0f)), glm::vec3(0.0, -0.4f, 0.0)), m_ModelPlatform);*/
 
 			Orion::Material mat =
 			{
@@ -369,6 +346,8 @@ namespace Orion {
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});
 
+
+
 			ImGui::Begin("Viewport");
 
 			bool isHover = ImGui::IsWindowHovered();
@@ -384,20 +363,9 @@ namespace Orion {
 			auto mouseA = ImGui::GetMousePos();
 
 			
-			mouseA.y = size.y - (mouseA.y - winA.y)  ;
-			mouseA.x = (mouseA.x - winA.x);
-
-			if (mouseA.y > size.y) mouseA.y = size.y;
-			if (mouseA.y < 0) mouseA.y = 0;
-
-			if (mouseA.x > size.x) mouseA.x = size.x;
-			if (mouseA.x < 0) mouseA.x = 0;
-
-			auto& mouse =  glm::vec2(mouseA.x , mouseA.y);
-			//ORI_INFO("X: {0}, Y: {1}", mouse.x, mouse.y);
-
-			m_ViewportMousePos = glm::vec2(mouse.x, mouse.y);
-
+			
+			Application::Get().GetWindow().SetSubWindowProp
+			({ "Viewport", (int32_t)size.x, (int32_t)size.y, {winA.x,winA.y}, {mouseA.x,mouseA.y} });
 
 			if (m_ViewportSize != *(glm::vec2*)&size)
 			{
@@ -441,7 +409,6 @@ namespace Orion {
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
-		glm::vec2 m_ViewportMousePos{0.0f};
 
 		glm::vec2 m_LightSettings{0.15f,0.058f};
 		glm::vec2 m_ViewportSize;
@@ -450,6 +417,5 @@ namespace Orion {
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
-		std::vector<Shared<Model>> m_Models;
 	};
 }

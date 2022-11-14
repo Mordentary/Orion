@@ -14,9 +14,14 @@ namespace Orion {
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const override;
 		virtual void SetLineWidth(float width) override;
 		virtual void SetDepthMask(bool mode) override;
+
+
 		virtual void CullBackFace(bool cull) override; //TODO: REMOVE
 
+		virtual void DoDepthTest(bool enabled) override;
+		virtual void StencilMode(uint32_t mode, int32_t num, uint32_t bitmask) override;
 
+		virtual void StencilWrite(bool enabled) override;
 	};
 
 }

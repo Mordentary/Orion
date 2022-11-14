@@ -33,8 +33,8 @@ namespace Orion
     void Model::RecalculateModelMatrix() 
     {
         m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) + glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) + glm::scale(glm::mat4(1.0f), m_Scale);
-        m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
-
+        //m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
+       // m_LastHitedPoint = glm::vec4(m_LastHitedPoint, 1.0f) * m_ModelMatrix; //TODO: MAYBE USEFUL FOR FUTURE DECALS
         RecalculateAABBInModelSpace(); 
     }
 
@@ -43,6 +43,9 @@ namespace Orion
         glm::vec4 min = glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z, 1.0f);
         glm::vec4 max = glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f);
         auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
+
+
+       // Orion::Renderer2D::DrawLine(glm::vec3(0.0f), m_LastHitedPoint, color + glm::vec4(0.2f));
 
 
         Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
@@ -108,11 +111,9 @@ namespace Orion
 
         FindGreastestCoord(scene->mRootNode, scene);
 
-        float scale = 1.0f / m_MaxCoord;
-
+        float scale = 1.0f / m_MaxDivider;
         m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * scale;
         m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * scale;
-
 
 		ProcessNode(scene->mRootNode, scene);
 
@@ -136,7 +137,7 @@ namespace Orion
             }
 
           //  m_ModelAABB = mesh->mAABB;
-            if (scaleF > m_MaxCoord) m_MaxCoord = scaleF;
+            if (scaleF > m_MaxDivider) m_MaxDivider = scaleF;
         } 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
@@ -183,7 +184,7 @@ namespace Orion
         // walk through each of the mesh's vertices
         
        
-        float scale = 1.0f / m_MaxCoord;
+        float scale = 1.0f / m_MaxDivider;
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
@@ -366,28 +367,36 @@ namespace Orion
     {
         
 
-        auto AABB = m_OriginModelAABB;
+        auto AABB = m_ModelAABB;
 
-        double tx1 = (AABB.mMin.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);
-        double tx2 = (AABB.mMax.x - ray.GetOrigin().x) * (1 / ray.GetDirection().x);
+        double tx1 = (AABB.mMin.x - ray.GetOrigin().x) / (ray.GetDirection().x * ray.GetLength());
+        double tx2 = (AABB.mMax.x - ray.GetOrigin().x) / (ray.GetDirection().x * ray.GetLength());
 
         double tmin = std::min(tx1, tx2);
         double tmax = std::max(tx1, tx2);
 
-        double ty1 = (AABB.mMin.y - ray.GetOrigin().y) * (1 / ray.GetDirection().y);
-        double ty2 = (AABB.mMax.y - ray.GetOrigin().y) * (1 / ray.GetDirection().y);
+        double ty1 = (AABB.mMin.y - ray.GetOrigin().y) / (ray.GetDirection().y * ray.GetLength());
+        double ty2 = (AABB.mMax.y - ray.GetOrigin().y) / (ray.GetDirection().y * ray.GetLength());
 
         tmin = std::max(tmin, std::min(ty1, ty2));
         tmax = std::min(tmax, std::max(ty1, ty2));
 
-        double tz1 = (AABB.mMin.z - ray.GetOrigin().z) * (1 / ray.GetDirection().z);
-        double tz2 = (AABB.mMax.z - ray.GetOrigin().z) * (1 / ray.GetDirection().z);
+        double tz1 = (AABB.mMin.z - ray.GetOrigin().z) / (ray.GetDirection().z * ray.GetLength());
+        double tz2 = (AABB.mMax.z - ray.GetOrigin().z) / (ray.GetDirection().z * ray.GetLength());
 
         tmin = std::max(tmin, std::min(tz1, tz2));
         tmax = std::min(tmax, std::max(tz1, tz2));
 
+       
 
-        return tmax >= tmin;
+       
+        if (tmax > std::max(tmin, 0.0))
+        {
+            m_LastHitedPoint = ray.GetOrigin() + glm::vec3(tmin * (ray.GetDirection().x * ray.GetLength()), tmin * (ray.GetDirection().y * ray.GetLength()), tmin * (ray.GetDirection().z * ray.GetLength()));
+            return true;
+        }
+
+        return false;
 
 
     }

@@ -16,5 +16,10 @@ namespace Orion
 		 static std::pair<float, float> GetMousePosition();
 		 static float GetMouseX();
 		 static float GetMouseY();
+
+		 static std::pair<float, float> Input::GetLocalWindowMousePosition();
+		 static float GetLocalWindowMouseX();
+		 static float GetLocalWindowMouseY();
+
 	};
 }

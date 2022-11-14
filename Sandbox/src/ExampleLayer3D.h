@@ -32,9 +32,9 @@ public:
 		m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
 		m_SpotLight->GetLightProperties().Position= glm::vec3(0.0f, 1.0f, 0.0f);
 
-		Orion::Renderer::AddLight(m_SpotLight);
-		Orion::Renderer::AddLight(m_PointLight);
-		Orion::Renderer::AddLight(m_DirLight);
+		Orion::Renderer::AddLightToScene(m_SpotLight);
+		Orion::Renderer::AddLightToScene(m_PointLight);
+		Orion::Renderer::AddLightToScene(m_DirLight);
 		m_Model = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 
 		Orion::FramebufferSpecification specFB;

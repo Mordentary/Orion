@@ -20,6 +20,7 @@ namespace Orion {
 		inline uint32_t GetHeight() const override { return m_Data.Height; }
 		inline uint32_t GetWidth() const override { return m_Data.Width; }
 		inline uint32_t GetSamplesNum() const override { return m_Data.SamplesPerPixel; }
+		inline const SubWindow& GetSubWindowProp() override {	return m_ImGuiViewport;}
 
 		inline int32_t GetCurrentTimeInSec_Int() override {return static_cast<int32_t>(glfwGetTime());}
 		inline float GetCurrentTimeInSec_Float() override {return static_cast<float>(glfwGetTime());}
@@ -41,6 +42,11 @@ namespace Orion {
 
 		inline void SetCursorPosition(float xPos, float yPos) override { glfwSetCursorPos(m_Window, xPos, yPos); }
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+
+
+		inline void SetSubWindowProp(const SubWindow& win) override { m_ImGuiViewport = win; }
+
+
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
@@ -63,7 +69,9 @@ namespace Orion {
 			EventCallbackFn EventCallback;
 		};
 		WindowData m_Data;
-
+	private:
+		SubWindow m_ImGuiViewport;
+	
 	};
 }
 

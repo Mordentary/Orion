@@ -2,38 +2,21 @@
 
 #include "Renderer.h"
 #include "Renderer2D.h"
+#include "Orion/Core/Application.h"
+
 #include"Platform/OpenGL/OpenGLShader.h"
 #include"../GraphicsObjects/LightSource.h"
 #include"../GraphicsObjects/Mesh.h"
 #include"../GraphicsObjects/Model.h"
+#include "Orion/Core/KeyCodes.h"
+#include "Orion/Core/MouseButtonCodes.h"
+#include "Orion/Core/Input.h"
 
 namespace Orion
 {
 	struct RendererData3D
 	{
-		static const uint32_t MaxPolygons = 20000;
-		static const uint32_t MaxVertices = MaxPolygons * 3;
-		static const uint32_t MaxTextureSlots = 32;
-
-		uint32_t MeshCount = 0;
-		uint32_t MeshVertexDataOffset = 0;
-		uint32_t MeshIndexkoDataOffset = 0;
-		uint32_t DrawCalls = 0;
-		uint32_t TotalSizeOfBatch = 0;
-
-		Shared<VertexArray> MeshVertexArray = nullptr;
-		Shared<IndexBuffer> MeshIndexBuffer = nullptr;
-		Shared<VertexBuffer> MeshVertexBuffer = nullptr;
-
 		Shared<Texture2D> WhiteTexture = nullptr;
-
-		Shared<Texture2D> ShadowMap = nullptr;
-
-		Shared<Mesh>* MeshBufferBase = nullptr;
-		Shared<Mesh>* MeshIterator = nullptr;
-
-		std::array<Shared<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint32_t TextureSlotsIndex = 1;
 
 		Shared<Shader> PhongShader = nullptr;
 		Shared<Shader> LightShader = nullptr;
@@ -43,10 +26,14 @@ namespace Orion
 		Shared<Shader> DepthTextureShader = nullptr;
 
 		Shared<Shader> CurrentShader = nullptr;
+		Shared<Shader> SelectModelShader = nullptr;
+
+		Shared<Model> SelectedModel = nullptr;
+
 
 		std::function<void()> SceneRenderFunc = nullptr;
-
 		Shared<Framebuffer> ScreenFramebuffer = nullptr;
+
 
 		Shared <Model> Cube = nullptr;
 		Shared <Model> Sphere = nullptr;
@@ -55,15 +42,12 @@ namespace Orion
 
 		Material DefaultMaterial;
 		std::vector<Shared<LightSource>> LightSources;
+		std::vector<Shared<Model>> Models;
+
 		Shared<DummyCamera> SceneCamera = nullptr;
 	};
 
 	RendererData3D Renderer::s_RenData3D;
-
-	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
-	{
-		RenderCommand::SetViewport(0, 0, width, height);
-	}
 
 	void Renderer::Init()
 	{
@@ -71,27 +55,13 @@ namespace Orion
 		RenderCommand::Init();
 		Renderer2D::Init();
 
-		s_RenData3D.MeshVertexArray = VertexArray::Create();
-		s_RenData3D.MeshVertexBuffer = VertexBuffer::Create(s_RenData3D.MaxPolygons * sizeof(MeshVertex));
-
-		s_RenData3D.MeshVertexBuffer->SetLayout({
-			{Orion::ShaderDataType::Float3, "a_Position"},
-			{Orion::ShaderDataType::Float3, "a_Normal"},
-			{Orion::ShaderDataType::Float4, "a_Color"},
-			{Orion::ShaderDataType::Float2, "a_TextureCoord"},
-			{Orion::ShaderDataType::Float, "a_TextureSlot"}
-			});
-
-		s_RenData3D.MeshIterator = s_RenData3D.MeshBufferBase;
+		
 		s_RenData3D.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t whiteTextureData = 0xffffffff;
 		s_RenData3D.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
 
-		int32_t  samples[s_RenData3D.MaxTextureSlots];
-		for (uint32_t i = 0; i < s_RenData3D.MaxTextureSlots; i++)
-			samples[i] = i;
-
+	
 		//Shader preparing
 
 		s_RenData3D.PhongShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PhongShader.glsl");
@@ -99,13 +69,10 @@ namespace Orion
 		s_RenData3D.CubemapShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapShader.glsl");
 		s_RenData3D.DepthCubemapShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapDepthShader.glsl");
 		s_RenData3D.DepthTextureShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/TextureDepthShader.glsl");
-
+		s_RenData3D.SelectModelShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/SelectModelShader.glsl");
 
 
 		s_RenData3D.PhongShader->Bind();
-		s_RenData3D.PhongShader->SetIntArray("u_Texture", &samples[0], s_RenData3D.MaxTextureSlots);
-
-		s_RenData3D.TextureSlots[0] = s_RenData3D.WhiteTexture;
 
 		s_RenData3D.DefaultMaterial =
 		{
@@ -115,47 +82,30 @@ namespace Orion
 		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Cube.obj");
 		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Sphere.obj");
 
-		//ResetBatch();
+		
 	}
 
-	//void Renderer::Flush()
-	//{
-	//	if (s_RenData3D.MeshCount) {
-	//		s_RenData3D.MeshIterator = s_RenData3D.MeshBufferBase;
+	void Renderer::ClosestObjectToRayHit()
+	{
+		
+		for (auto& model : s_RenData3D.Models)
+		{
+			if (model->IsIntersect(s_RenData3D.SceneCamera->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY())) && Orion::Input::IsKeyPressed(ORI_KEY_F))
+			{
+				if (!s_RenData3D.SelectedModel || !s_RenData3D.SelectedModel->IsIntersect(s_RenData3D.SceneCamera->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY())))
+					s_RenData3D.SelectedModel = model;
 
-	//		for (uint32_t i = 0; i < s_RenData3D.MeshCount; i++)
-	//		{
-	//			auto& Mesh = **s_RenData3D.MeshIterator;
+				if (glm::distance(s_RenData3D.SceneCamera->GetPosition(), model->GetLastHitedPoint()) <
+					glm::distance(s_RenData3D.SceneCamera->GetPosition(), s_RenData3D.SelectedModel->GetLastHitedPoint()))
+					s_RenData3D.SelectedModel = model;
+			}
 
-	//			uint32_t dataSize = sizeof(MeshVertex) * Mesh.GetVerticesCount();
-	//			s_RenData3D.MeshVertexBuffer->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset, dataSize);
-
-	//			s_RenData3D.MeshVertexDataOffset += dataSize;
-	//			s_RenData3D.MeshIterator++;
-
-	//			//	s_RenData3D.Inde->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset, dataSize);
-	//		}
-
-	//		s_RenData3D.PhongShader->Bind();
-	//		RenderCommand::DrawIndexed(s_RenData3D.MeshVertexArray);
-	//		s_RenData3D.DrawCalls++;
-
-	//		memset(s_RenData3D.MeshBufferBase, 0, s_RenData3D.MeshVertexDataOffset);
-	//		s_RenData3D.MeshVertexBuffer->SetData(s_RenData3D.MeshBufferBase, s_RenData3D.MeshVertexDataOffset);
-	//	}
-	//}
-	//void Renderer::ResetBatch()
-	//{
-	//	s_RenData3D.MeshIterator = s_RenData3D.MeshBufferBase;
-	//	s_RenData3D.MeshCount = 0;
-
-	//	s_RenData3D.MeshVertexDataOffset = 0;
-	//	s_RenData3D.TextureSlotsIndex = 1;
-	//}
+		}
+		if (s_RenData3D.SelectedModel)
+			ORI_INFO("Intersect:{0} | Point:{1}", s_RenData3D.SelectedModel->GetModelName(),0);
 
 
-	
-
+	}
 
 	void Renderer::PrepareLights()
 	{
@@ -185,7 +135,6 @@ namespace Orion
 
 		s_RenData3D.WhiteTexture->Bind(0);
 
-
 		s_RenData3D.LightShader->Bind();
 		s_RenData3D.LightShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 
@@ -198,8 +147,68 @@ namespace Orion
 
 
 	}
+
+	void Renderer::DrawScene()
+	{
+		s_RenData3D.CurrentShader->Bind();
+		for  (Shared<Model>& model : s_RenData3D.Models)
+		{
+			if (s_RenData3D.SelectedModel && model == s_RenData3D.SelectedModel) continue;
+
+
+			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", model->GetModelMatrix());
+			model->Render(s_RenData3D.CurrentShader);
+
+
+		}
+
+		if (s_RenData3D.SelectedModel) 
+		{
+			glm::mat4 modelTranslate(0.0f);
+			if (Orion::Input::IsMouseButtonPressed(ORI_MOUSE_BUTTON_1))
+			{
+
+				auto[mouseX,mouseY] = Orion::Input::GetLocalWindowMousePosition();
+
+				auto viewport = Orion::Application::Get().GetWindow().GetSubWindowProp();
+				// 0.. Width 
+
+				//Width .. Width
+				mouseX = ((viewport.Width*2) * mouseX / viewport.Width) - viewport.Width;
+				mouseY = ((viewport.Height * 2) * mouseY / viewport.Height) - viewport.Height;
+
+
+				mouseX /=  viewport.Width;
+				mouseY /= viewport.Height;
+
+
+				mouseX /= s_RenData3D.SelectedModel->GetMaxModelDivider();
+				mouseY /= s_RenData3D.SelectedModel->GetMaxModelDivider();
+
+				ORI_INFO("Mouse:{0} || {1}", mouseX, mouseY);
+
+				modelTranslate = glm::translate(glm::mat4(1.0f),
+					glm::vec3(
+						s_RenData3D.SelectedModel->GetPosition().x + mouseX,
+						s_RenData3D.SelectedModel->GetPosition().y + mouseY,
+						s_RenData3D.SelectedModel->GetPosition().z)) * glm::scale(glm::mat4(1.0f), s_RenData3D.SelectedModel->GetScale());
+
+				 s_RenData3D.SelectedModel->SetModelMatrix(modelTranslate);
+
+			}
+
+			s_RenData3D.CurrentShader->Bind();
+			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix() );
+			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
+
+		}
+
+	}
+
+
 	void Renderer::EndScene()
 	{
+		 ClosestObjectToRayHit();
 		Renderer2D::EndScene();
 
 		if (s_RenData3D.SceneCubeMap && !false)
@@ -208,7 +217,7 @@ namespace Orion
 
 		s_RenData3D.ScreenFramebuffer->Unbind();
 	}
-	void Renderer::AddLight(const Shared<LightSource>& light)
+	void Renderer::AddLightToScene(const Shared<LightSource>& light)
 	{
 		if (light->GetLightModel() == nullptr)
 		{
@@ -217,6 +226,12 @@ namespace Orion
 		s_RenData3D.LightSources.push_back(light);
 		
 	}
+
+	void Renderer::AddModelToScene(const Shared<Model>& model)
+	{
+		s_RenData3D.Models.push_back(model);
+	}
+
 	void Renderer::LoadAndRenderLights()
 	{
 		if (!s_RenData3D.LightSources.empty())
@@ -266,14 +281,6 @@ namespace Orion
 
 
 	}
-	/*void Renderer::AppendMesh(const Shared<Mesh>& mesh, const glm::mat4& modelMatrix) //TODO: BATCH RENDERING
-	{
-		s_RenData3D.MeshIterator = &std::const_pointer_cast<Mesh>(mesh);
-
-		s_RenData3D.TotalSizeOfBatch += sizeof(MeshVertex) * mesh->GetVerticesCount();
-		s_RenData3D.MeshIterator++;
-		s_RenData3D.MeshCount++;
-	}*/
 
 	void Renderer::DrawCube(const glm::mat4& modelMatrix, const Material& material)
 	{
@@ -314,24 +321,5 @@ namespace Orion
 	{
 		s_RenData3D.SceneCubeMap = cubeMap;
 	}
-	int32_t Renderer::GetTextureSlot(const Shared<Texture2D>& texture)
-	{
-		int32_t textureIndex = 0;
-		for (int32_t i = 1; i < s_RenData3D.TextureSlotsIndex; i++)
-		{
-			if ((*s_RenData3D.TextureSlots[i].get()) == (*texture.get()))
-			{
-				textureIndex = i;
-				break;
-			}
-		}
 
-		if (textureIndex == 0)
-		{
-			textureIndex = s_RenData3D.TextureSlotsIndex;
-			s_RenData3D.TextureSlots[textureIndex] = texture;
-			s_RenData3D.TextureSlotsIndex++;
-		}
-		return textureIndex;
-	}
 }

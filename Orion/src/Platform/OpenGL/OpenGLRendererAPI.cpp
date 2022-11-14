@@ -10,17 +10,33 @@ namespace Orion {
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_MULTISAMPLE);
+
 		glEnable(GL_STENCIL_TEST);
+		//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		//glStencilMask(0x00);
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 	}
+
 	void OpenGLRendererAPI::CullBackFace(bool cull)//TODO: REMOVE 
 	{
-		if (cull) {glCullFace(GL_BACK); return;}
+		if (cull) 
+		glCullFace(GL_BACK);
+		else
 		glCullFace(GL_FRONT);
 	} 
 
+	void OpenGLRendererAPI::DoDepthTest(bool enabled)//TODO: REMOVE 
+	{
 
+		if(enabled)
+		glEnable(GL_DEPTH_TEST);
+		else
+		glDisable(GL_DEPTH_TEST);
+
+
+	}
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
@@ -37,7 +53,19 @@ namespace Orion {
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
+	void OpenGLRendererAPI::StencilWrite(bool enabled) 
+	{
+		if(enabled)
+		glStencilMask(0xFF);
+		else
+		glStencilMask(0x00);
 
+
+	}
+	void OpenGLRendererAPI::StencilMode(uint32_t mode, int32_t num, uint32_t bitmask)
+	{
+		glStencilFunc(mode, num, bitmask);
+	}
 
 	void OpenGLRendererAPI::DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
 	{

@@ -24,6 +24,8 @@ namespace Orion
         inline void SetPosition(const glm::vec3& position) { m_Position = position; RecalculateModelMatrix();}
         inline void SetScale(const glm::vec3& scale) { m_Scale = scale; RecalculateModelMatrix();}
         inline void SetRotation(const glm::vec3& rotation) { m_Rotation = rotation; RecalculateModelMatrix();}
+        inline float GetMaxModelDivider() { return m_MaxDivider; }
+
 
         inline Shared<Mesh>* GetMeshData() { return m_Meshes.data(); }
         inline const glm::mat4& GetModelMatrix() { return m_ModelMatrix; }
@@ -31,6 +33,10 @@ namespace Orion
         inline const glm::vec3& GetPosition() { return m_Position; }
         inline const glm::vec3& GetScale() { return m_Scale; }
         inline const glm::vec3& GetRotation() { return m_Rotation; }
+
+
+        inline const glm::vec3& GetLastHitedPoint() { return m_LastHitedPoint; }
+
 
         //inline  glm::vec3 GetPosition() { return m_Position; }
         //inline  glm::vec3 GetScale() { return m_Scale; }
@@ -56,10 +62,13 @@ namespace Orion
         glm::vec3 m_Rotation{ 1.0f };
         float m_RotAngle = 0.0f;
 
+        glm::vec3 m_LastHitedPoint{};
+
+
         aiAABB m_OriginModelAABB;
         aiAABB m_ModelAABB;
 
-        float m_MaxCoord = 0.f;
+        float m_MaxDivider = 0.f;
 
         std::vector<Shared<Mesh>> m_Meshes;
       

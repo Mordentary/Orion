@@ -24,9 +24,10 @@ namespace Orion
 
 		const glm::vec3& GetDirection() const { return m_Direction; }
 		const glm::vec3& GetOrigin() const { return m_Origin; }
-		float GetLength() { return m_Length; }
-
+		float GetLength() const { return m_Length; }
 		glm::vec3 GetEndPoint() const;
+
+
 
 
 		CameraRay& operator=(const CameraRay& r) {
@@ -42,7 +43,9 @@ namespace Orion
 	private:
 		glm::vec3 m_Origin{1.0f};
 		glm::vec3 m_Direction{1.0f};
+		glm::vec3 m_LastHitedPoint{};
 		float m_Length = 0.0f;
+
 	};
 
 
@@ -83,6 +86,9 @@ namespace Orion
 
 		inline const float& GetSensitivity() const { return m_CameraSensitivity; }
 		inline const float& GetTranslationSpeed() { return m_CameraTranslationSpeed; }
+
+		inline const CameraRay& GetCameraRay() { return m_Ray; }
+
 
 		inline const float IsRotation() const { return m_Rotation; }
 		

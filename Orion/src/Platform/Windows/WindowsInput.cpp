@@ -54,4 +54,43 @@ namespace Orion {
 
 		return (float)y;
 	}
+
+
+	std::pair<float, float> Input::GetLocalWindowMousePosition()
+	{
+		
+		auto& window = Application::Get().GetWindow();
+		auto VP_Prop = window.GetSubWindowProp();
+
+		glm::vec2 mouseA = VP_Prop.MousePosInAbs;
+		glm::vec2 winA = VP_Prop.ScreenPosInAbs;
+
+		glm::vec2 size = { VP_Prop.Width,VP_Prop.Height };
+
+
+		mouseA.y = size.y - (mouseA.y - winA.y);
+		mouseA.x = (mouseA.x - winA.x);
+
+		if (mouseA.y > size.y) mouseA.y = size.y;
+		if (mouseA.y < 0) mouseA.y = 0;
+
+		if (mouseA.x > size.x) mouseA.x = size.x;
+		if (mouseA.x < 0) mouseA.x = 0;
+
+
+		return { mouseA.x,mouseA.y };
+	}
+
+	float Input::GetLocalWindowMouseX()
+	{
+		auto [x, y] = GetLocalWindowMousePosition();
+
+		return (float)x;
+	}
+	float Input::GetLocalWindowMouseY() 
+	{
+		auto [x, y] = GetLocalWindowMousePosition();
+
+		return (float)y;
+	}
 }

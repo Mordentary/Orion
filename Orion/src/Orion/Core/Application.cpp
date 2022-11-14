@@ -100,7 +100,7 @@ namespace Orion
 		}
 
 		m_Minimized = false;
-		Renderer::OnWindowResize(e.GetWidth(),e.GetHeight());
+		RenderCommand::SetViewport(0,0,e.GetWidth(),e.GetHeight());
 		return false;
 	}
 	bool Application::OnWindowClose(WindowCloseEvent& e)

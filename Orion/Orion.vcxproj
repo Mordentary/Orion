@@ -675,6 +675,7 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\SelectModelShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl" />

@@ -23,7 +23,7 @@ out vec4 v_FragPosSpotLight;
 out mat3 v_TBN;
 
 
-flat out int v_TextSlot;
+
 
 
 uniform mat4 u_DirLightMatrix;
@@ -38,7 +38,7 @@ void main()
    v_Normal =  mat3(transpose(inverse(u_ModelMatrix))) * a_Normal; 
    v_Color = a_Color;
    v_TextCoord = a_TextureCoord;
-   v_TextSlot = int(a_TextureSlot);
+
 
    vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent, 0.0)));
    vec3 B = normalize(vec3(u_ModelMatrix * vec4(a_Bitangent, 0.0)));
@@ -138,18 +138,12 @@ in vec4 v_FragPosSpotLight;
 
 in mat3 v_TBN;
 
-flat in int v_TextSlot;
-
-
-
-uniform sampler2D u_Texture[32];
-
 
 uniform sampler2D u_ShadowMapDir;
 uniform sampler2D u_ShadowMapSpot;
-
-
 uniform samplerCube u_ShadowCubemap;
+
+
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
 
@@ -163,6 +157,7 @@ void main()
 {
 
     vec3 normal = texture(u_Material.normals, v_TextCoord).rgb;
+
     if(normal != vec3(1.0f))
     {
         normal = normal * 2.0 - 1.0;

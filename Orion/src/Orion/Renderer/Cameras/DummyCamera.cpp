@@ -5,6 +5,7 @@
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
 #include"Orion/Core/MouseButtonCodes.h"
+#include<glm/gtx/string_cast.hpp>
 
 namespace Orion 
 {
@@ -41,9 +42,11 @@ namespace Orion
 		glm::vec4 ray_clip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
 		glm::vec4 ray_eye = glm::inverse(m_ProjectionMatrix) * ray_clip;
 		glm::vec3 ray_wor = glm::vec3((inverse(m_ViewMatrix) * glm::vec4(ray_eye.x, -ray_eye.y, -1.0, 0.0f)));
+		//std::cout << glm::to_string(ray_wor) << "\n";
 
+		m_Ray.Update(glm::normalize(ray_wor),m_Position,10.f);
 
-		m_Ray.Update(glm::normalize(ray_wor),m_Position,50.f);
+		
 
 		return m_Ray;
 	}

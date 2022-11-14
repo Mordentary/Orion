@@ -32,6 +32,21 @@ namespace Orion
 		{
 			s_RendererAPI->SetClearColor(color);
 		}
+		inline static void StencilWrite(bool enabled) 
+		{
+			s_RendererAPI->StencilWrite(enabled);
+
+		}
+
+		inline static void StencilMode(uint32_t mode, int32_t num, uint32_t bitmask)
+		{
+			s_RendererAPI->StencilMode(mode, num, bitmask);
+		}
+
+		inline static void DoDepthTest(bool enabled)
+		{
+			s_RendererAPI->DoDepthTest(enabled);
+		}
 
 		inline static void Clear(int32_t mode) 
 		{
