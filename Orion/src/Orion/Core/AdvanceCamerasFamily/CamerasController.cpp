@@ -96,8 +96,11 @@ namespace Orion
 	{
 		auto& cam = *m_CamerasStorage[m_ActiveCamera];
 
+
 		cam.SetZoomLevel(std::max(cam.GetZoomLevel() - e.GetYOffset() * 0.25f, 0.25f));
 		cam.RecalculateProjection();
+
+
 		return false;
 	}
 

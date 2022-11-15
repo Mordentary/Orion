@@ -5,7 +5,11 @@
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
 #include"Orion/Core/MouseButtonCodes.h"
-#include<glm/gtx/string_cast.hpp>
+#include "Orion/Renderer/GraphicsObjects/Model.h"
+#include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
+
+#include <glm/gtx/string_cast.hpp>
+
 
 namespace Orion 
 {
@@ -46,13 +50,43 @@ namespace Orion
 
 		m_Ray.Update(glm::normalize(ray_wor),m_Position,10.f);
 
-		
-
 		return m_Ray;
 	}
 
+	void DummyCamera::DragObjectAlongCameraPlane(Shared<Model>&model)
+	{
+		if (Orion::Input::IsMouseButtonPressed(ORI_MOUSE_BUTTON_1) && !Orion::CamerasController::GetBlockUpdate())
+		{	
 
 
+			glm::vec3 worRay = m_Ray.GetDirection();
+			glm::vec3 worRayPos = m_Ray.GetOrigin();
+
+			glm::vec3 cameraDir = -m_CameraForward;
+
+
+			static glm::vec3 pointIntersection{};
+			float denom = glm::dot(cameraDir, worRay);
+
+			if (abs(denom) > 1e-6)
+			{
+				glm::vec3 p0l0 = model->GetPosition() - worRayPos;
+				float t = glm::dot(p0l0, cameraDir) / denom;
+				if (t >= 0)
+				{
+					pointIntersection = worRayPos + (worRay * t);
+				}
+			}
+
+			glm::mat4 modelTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(
+				pointIntersection.x,
+				pointIntersection.y,
+				pointIntersection.z)) * glm::scale(glm::mat4(1.0f), model->GetScale());
+
+			model->SetModelMatrix(modelTranslate);
+
+		}
+	}
 
 
 	CameraRay::CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength)

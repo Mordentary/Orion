@@ -11,9 +11,9 @@ namespace Orion
 	}
 
 	OrthographicCamera::OrthographicCamera(glm::vec3& position, glm::vec3& dir, glm::vec4& borders, glm::vec2& nearFarPlanes)
-		: DummyCamera(position,  glm::lookAt(position, position - (glm::vec3(dir.x,dir.y,-dir.z)), glm::vec3(0.0f, 1.0f, 0.0f)), (glm::ortho(borders.x, borders.y, borders.z, borders.w, nearFarPlanes.x, nearFarPlanes.y)), false)
+		: DummyCamera(position,  glm::lookAt(position, position + glm::normalize(glm::vec3(dir.x,dir.y,dir.z)), glm::vec3(0.0f, 1.0f, 0.0f)), (glm::ortho(borders.x, borders.y, borders.z, borders.w, nearFarPlanes.x, nearFarPlanes.y)), false)
 	{
-
+		m_CameraForward = glm::normalize(glm::vec3(dir.x, dir.y, dir.z));
 	}
 
 
@@ -63,7 +63,7 @@ namespace Orion
 	inline void OrthographicCamera::RecalculateView()
 	{
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians(m_CameraRotation), glm::vec3(0, 0, 1));
-
+		m_CameraForward = glm::vec3(transform[0][2], transform[1][2], transform[2][2]);
 		m_ViewMatrix = glm::inverse(transform);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}

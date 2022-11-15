@@ -26,20 +26,26 @@ class Model;
 		static void EndScene();
 
 		static void DrawScene();
-
 		static void DrawCube(const glm::mat4& modelMatrix, const Material& material);
 		static void DrawSphere(const glm::mat4& modelMatrix, const Material& material);
 		static void DrawModel(const glm::mat4&  modelMatrix, const Shared<Model>& model);
+
+
 
 		static void SetSceneCubemap(const Shared<Texture2D>& cubeMap);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 		static void AddLightToScene(const Shared<LightSource>& light);
+
+		static void AddCubeToScene(const glm::mat4& modelMatrix, const Material& material);
+		static void AddSphereToScene(const glm::mat4& modelMatrix, const Material& material);
+
 		static void AddModelToScene(const Shared<Model>& model);
-
-
 		static void LightSettings(float LinearAttenuation = 0.045, float QuadraticAttenuation = 0.0075);
+
+		static Shared<Model>& GetSelectedModel();
+
 	private:
 		friend struct RendererData3D;
 		static RendererData3D s_RenData3D;

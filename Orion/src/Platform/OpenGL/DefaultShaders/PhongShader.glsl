@@ -139,11 +139,12 @@ in vec4 v_FragPosSpotLight;
 in mat3 v_TBN;
 
 
+
 uniform sampler2D u_ShadowMapDir;
 uniform sampler2D u_ShadowMapSpot;
+
+
 uniform samplerCube u_ShadowCubemap;
-
-
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
 
@@ -157,7 +158,6 @@ void main()
 {
 
     vec3 normal = texture(u_Material.normals, v_TextCoord).rgb;
-
     if(normal != vec3(1.0f))
     {
         normal = normal * 2.0 - 1.0;

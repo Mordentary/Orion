@@ -1,7 +1,6 @@
 #pragma once
 #include <Orion/Core/TimeHelper.h>
 
-
 namespace Orion 
 {
 	enum class Cameras
@@ -49,7 +48,7 @@ namespace Orion
 	};
 
 
-
+	class Model;
 
 
 	class DummyCamera
@@ -72,11 +71,15 @@ namespace Orion
 		virtual void RecalculateViewProjection() = 0;
 		virtual void RecalculateProjection() = 0;
 
+
+		void DragObjectAlongCameraPlane(Shared<Model>& model);
+
 		const inline glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionViewMatrix; }
 		const inline glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const inline glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
+		inline const glm::vec3& GetCameraForwardDir() const { return m_CameraForward; }
 
 		virtual const Cameras Get() = 0;
 
@@ -110,6 +113,8 @@ namespace Orion
 		bool m_Rotation = false;
 
 		glm::vec3 m_Position{};
+		glm::vec3 m_CameraForward{};
+
 		glm::mat4 m_ViewMatrix{};
 		glm::mat4 m_ProjectionMatrix{};
 		glm::mat4 m_ProjectionViewMatrix{};

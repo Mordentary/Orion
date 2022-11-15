@@ -28,6 +28,8 @@ namespace Orion
 
 
         inline Shared<Mesh>* GetMeshData() { return m_Meshes.data(); }
+        inline std::vector<Shared<Mesh>>& GetMeshes() { return m_Meshes; }
+
         inline const glm::mat4& GetModelMatrix() { return m_ModelMatrix; }
 
         inline const glm::vec3& GetPosition() { return m_Position; }

@@ -17,8 +17,6 @@ namespace Orion {
 
 		
 
-		
-
 	private:
 		void UpdateCameraOrientation(Orion::Timestep dt);
 		void UpdateCameraDisplacement(Orion::Timestep deltaTime);

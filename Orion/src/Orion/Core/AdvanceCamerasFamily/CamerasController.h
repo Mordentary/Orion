@@ -19,6 +19,8 @@ namespace Orion {
 		static void SetActiveCamera(std::string name);
 		static void AddCamera(std::string name, const Shared<DummyCamera>& camera);
 		static void SetBlockUpdate(bool block) { s_CamerasController.m_BlockUpdate = block; };
+		static bool GetBlockUpdate() { return s_CamerasController.m_BlockUpdate ; };
+
 
 		static void OnViewportResize(const glm::vec2& size);
 		static const std::string& GetActiveCameraName() { return s_CamerasController.m_ActiveCamera; }

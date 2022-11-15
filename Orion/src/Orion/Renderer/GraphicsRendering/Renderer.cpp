@@ -101,8 +101,8 @@ namespace Orion
 			}
 
 		}
-		if (s_RenData3D.SelectedModel)
-			ORI_INFO("Intersect:{0} | Point:{1}", s_RenData3D.SelectedModel->GetModelName(),0);
+	/*	if (s_RenData3D.SelectedModel)
+			ORI_INFO("Intersect:{0} | Point:{1}", s_RenData3D.SelectedModel->GetModelName(),0);*/
 
 
 	}
@@ -168,36 +168,10 @@ namespace Orion
 			if (Orion::Input::IsMouseButtonPressed(ORI_MOUSE_BUTTON_1))
 			{
 
-				auto[mouseX,mouseY] = Orion::Input::GetLocalWindowMousePosition();
-
-				auto viewport = Orion::Application::Get().GetWindow().GetSubWindowProp();
-				// 0.. Width 
-
-				//Width .. Width
-				mouseX = ((viewport.Width*2) * mouseX / viewport.Width) - viewport.Width;
-				mouseY = ((viewport.Height * 2) * mouseY / viewport.Height) - viewport.Height;
-
-
-				mouseX /=  viewport.Width;
-				mouseY /= viewport.Height;
-
-
-				mouseX /= s_RenData3D.SelectedModel->GetMaxModelDivider();
-				mouseY /= s_RenData3D.SelectedModel->GetMaxModelDivider();
-
-				ORI_INFO("Mouse:{0} || {1}", mouseX, mouseY);
-
-				modelTranslate = glm::translate(glm::mat4(1.0f),
-					glm::vec3(
-						s_RenData3D.SelectedModel->GetPosition().x + mouseX,
-						s_RenData3D.SelectedModel->GetPosition().y + mouseY,
-						s_RenData3D.SelectedModel->GetPosition().z)) * glm::scale(glm::mat4(1.0f), s_RenData3D.SelectedModel->GetScale());
-
-				 s_RenData3D.SelectedModel->SetModelMatrix(modelTranslate);
+				s_RenData3D.SceneCamera->DragObjectAlongCameraPlane(s_RenData3D.SelectedModel);
 
 			}
 
-			s_RenData3D.CurrentShader->Bind();
 			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix() );
 			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
 
@@ -230,6 +204,28 @@ namespace Orion
 	void Renderer::AddModelToScene(const Shared<Model>& model)
 	{
 		s_RenData3D.Models.push_back(model);
+	}
+
+
+	void Renderer::AddCubeToScene(const glm::mat4& modelMatrix, const Material& material)
+	{
+		Model model = *s_RenData3D.Cube.get();
+
+		model.GetMeshData()[0]->SetMaterial(material);
+		model.SetModelMatrix(modelMatrix);
+
+		s_RenData3D.Models.push_back(CreateShared<Model>(model));
+
+
+	}
+	void Renderer::AddSphereToScene(const glm::mat4& modelMatrix, const Material& material) 
+	{
+		Model model = *s_RenData3D.Sphere.get();
+
+		model.GetMeshData()[0]->SetMaterial(material);
+		model.SetModelMatrix(modelMatrix);
+
+		s_RenData3D.Models.push_back(CreateShared<Model>(model));
 	}
 
 	void Renderer::LoadAndRenderLights()
@@ -320,6 +316,10 @@ namespace Orion
 	void Renderer::SetSceneCubemap(const Shared<Texture2D>& cubeMap)
 	{
 		s_RenData3D.SceneCubeMap = cubeMap;
+	}
+	Shared<Model>& Renderer::GetSelectedModel()
+	{
+		return s_RenData3D.SelectedModel;
 	}
 
 }

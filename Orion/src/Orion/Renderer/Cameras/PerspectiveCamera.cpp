@@ -25,7 +25,7 @@ namespace Orion
 
 		m_ViewMatrix = glm::lookAt(position, position + m_CameraSpaceAxisZ, m_CameraSpaceAxisY);
 
-
+		m_CameraForward = m_CameraSpaceAxisZ;
 	}
 
 	void PerspectiveCamera::Update(Orion::Timestep dt)
@@ -82,7 +82,7 @@ namespace Orion
 
 			m_CameraSpaceAxisZ = glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotY), m_CameraSpaceAxisY);
 
-
+			m_CameraForward = m_CameraSpaceAxisZ;
 			app->GetWindow().SetCursorPosition(width / 2, height / 2);
 		}
 		else if (Orion::Input::IsMouseButtonReleased(ORI_MOUSE_BUTTON_RIGHT))
@@ -91,6 +91,7 @@ namespace Orion
 			app->GetWindow().DisableCursor(false);
 			firstClick = true;
 		}
+
 	}
 
 	void PerspectiveCamera::UpdateCameraDisplacement(Orion::Timestep ts)
@@ -157,7 +158,7 @@ namespace Orion
 	inline void PerspectiveCamera::RecalculateProjection()
 	{
 		m_AspectRatio = m_ScreenSize.x / m_ScreenSize.y;
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg + m_ZoomLevel), (float)m_AspectRatio, 0.1f, 10000.0f);
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg), (float)m_AspectRatio, 0.1f, 1000.0f);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix; 
 	}
 

@@ -32,7 +32,7 @@ namespace Orion
 
     void Model::RecalculateModelMatrix() 
     {
-        m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) + glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) + glm::scale(glm::mat4(1.0f), m_Scale);
+        m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) * glm::scale(glm::mat4(1.0f), m_Scale);
         //m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
        // m_LastHitedPoint = glm::vec4(m_LastHitedPoint, 1.0f) * m_ModelMatrix; //TODO: MAYBE USEFUL FOR FUTURE DECALS
         RecalculateAABBInModelSpace(); 
@@ -72,7 +72,7 @@ namespace Orion
         for (auto& mesh : m_Meshes)
             mesh->Render(shader);
 
-        RenderModelAABB();
+       // RenderModelAABB();
 
 	}
 
@@ -158,7 +158,6 @@ namespace Orion
                 // the node object only contains indices to index the actual objects in the scene. 
                 // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-             
                 m_Meshes.push_back(ProcessMesh(mesh, scene));
             }
             // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
@@ -304,12 +303,13 @@ namespace Orion
        if(!specularMaps.empty())
             mat.specularMap = specularMaps[0];
         
-       if (!shin)mat.shininess = shin;
-       else mat.shininess = 32.f;
+            mat.shininess = 32.f;
         
 
         // return a mesh object created from the extracted mesh data
-        return CreateShared<Mesh>(vertices, indices, mat);
+            
+            return CreateShared<Mesh>(vertices, indices, mat);
+            
     }
 
     std::vector<Shared<Texture2D>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)

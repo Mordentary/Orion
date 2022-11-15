@@ -48,7 +48,7 @@ namespace Orion {
 			m_ModelDragon->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 			m_ModelDragon->SetPosition(glm::vec3(-0.6, -0.6, -6.2));
 
-
+		
 		
 			//m_PointLight2 = Orion::CreateShared<Orion::PointLight>();
 			//m_PointLight3 = Orion::CreateShared<Orion::PointLight>();
@@ -60,6 +60,11 @@ namespace Orion {
 			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
 			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
 
+		
+
+			Orion::Renderer::AddSphereToScene(glm::mat4(1.0f), { nullptr,nullptr,nullptr,0 });
+			Orion::Renderer::AddCubeToScene(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.f)), { nullptr,nullptr,nullptr, 2.f });
+			
 
 
 			Orion::Renderer::AddModelToScene(m_ModelCat);
@@ -121,7 +126,7 @@ namespace Orion {
 			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
 			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
-			m_ModelCar->SetPosition(m_ModelCar->GetPosition() + 0.001f);
+			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
 			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
 			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
 			//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
@@ -155,14 +160,6 @@ namespace Orion {
 
 			Orion::CamerasController::GetActiveCamera()->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY()).DebugDraw();
 			
-
-			Orion::Material mat =
-			{
-				m_DiffuseMap, m_SpecularMap, nullptr, 2.f
-			};
-
-			Orion::Renderer::DrawSphere(glm::mat4(1.0f),{nullptr,nullptr,0});
-			Orion::Renderer::DrawCube(glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-3.0f,0.f)), mat);
 
 		}
 
@@ -317,6 +314,7 @@ namespace Orion {
 				ImGui::EndMenuBar();
 			}
 			ImGui::Begin("Setting");
+
 			ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 			ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
 			ImGui::SliderFloat("LinearAttenuation", &m_LightSettings.x, 0.0001f, 1.f);
@@ -337,11 +335,65 @@ namespace Orion {
 
 			ImGui::Begin("ShadowMapSpot");
 
-			ImVec2& sizeSpitView = ImGui::GetContentRegionAvail();
+			ImVec2& sizeSpotView = ImGui::GetContentRegionAvail();
 
-			ImGui::Image((void*)m_SpotLight->GetShadowmap()->GetRendererID(), sizeSpitView, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+			ImGui::Image((void*)m_SpotLight->GetShadowmap()->GetRendererID(), sizeSpotView, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
 			ImGui::End();
+
+
+			ImGui::Begin("SelectedObject");
+
+			ImVec2& winSize = ImGui::GetContentRegionAvail();
+			float AR = winSize.x / winSize.y;
+
+			auto& selectedObject = Orion::Renderer::GetSelectedModel();
+			
+			if (selectedObject) 
+			{
+				ImGui::Text("ModelName: %s", selectedObject->GetModelName().c_str());
+				uint32_t index = 0;
+			
+				for (auto& mesh : selectedObject->GetMeshes())
+				{
+					
+					if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
+					{
+
+						auto& mat = mesh->GetMaterial();
+
+						if (mat.diffuseMap) 
+						{
+							ImGui::Text("DiffuseTexture:");
+							ImGui::Image((void*)mat.diffuseMap->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+							ImGui::Separator();
+
+						}
+						if (mat.specularMap) 
+						{
+							ImGui::Text("SpecularTexture:");
+							ImGui::Image((void*)mat.specularMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+							ImGui::Separator();
+
+						}
+						if (mat.normalMap)
+						{
+							ImGui::Text("NormalMap:");
+							ImGui::Image((void*)mat.normalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+							ImGui::Separator();
+
+						}
+
+						ImGui::SliderFloat("Shininess factor: ", &mesh->GetMaterial().shininess, 10.0f, 128.f);
+					}
+
+						++index;
+				}
+
+			}
+
+			ImGui::End();
+
 
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});

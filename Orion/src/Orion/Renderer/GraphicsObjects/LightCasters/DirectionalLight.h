@@ -13,7 +13,7 @@ namespace Orion
 			fb.Height = 4096;
 
 			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
-			m_ProjMatrix = glm::ortho(-10.f, 10.f, -10.f, 10.f, -10.f, 10.f);
+			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
 
 			m_ShadowMap = Framebuffer::Create(fb);
 		};
@@ -26,7 +26,7 @@ namespace Orion
 			fb.Height = shadowHeight;
 
 			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
-			m_ProjMatrix = glm::ortho(-10.f, 10.f, -10.f, 10.f, -10.f, 10.f);
+			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
 
 			m_ShadowMap = Framebuffer::Create(fb);
 		}
