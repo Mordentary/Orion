@@ -151,6 +151,9 @@ namespace Orion
 	void Renderer::DrawScene()
 	{
 		s_RenData3D.CurrentShader->Bind();
+
+		Orion::RenderCommand::StencilWrite(false);
+
 		for  (Shared<Model>& model : s_RenData3D.Models)
 		{
 			if (s_RenData3D.SelectedModel && model == s_RenData3D.SelectedModel) continue;
@@ -164,16 +167,41 @@ namespace Orion
 
 		if (s_RenData3D.SelectedModel) 
 		{
-			glm::mat4 modelTranslate(0.0f);
+			
+
 			if (Orion::Input::IsMouseButtonPressed(ORI_MOUSE_BUTTON_1))
 			{
-
 				s_RenData3D.SceneCamera->DragObjectAlongCameraPlane(s_RenData3D.SelectedModel);
-
 			}
 
-			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix() );
-			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
+		
+				Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
+				Orion::RenderCommand::StencilWrite(true);
+				s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix() );
+				s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
+
+			if (s_RenData3D.CurrentShader == s_RenData3D.PhongShader) 
+			{
+	
+				s_RenData3D.SelectModelShader->Bind();
+				Orion::RenderCommand::StencilMode(ORI_GL_NOTEQUAL, 1, 0xFF);
+				Orion::RenderCommand::StencilWrite(false);
+				
+				s_RenData3D.SelectModelShader->SetMat4("u_ViewProj", s_RenData3D.SceneCamera->GetProjectionViewMatrix());
+				s_RenData3D.SelectModelShader->SetMat4("u_ModelMatrix", glm::scale(s_RenData3D.SelectedModel->GetModelMatrix(),glm::vec3(1.0f)));
+				s_RenData3D.SelectedModel->Render(s_RenData3D.SelectModelShader);
+
+				Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
+				Orion::RenderCommand::StencilWrite(true);
+				Orion::RenderCommand::DoDepthTest(true);
+			}
+			else 
+			{
+				s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix());
+				s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
+			}
+
+
 
 		}
 

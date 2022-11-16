@@ -89,7 +89,7 @@ public:
 
 		Orion::Material mat =
 		{
-			m_DiffuseMap, m_SpecularMap, 2.f
+			m_DiffuseMap, m_SpecularMap, nullptr, 2.f
 		};
 
 		Orion::Renderer::DrawCube(glm::mat4(1.0f),mat);

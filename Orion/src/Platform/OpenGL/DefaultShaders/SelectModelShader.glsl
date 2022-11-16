@@ -13,13 +13,14 @@ layout(location = 6) in float a_TextureSlot;
 uniform mat4 u_ViewProj;
 uniform mat4 u_ModelMatrix;
 
-uniform mat4 u_OutlineScale;
 
-
+out vec2 v_TextCoord;
 
 void main()
 {
-    gl_Position = u_OutlineScale * (u_ViewProj * u_ModelMatrix * vec4(a_Position, 1.0));
+
+    v_TextCoord = a_TextureCoord;
+    gl_Position = (u_ViewProj * u_ModelMatrix * vec4(a_Position + a_Normal * 0.01, 1.0));
 }
 
 #type fragment
@@ -31,14 +32,19 @@ layout(location = 0) out vec4 f_Color;
 
 
 
-uniform vec3 u_LightColor;
+struct Material
+{
+    sampler2D diffuse;
+};
 
-
+in vec2 v_TextCoord;
+uniform Material u_Material;
 
 void main()
 {
+    if (texture(u_Material.diffuse, v_TextCoord).a < 0.1f) discard;
 
-    f_Color = vec4(u_LightColor, 1.0f);
+    f_Color = vec4(0.7f, 0.25f, 0.25f,1.0f);
 
 }
 
