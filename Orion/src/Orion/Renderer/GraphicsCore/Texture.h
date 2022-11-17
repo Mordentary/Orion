@@ -33,11 +33,15 @@ namespace Orion
 		struct Texture2DParameters
 		{
 			bool Flip = true;
+			bool sRGBA = false;
 			int32_t TEXTURE_WRAP	   = 0x2901; // DEFAULT VALUE REPRESENTS GL_REPEAT
 			int32_t TEXTURE_FILTER_MIN = 0x2601; // DEFAULT VALUE REPRESENTS GL_LINEAR
 			int32_t TEXTURE_FILTER_MAX = 0x2601; // DEFAULT VALUE REPRESENTS GL_LINEAR
 			//TODO: MIPMAP ABSTRACTION
 
+			Texture2DParameters() = default;
+			Texture2DParameters(bool flip, bool sRGBA) : Flip(flip), sRGBA(sRGBA)
+			{}
 		};
 
 

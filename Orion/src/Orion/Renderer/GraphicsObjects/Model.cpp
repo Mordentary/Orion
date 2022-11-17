@@ -150,8 +150,6 @@ namespace Orion
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
             
-          
-
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
             {
@@ -320,7 +318,16 @@ namespace Orion
             {
                 aiString str;
                 mat->GetTexture(type, i, &str);
-                texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+                if (type == aiTextureType_DIFFUSE) 
+                {
+                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+
+                }
+                else 
+                {
+                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+
+                }
                 textures.push_back(texture);
             }
             if (!mat->GetTextureCount(type)) 

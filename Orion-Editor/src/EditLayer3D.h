@@ -119,7 +119,7 @@ namespace Orion {
 			float time = Orion::CurrentTime::GetCurrentTimeInSec();
 
 			lightPos.x = sin(time) * 2.0f;
-			lightPos.y = 6.0f;
+			lightPos.y = 4.0f;
 			lightPos.z = cos(time) * 2.0f;
 
 			m_PointLight->GetLightProperties().Position = lightPos / 3.f;
@@ -317,8 +317,8 @@ namespace Orion {
 
 			ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 			ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
-			ImGui::SliderFloat("LinearAttenuation", &m_LightSettings.x, 0.0001f, 1.f);
-			ImGui::SliderFloat("QuadraticAttenuation", &m_LightSettings.y, 0.0001f, 1.0f);
+			ImGui::SliderFloat("LinearAttenuation", &m_LightSettings.x, 0.1f, 5.f);
+			ImGui::SliderFloat("QuadraticAttenuation", &m_LightSettings.y, 0.1f, 5.0f);
 			ImGui::Text("FPS: %f", ts.GetFPS());
 
 

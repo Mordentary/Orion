@@ -153,6 +153,7 @@ uniform SpotLight u_Spotlight;
 uniform DirectionalLight u_Dirlight;
 
 
+    const float gamma = 2.2f;
 
 void main()
 {
@@ -176,10 +177,22 @@ void main()
     result += CalcPointLight(u_Pointlight, normal, v_FragPos, viewDir);
     result += CalcDirectionalLight(u_Dirlight, normal, viewDir);
 
-     
+
     if(result.a < 0.1f) discard;
 
-    f_Color =  result * v_Color;
+     
+
+
+    vec3 hdrColor = result.rgb;
+
+    // reinhard tone mapping
+    vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+    // gamma correction 
+    mapped = pow(mapped, vec3(1.0 / gamma));
+
+
+
+    f_Color = vec4(mapped, result.a) * v_Color;
 
 } 
 
@@ -303,8 +316,8 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
   			     light.quadratic * (distance * distance));    
     // combine results
     vec3 ambient  = light.ambient;
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
-    vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
+    vec3 diffuse  = light.diffuse  * diff * pow(vec3(texture(u_Material.diffuse, v_TextCoord)),vec3(gamma));
+    vec3 specular = light.specular * spec * pow(vec3(texture(u_Material.specular, v_TextCoord)),vec3(gamma));
 
     ambient  *= attenuation;
     diffuse  *= attenuation;
@@ -312,8 +325,10 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     float shadow = ShadowCalculationPoint(v_FragPos);
  
+    vec3 finalColor = vec3(diffuse + specular) * (1.0f - shadow) + ambient;
+ 
 
-    return vec4(vec3(diffuse + specular) * (1.0f - shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
+    return vec4(finalColor, texture(u_Material.diffuse, v_TextCoord).w);
 
 }
 
@@ -378,8 +393,8 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
     float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
     // combine results
     vec3 ambient  = light.ambient;
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
-    vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
+    vec3 diffuse  = light.diffuse  * diff * pow(vec3(texture(u_Material.diffuse, v_TextCoord)), vec3(gamma));
+    vec3 specular = light.specular * spec * pow(vec3(texture(u_Material.specular, v_TextCoord)), vec3(gamma));
 
     float shadow = ShadowCalculationDir(v_FragPosDirLight);
 

@@ -27,12 +27,21 @@ namespace Orion
 		GLenum internalFormat = 0, dataFormat = 0;
 		if (channels == 4)
 		{
-			internalFormat = GL_RGBA8;
+			if(spec.sRGBA)
+				internalFormat = GL_SRGB_ALPHA;
+			else 
+				internalFormat = GL_RGBA8;
+
 			dataFormat = GL_RGBA;
 		}
 		if (channels == 3)
 		{
-			internalFormat = GL_RGB8;
+			if (spec.sRGBA)
+				internalFormat = GL_SRGB;
+			else
+				internalFormat = GL_RGB8;
+
+
 			dataFormat = GL_RGB;
 		}
 		if (channels == 1)
@@ -67,7 +76,7 @@ namespace Orion
 		m_Width  = width;
 		m_Height = height;
 
-		m_InternalFormat = GL_RGBA8;
+		m_InternalFormat = GL_RGBA16F;
 		m_DataFormat = GL_RGBA;
 
 		ORI_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported");
@@ -117,11 +126,11 @@ namespace Orion
 			//////////////////////////////////////////
 			glGenTextures(1, &m_RendererID);
 			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_RendererID);
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA, width, height, GL_TRUE);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA16F, width, height, GL_TRUE);
 
 
 
-			m_InternalFormat = GL_RGBA;
+			m_InternalFormat = GL_RGBA16F;
 			m_DataFormat = GL_RGBA;
 
 
@@ -136,12 +145,12 @@ namespace Orion
 		////////////////////////////
 		glGenTextures(1, &m_RendererID);
 		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		m_InternalFormat = GL_RGBA8;
+		m_InternalFormat = GL_RGBA16F;
 		m_DataFormat = GL_RGBA;
 
 	}

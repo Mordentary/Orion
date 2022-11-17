@@ -195,11 +195,7 @@ namespace Orion
 				Orion::RenderCommand::StencilWrite(true);
 				Orion::RenderCommand::DoDepthTest(true);
 			}
-			else 
-			{
-				s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix());
-				s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
-			}
+		
 
 
 
