@@ -21,6 +21,8 @@ namespace Orion
 		Shared<Shader> PhongShader = nullptr;
 		Shared<Shader> LightShader = nullptr;
 		Shared<Shader> CubemapShader = nullptr;
+		Shared<Shader> GaussianBlurShader = nullptr;
+
 
 		Shared<Shader> DepthCubemapShader = nullptr;
 		Shared<Shader> DepthTextureShader = nullptr;
@@ -70,6 +72,8 @@ namespace Orion
 		s_RenData3D.DepthCubemapShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapDepthShader.glsl");
 		s_RenData3D.DepthTextureShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/TextureDepthShader.glsl");
 		s_RenData3D.SelectModelShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/SelectModelShader.glsl");
+		s_RenData3D.GaussianBlurShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GaussianBlurShader.glsl");
+
 
 
 		s_RenData3D.PhongShader->Bind();
@@ -203,15 +207,33 @@ namespace Orion
 
 	}
 
+	void Renderer::PostProcessing(Shared<Framebuffer>& finalFramebuffer)
+	{
 
+		auto& prop = Orion::Application::Get().GetWindow().GetSubWindowProp();
+		finalFramebuffer->Bind();
+		s_RenData3D.GaussianBlurShader->Bind();
+
+
+
+		Renderer2D::DrawBillboard(s_RenData3D.GaussianBlurShader,s_RenData3D.SceneCamera,glm::vec2(0,0),glm::vec2(prop.Width, prop.Height));
+
+		s_RenData3D.GaussianBlurShader->Unbind();
+		finalFramebuffer->Unbind();
+
+
+		s_RenData3D.ScreenFramebuffer->BlitToBuffer(finalFramebuffer);
+
+
+	}
 	void Renderer::EndScene()
 	{
-		 ClosestObjectToRayHit();
+		ClosestObjectToRayHit();
 		Renderer2D::EndScene();
+
 
 		if (s_RenData3D.SceneCubeMap && !false)
 			LoadCubemap(s_RenData3D.SceneCamera);
-
 
 		s_RenData3D.ScreenFramebuffer->Unbind();
 	}

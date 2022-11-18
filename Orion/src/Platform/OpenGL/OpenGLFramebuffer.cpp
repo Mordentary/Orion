@@ -14,7 +14,11 @@ namespace Orion
 	{
 		glDeleteFramebuffers(1, &m_RendererID);
 
-		if(m_ColorAttachment) glDeleteTextures(1, &m_ColorAttachment->GetRendererID()); m_ColorAttachment = nullptr;;
+		for (auto& texture : m_ColorAttachments)
+		{
+			if(texture) glDeleteTextures(1, &texture->GetRendererID());
+		}
+		m_ColorAttachments.clear();
 		if (m_DepthAttachment) glDeleteTextures(1, &m_DepthAttachment->GetRendererID()); m_DepthAttachment = nullptr;;
 
 		glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
@@ -39,10 +43,14 @@ namespace Orion
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
-	void OpenGLFramebuffer::BlitToBuffer(Orion::Shared<Framebuffer>& fb)
+	void OpenGLFramebuffer::BlitToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex, uint32_t colorAttachIndex)
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + thisFBColorAttachIndex);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + colorAttachIndex);
+
 		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -52,10 +60,7 @@ namespace Orion
 		m_Specification.Height = height;
 		Invalidate();
 	}
-	inline void OpenGLFramebuffer::ClearFBOTexture(int32_t index, int value) 
-	{
 
-	}
 	void OpenGLFramebuffer::Invalidate(const FramebufferSpecification& spec)
 	{
 		m_Specification = spec;
@@ -67,7 +72,12 @@ namespace Orion
 			{
 				glDeleteFramebuffers(1, &m_RendererID);
 
-				if (m_ColorAttachment) glDeleteTextures(1, &m_ColorAttachment->GetRendererID()); m_ColorAttachment = nullptr;
+				for (auto& texture : m_ColorAttachments)
+				{
+					if (texture) glDeleteTextures(1, &texture->GetRendererID());
+				}
+				m_ColorAttachments.clear();
+
 				if (m_DepthAttachment) glDeleteTextures(1, &m_DepthAttachment->GetRendererID()); m_DepthAttachment = nullptr;
 
 				glDeleteRenderbuffers(1, &m_DepthStencilAttachment);
@@ -94,7 +104,7 @@ namespace Orion
 		
 					return;
 				}
-				
+
 				m_DepthAttachment = Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples ,true);
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment->GetRendererID(), 0);
 				glDrawBuffer(GL_NONE);
@@ -106,11 +116,27 @@ namespace Orion
 				return;
 			}
 
-			m_ColorAttachment = Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples, false);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_Specification.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, m_ColorAttachment->GetRendererID(), 0);
-		
 
+
+			for (size_t i = 0; i < m_Specification.ColorAttachments; i++)
+			{
+
+				m_ColorAttachments.push_back(Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples, false));
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, m_Specification.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, m_ColorAttachments[i]->GetRendererID(), 0);
+		
+			}
+
+			GLenum* attachments = new GLenum[m_Specification.ColorAttachments];
+
+			for (size_t i = 0; i < m_Specification.ColorAttachments; i++)
+			{
+				attachments[i] = GL_COLOR_ATTACHMENT0 + i;
+			}
+		
+			glDrawBuffers(m_Specification.ColorAttachments, attachments);
 				
+
+			delete[] attachments;
 			///////////////////////////////
 			///RENDEROBJECT ATTACHMENT////
 			//////////////////////////////

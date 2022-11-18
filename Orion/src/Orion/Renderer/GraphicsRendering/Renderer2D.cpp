@@ -1,7 +1,7 @@
 #include "oripch.h"
 #include "Renderer2D.h"
 #include"RenderCommand.h"
-
+#include "Orion/Core/Application.h"
 namespace Orion
 {
 	struct QuadVertex
@@ -223,6 +223,74 @@ namespace Orion
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
 		DrawQuad(glm::vec3(position, 0), size, rotation, color);
+	}
+
+	void Renderer2D::DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPosScreen, glm::vec2& quadSizeScreen)
+	{
+		shader->Bind();
+
+		auto& subScreenProp = Orion::Application::Get().GetWindow().GetSubWindowProp();
+		//ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
+		float quadPosNDSx = (2.0f * quadPosScreen.x) / subScreenProp.Width - 1.0f;
+		float quadPosNDSy = 1.0f - (2.0f * quadPosScreen.y) / subScreenProp.Height;
+		float z = 1.0f;
+
+		glm::vec3 quadPosNDS = glm::vec3(quadPosNDSx, quadPosNDSy, z);
+
+		glm::vec4 quadPosClip = glm::vec4(quadPosNDS.x, quadPosNDS.y, -1.0, 1.0);
+
+		glm::vec4 quadPosEye = glm::inverse(camera->GetProjectionMatrix()) * quadPosClip;
+
+		glm::vec3 quadPosWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadPosEye.x, -quadPosEye.y, -1.0, 0.0f)));
+
+		//std::cout << glm::to_string(ray_wor) << "\n";
+
+		float quadSizeNDSx = (2.0f * quadSizeScreen.x) / subScreenProp.Width - 1.0f;
+		float quadSizeNDSy = 1.0f - (2.0f * quadSizeScreen.y) / subScreenProp.Height;
+	
+
+		glm::vec3 quadSizeNDS = glm::vec3(quadSizeNDSx, quadSizeNDSy, z);
+
+		glm::vec4 quadSizeClip = glm::vec4(quadSizeNDS.x, quadSizeNDS.y, -1.0, 1.0);
+
+		glm::vec4 quadSizeEye = glm::inverse(camera->GetProjectionMatrix()) * quadSizeClip;
+
+		glm::vec3 quadSizeWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadSizeEye.x, -quadSizeEye.y, -1.0, 0.0f)));
+
+
+		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x ,quadPosWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_BL;
+		++s_RenData2D.QuadVertexIterator;
+
+		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x + quadSizeWorld.x,quadPosWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_BR;
+		++s_RenData2D.QuadVertexIterator;
+
+		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x + quadSizeWorld.x,quadPosWorld.y + quadSizeWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_TR;
+		++s_RenData2D.QuadVertexIterator;
+
+		s_RenData2D.QuadVertexIterator->Position = {quadPosWorld.x, quadPosWorld.y + quadSizeWorld.y, 0.0f};
+		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_TL;
+		++s_RenData2D.QuadVertexIterator;
+
+		QuadVertex* EndSegment = s_RenData2D.QuadVertexIterator;
+		s_RenData2D.QuadVertexIterator -= 4;
+		QuadVertex* StartSegment = s_RenData2D.QuadVertexIterator;
+
+
+		uint32_t dataSize = 4*sizeof(QuadVertex);
+		s_RenData2D.QuadVertexBuffer->SetData(StartSegment, dataSize);
+
+		shader->Bind();
+		RenderCommand::DrawIndexed(s_RenData2D.QuadVertexArray, 6);
+		s_RenData2D.DrawCalls++;
+
+		memset(StartSegment, 0, dataSize);
+		s_RenData2D.QuadVertexBuffer->SetData(StartSegment, dataSize);
+
+
+		shader->Unbind();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color)

@@ -61,6 +61,8 @@ void main()
 
 
 layout(location = 0) out vec4 f_Color;
+layout(location = 1) out vec4 f_BrightColor;
+
 
 
 
@@ -191,8 +193,13 @@ void main()
     mapped = pow(mapped, vec3(1.0 / gamma));
 
 
-
     f_Color = vec4(mapped, result.a) * v_Color;
+
+    float brightness = dot(f_Color.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if (brightness > 1.0)
+        f_BrightColor = vec4(f_Color.rgb, f_Color.rgb);
+    else
+        f_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 } 
 

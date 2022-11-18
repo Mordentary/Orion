@@ -95,6 +95,8 @@ namespace Orion {
 			specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
 			specFB.Height = Orion::Application::Get().GetWindow().GetHeight();
 			specFB.Samples = 4;
+			specFB.ColorAttachments = 2;
+
 
 			m_FramebufferMS = Orion::Framebuffer::Create(specFB);
 			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
@@ -148,7 +150,7 @@ namespace Orion {
 			Orion::Renderer::EndScene();
 
 		
-			m_FramebufferMS->BlitToBuffer(m_Framebuffer);
+			Orion::Renderer::PostProcessing(m_Framebuffer);
 
 
 		}
@@ -429,7 +431,7 @@ namespace Orion {
 			}
 			m_ViewportSize = {size.x,size.y};
 				
-			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(), size, ImVec2{0,1}, ImVec2{1,0});
+			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(0), size, ImVec2{0,1}, ImVec2{1,0});
 
 			ImGui::End();
 
@@ -462,7 +464,7 @@ namespace Orion {
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
 
-		glm::vec2 m_LightSettings{0.15f,0.058f};
+		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra;

@@ -1626,5 +1626,6 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\SelectModelShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\GaussianBlurShader.glsl" />
   </ItemGroup>
 </Project>

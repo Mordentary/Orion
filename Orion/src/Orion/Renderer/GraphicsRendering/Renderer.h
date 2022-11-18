@@ -46,6 +46,7 @@ class Model;
 
 		static Shared<Model>& GetSelectedModel();
 
+		static void PostProcessing(Shared<Framebuffer>& finalFramebuffer);
 	private:
 		friend struct RendererData3D;
 		static RendererData3D s_RenData3D;
