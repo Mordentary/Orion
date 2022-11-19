@@ -83,6 +83,8 @@ namespace Orion
 
 		}
 
+
+
 		s_RenData2D.QuadVertexArray = VertexArray::Create();
 		s_RenData2D.QuadVertexArray->Bind();
 		Shared<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_RenData2D.MaxIndices_Quad);
@@ -220,58 +222,65 @@ namespace Orion
 	/////////////////////////////////////////////
 	// Draw simple quad  ///////////////////////
 	///////////////////////////////////////////
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
+	void Renderer2D::AddQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
-		DrawQuad(glm::vec3(position, 0), size, rotation, color);
+		AddQuad(glm::vec3(position, 0), size, rotation, color);
 	}
 
-	void Renderer2D::DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPosScreen, glm::vec2& quadSizeScreen)
+	void Renderer2D::DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPosScreenCoord, glm::vec2& quadSizeScreenCoord)
 	{
-		shader->Bind();
 
 		auto& subScreenProp = Orion::Application::Get().GetWindow().GetSubWindowProp();
 		//ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
-		float quadPosNDSx = (2.0f * quadPosScreen.x) / subScreenProp.Width - 1.0f;
-		float quadPosNDSy = 1.0f - (2.0f * quadPosScreen.y) / subScreenProp.Height;
+		float quadPosNDSx =  (quadPosScreenCoord.x - (subScreenProp.Width / 2.f)) / (subScreenProp.Width / 2.f);
+		float quadPosNDSy = (quadPosScreenCoord.y - (subScreenProp.Height / 2.f)) / (subScreenProp.Height / 2.f);
 		float z = 1.0f;
 
 		glm::vec3 quadPosNDS = glm::vec3(quadPosNDSx, quadPosNDSy, z);
 
-		glm::vec4 quadPosClip = glm::vec4(quadPosNDS.x, quadPosNDS.y, -1.0, 1.0);
-
-		glm::vec4 quadPosEye = glm::inverse(camera->GetProjectionMatrix()) * quadPosClip;
-
-		glm::vec3 quadPosWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadPosEye.x, -quadPosEye.y, -1.0, 0.0f)));
+		//glm::vec4 quadPosClip = glm::vec4(quadPosNDS.x, quadPosNDS.y, -1.0, 1.0);
+		//
+		//glm::vec4 quadPosEye = glm::inverse(camera->GetProjectionMatrix()) * quadPosClip;
+		//
+		//glm::vec3 quadPosWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadPosEye.x, -quadPosEye.y, -1.0, 0.0f)));
 
 		//std::cout << glm::to_string(ray_wor) << "\n";
 
-		float quadSizeNDSx = (2.0f * quadSizeScreen.x) / subScreenProp.Width - 1.0f;
-		float quadSizeNDSy = 1.0f - (2.0f * quadSizeScreen.y) / subScreenProp.Height;
+		float quadSizeNDSx = (quadSizeScreenCoord.x - (subScreenProp.Width/ 2.f)) / (subScreenProp.Width / 2.f);
+		float quadSizeNDSy = (quadSizeScreenCoord.y - (subScreenProp.Height / 2.f)) / (subScreenProp.Height / 2.f);
 	
 
-		glm::vec3 quadSizeNDS = glm::vec3(quadSizeNDSx, quadSizeNDSy, z);
+		glm::vec3 quadSizeNDS = glm::vec3(quadSizeNDSx * 2, quadSizeNDSy * 2, z);
 
-		glm::vec4 quadSizeClip = glm::vec4(quadSizeNDS.x, quadSizeNDS.y, -1.0, 1.0);
+		//glm::vec4 quadSizeClip = glm::vec4(quadSizeNDS.x, quadSizeNDS.y, -1.0, 1.0);
+		//
+		//glm::vec4 quadSizeEye = glm::inverse(camera->GetProjectionMatrix()) * quadSizeClip;
+		//
+		//glm::vec3 quadSizeWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadSizeEye.x, -quadSizeEye.y, -1.0, 0.0f)));
 
-		glm::vec4 quadSizeEye = glm::inverse(camera->GetProjectionMatrix()) * quadSizeClip;
 
-		glm::vec3 quadSizeWorld = glm::vec3((inverse(camera->GetViewMatrix()) * glm::vec4(quadSizeEye.x, -quadSizeEye.y, -1.0, 0.0f)));
+		glm::vec4 color{ 1.0f };
+		float textureSlot = 1.0f;
 
 
-		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x ,quadPosWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->Position = { quadPosNDS.x ,quadPosNDS.y, 0.0f };
 		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_BL;
+
 		++s_RenData2D.QuadVertexIterator;
 
-		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x + quadSizeWorld.x,quadPosWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->Position = { quadPosNDS.x + quadSizeNDS.x,quadPosNDS.y, 0.0f };
 		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_BR;
+
 		++s_RenData2D.QuadVertexIterator;
 
-		s_RenData2D.QuadVertexIterator->Position = { quadPosWorld.x + quadSizeWorld.x,quadPosWorld.y + quadSizeWorld.y, 0.0f };
+		s_RenData2D.QuadVertexIterator->Position = { quadPosNDS.x + quadSizeNDS.x,quadPosNDS.y + quadSizeNDS.y, 0.0f };
 		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_TR;
+
 		++s_RenData2D.QuadVertexIterator;
 
-		s_RenData2D.QuadVertexIterator->Position = {quadPosWorld.x, quadPosWorld.y + quadSizeWorld.y, 0.0f};
+		s_RenData2D.QuadVertexIterator->Position = { quadPosNDS.x, quadSizeNDS.y + quadPosNDS.y, 0.0f};
 		s_RenData2D.QuadVertexIterator->TextureCoord = Constants::TextureCoord_TL;
+
 		++s_RenData2D.QuadVertexIterator;
 
 		QuadVertex* EndSegment = s_RenData2D.QuadVertexIterator;
@@ -282,18 +291,20 @@ namespace Orion
 		uint32_t dataSize = 4*sizeof(QuadVertex);
 		s_RenData2D.QuadVertexBuffer->SetData(StartSegment, dataSize);
 
+		RenderCommand::DoDepthTest(false);
 		shader->Bind();
 		RenderCommand::DrawIndexed(s_RenData2D.QuadVertexArray, 6);
 		s_RenData2D.DrawCalls++;
 
+		RenderCommand::DoDepthTest(true);
+
 		memset(StartSegment, 0, dataSize);
 		s_RenData2D.QuadVertexBuffer->SetData(StartSegment, dataSize);
-
 
 		shader->Unbind();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
+	void Renderer2D::AddQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color)
 	{
 		ORI_PROFILE_FUNCTION();
 
@@ -316,11 +327,11 @@ namespace Orion
 		s_RenData2D.QuadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::AddQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
-		DrawQuad(glm::vec3(position, 0), size, color);
+		AddQuad(glm::vec3(position, 0), size, color);
 	}
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::AddQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		if (s_RenData2D.QuadIndexCount >= s_RenData2D.MaxIndices_Quad)
 			EndScene();
@@ -340,11 +351,11 @@ namespace Orion
 	// Draw texture  ///////////////////////////
 	///////////////////////////////////////////
 
-	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
-		DrawTexturedQuad(glm::vec3(position, 0), size, rotation, texture, color, tilling);
+		AddTexturedQuad(glm::vec3(position, 0), size, rotation, texture, color, tilling);
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
 		ORI_PROFILE_FUNCTION();
 
@@ -365,7 +376,7 @@ namespace Orion
 		s_RenData2D.QuadIndexCount += 6;
 		s_RenData2D.QuadCount++;
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
 		if (s_RenData2D.QuadIndexCount >= s_RenData2D.MaxIndices_Quad)
 			EndScene();
@@ -380,20 +391,20 @@ namespace Orion
 		s_RenData2D.QuadIndexCount += 6;
 		s_RenData2D.QuadCount++;
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
-		DrawTexturedQuad(glm::vec3(position, 0), size, texture, color, tilling);
+		AddTexturedQuad(glm::vec3(position, 0), size, texture, color, tilling);
 	}
 
 	/////////////////////////////////////////////
 	// Draw subTexture  ////////////////////////
 	///////////////////////////////////////////
 
-	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
 	{
-		DrawTexturedQuad(glm::vec3(position, 0), size, rotation, subTexture, color, tilling);
+		AddTexturedQuad(glm::vec3(position, 0), size, rotation, subTexture, color, tilling);
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
+	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const float tilling)
 	{
 		ORI_PROFILE_FUNCTION();
 
@@ -415,7 +426,7 @@ namespace Orion
 		s_RenData2D.QuadIndexCount += 6;
 		s_RenData2D.QuadCount++;
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
+	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
 	{
 		if (s_RenData2D.QuadIndexCount >= s_RenData2D.MaxIndices_Quad)
 			EndScene();
@@ -437,16 +448,16 @@ namespace Orion
 		s_RenData2D.QuadCount++;
 		s_RenData2D.QuadIndexCount += 6;
 	}
-	void Renderer2D::DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
+	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
 	{
-		DrawTexturedQuad(glm::vec3(position, 0), size, subTexture, color, flip);
+		AddTexturedQuad(glm::vec3(position, 0), size, subTexture, color, flip);
 	}
 
 	/////////////////////////////////////////////
 	// Draw line  //////////////////////////////
 	///////////////////////////////////////////
 
-	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color)
+	void Renderer2D::AddLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color)
 	{
 		if (s_RenData2D.LineVertexCount >= s_RenData2D.MaxVertices_Line)
 			EndScene();
@@ -458,7 +469,7 @@ namespace Orion
 		s_RenData2D.LineVertexCount += 2;
 	}
 
-	void Renderer2D::DrawBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::AddBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
 		if (s_RenData2D.LineVertexCount >= s_RenData2D.MaxVertices_Line)
 			EndScene();

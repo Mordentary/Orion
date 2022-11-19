@@ -20,7 +20,7 @@ void main()
 {
 
     v_TextCoord = a_TextureCoord;
-    gl_Position = (u_ViewProj * u_ModelMatrix * vec4(a_Position + a_Normal * 0.01, 1.0));
+    gl_Position = (u_ViewProj * u_ModelMatrix * vec4(a_Position + a_Normal * 0.005, 1.0));
 }
 
 #type fragment

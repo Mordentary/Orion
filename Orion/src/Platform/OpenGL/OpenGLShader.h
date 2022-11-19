@@ -30,6 +30,8 @@ namespace Orion
 
         void SetIntArray(const std::string& name,const int* values, uint32_t count) override;
 
+        void SetFloatArray(const std::string& name, const float* values, uint32_t count) override;
+
         virtual void SetFloat(const std::string& name, float value) override;
 
         virtual void SetFloat2(const std::string& name, const glm::vec2& value) override;
@@ -54,6 +56,8 @@ namespace Orion
 
         void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count);
 
+        void UploadUniformFloatArray(const std::string& name, const float* values, uint32_t count);
+
         void UploadUniformInt(const std::string& name, int value);
 
         void UploadUniformFloat(const std::string& name, float value);
@@ -77,7 +81,6 @@ namespace Orion
         void UploadUniformMat4(const std::string& name, const glm::mat4& mat);
 
         void UploadUniformMat4Array(const std::string& name, const glm::mat4* mat, uint32_t count);
-
 
 
     private:

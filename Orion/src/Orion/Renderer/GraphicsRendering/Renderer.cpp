@@ -22,7 +22,7 @@ namespace Orion
 		Shared<Shader> LightShader = nullptr;
 		Shared<Shader> CubemapShader = nullptr;
 		Shared<Shader> GaussianBlurShader = nullptr;
-
+		Shared<Shader> PostProcessingShader = nullptr;
 
 		Shared<Shader> DepthCubemapShader = nullptr;
 		Shared<Shader> DepthTextureShader = nullptr;
@@ -32,6 +32,7 @@ namespace Orion
 
 		Shared<Model> SelectedModel = nullptr;
 
+		Orion::Renderer::PostProcessSpec ScenePostProcessSpec;
 
 		std::function<void()> SceneRenderFunc = nullptr;
 		Shared<Framebuffer> ScreenFramebuffer = nullptr;
@@ -40,7 +41,7 @@ namespace Orion
 		Shared <Model> Cube = nullptr;
 		Shared <Model> Sphere = nullptr;
 
-		Shared<Texture2D> SceneCubeMap = nullptr;
+		std::vector<Shared<Texture2D>> SceneCubemaps;
 
 		Material DefaultMaterial;
 		std::vector<Shared<LightSource>> LightSources;
@@ -73,6 +74,8 @@ namespace Orion
 		s_RenData3D.DepthTextureShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/TextureDepthShader.glsl");
 		s_RenData3D.SelectModelShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/SelectModelShader.glsl");
 		s_RenData3D.GaussianBlurShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GaussianBlurShader.glsl");
+		s_RenData3D.PostProcessingShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PostProcessingShader.glsl");
+
 
 
 
@@ -132,7 +135,8 @@ namespace Orion
 
 
 		s_RenData3D.ScreenFramebuffer->Bind();
-		Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
+		//Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
+		Orion::RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 
 		s_RenData3D.CurrentShader = s_RenData3D.PhongShader;
@@ -144,6 +148,14 @@ namespace Orion
 
 		s_RenData3D.PhongShader->Bind();
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
+
+		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
+		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
+
+		s_RenData3D.PhongShader->SetInt("u_GammaCorrection", s_RenData3D.ScenePostProcessSpec.GammaCorrectionEnable);
+
+
+
 		s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
 		LoadAndRenderLights();
 
@@ -207,22 +219,98 @@ namespace Orion
 
 	}
 
-	void Renderer::PostProcessing(Shared<Framebuffer>& finalFramebuffer)
+	void Renderer::PostProcessing(Shared<Framebuffer>& finalFramebuffer, const PostProcessSpec& spec)
 	{
-
 		auto& prop = Orion::Application::Get().GetWindow().GetSubWindowProp();
-		finalFramebuffer->Bind();
+		if (prop.Width <= 0 || prop.Height <= 0) return;
+
+
+		s_RenData3D.ScenePostProcessSpec = spec;
+
+		Shared<Framebuffer> horizontalPassBlur = nullptr;
+		Shared<Framebuffer> verticalPassBlur = nullptr;
+		
+		horizontalPassBlur = Orion::Framebuffer::Create({ (uint32_t)prop.Width,(uint32_t)prop.Height});
+		verticalPassBlur = Orion::Framebuffer::Create({ (uint32_t)prop.Width,(uint32_t)prop.Height });
+
+		s_RenData3D.ScreenFramebuffer->BlitToBuffer(verticalPassBlur, 1, 0);
+		
 		s_RenData3D.GaussianBlurShader->Bind();
+		s_RenData3D.GaussianBlurShader->SetFloatArray("u_Weights", &spec.GaussianCurve[0], 5);
+
+
+		RenderCommand::SetClearColor(glm::vec4(0.0f));
+
+		for (uint32_t i = 0; i < spec.NumberBlurPasses; i++)
+		{
+			s_RenData3D.GaussianBlurShader->Bind();
+			horizontalPassBlur->Bind();
+
+			RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
+
+			verticalPassBlur->GetColorAttachmentTexture(0)->Bind(7);
+			s_RenData3D.GaussianBlurShader->SetInt("u_SceneTex", verticalPassBlur->GetColorAttachmentTexture(0)->GetCurrentSlot());
+			s_RenData3D.GaussianBlurShader->SetInt("u_IsHorizontalBlur", true);
+
+			Renderer2D::DrawBillboard(s_RenData3D.GaussianBlurShader, s_RenData3D.SceneCamera, glm::vec2(0, 0), glm::vec2(prop.Width, prop.Height));
+
+
+			horizontalPassBlur->Unbind();
+
+			s_RenData3D.GaussianBlurShader->Bind();
+
+			verticalPassBlur->Bind();
+		
+			RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
+
+			horizontalPassBlur->GetColorAttachmentTexture(0)->Bind(7);
+			s_RenData3D.GaussianBlurShader->SetInt("u_SceneTex", horizontalPassBlur->GetColorAttachmentTexture(0)->GetCurrentSlot());
+			s_RenData3D.GaussianBlurShader->SetInt("u_IsHorizontalBlur", false);
+
+			Renderer2D::DrawBillboard(s_RenData3D.GaussianBlurShader, s_RenData3D.SceneCamera, glm::vec2(0, 0), glm::vec2(prop.Width, prop.Height));
 
 
 
-		Renderer2D::DrawBillboard(s_RenData3D.GaussianBlurShader,s_RenData3D.SceneCamera,glm::vec2(0,0),glm::vec2(prop.Width, prop.Height));
+			verticalPassBlur->Unbind();
+		}
 
-		s_RenData3D.GaussianBlurShader->Unbind();
+		s_RenData3D.ScreenFramebuffer->Bind();
+		if (s_RenData3D.SceneCubemaps.size() > spec.CubemapIndex && spec.EnableCubemap)
+			DrawCubemap(s_RenData3D.SceneCamera, spec.CubemapIndex, spec.GammaCorrectionEnable);
+		
+
+		s_RenData3D.ScreenFramebuffer->Unbind();
+
+		s_RenData3D.ScreenFramebuffer->BlitToBuffer(horizontalPassBlur, 0, 0); // Use horizontal buffer because don't want to create new buffer
+
+		finalFramebuffer->Bind();
+
+		s_RenData3D.PostProcessingShader->Bind();
+
+		verticalPassBlur->GetColorAttachmentTexture(0)->Bind(8);
+		s_RenData3D.PostProcessingShader->SetInt("u_GaussianBlurTex", verticalPassBlur->GetColorAttachmentTexture(0)->GetCurrentSlot());
+
+
+		horizontalPassBlur->GetColorAttachmentTexture(0)->Bind(9);
+		s_RenData3D.PostProcessingShader->SetInt("u_SceneTex", horizontalPassBlur->GetColorAttachmentTexture(0)->GetCurrentSlot());
+
+		s_RenData3D.PostProcessingShader->SetInt("u_HDR", spec.HDR_Enable);
+		s_RenData3D.PostProcessingShader->SetInt("u_GammaCorrection", spec.GammaCorrectionEnable);
+
+
+		s_RenData3D.PostProcessingShader->SetInt("u_Bloom", spec.BloomEnable);
+		s_RenData3D.PostProcessingShader->SetFloat("u_ExposureFactor", spec.Exposure);
+
+
+		Renderer2D::DrawBillboard(s_RenData3D.PostProcessingShader, s_RenData3D.SceneCamera, glm::vec2(0, 0), glm::vec2(prop.Width, prop.Height));
+
+
+		s_RenData3D.PostProcessingShader->Unbind();
+
+		
+
 		finalFramebuffer->Unbind();
 
-
-		s_RenData3D.ScreenFramebuffer->BlitToBuffer(finalFramebuffer);
 
 
 	}
@@ -232,10 +320,6 @@ namespace Orion
 		Renderer2D::EndScene();
 
 
-		if (s_RenData3D.SceneCubeMap && !false)
-			LoadCubemap(s_RenData3D.SceneCamera);
-
-		s_RenData3D.ScreenFramebuffer->Unbind();
 	}
 	void Renderer::AddLightToScene(const Shared<LightSource>& light)
 	{
@@ -291,7 +375,7 @@ namespace Orion
 		}
 
 	}
-	void Renderer::LightSettings(float linearAttenuation, float quadraticAttenuation) 
+	void Renderer::UpdateLightSettings(float linearAttenuation, float quadraticAttenuation) 
 	{
 		if (!s_RenData3D.LightSources.empty())
 		{
@@ -303,21 +387,23 @@ namespace Orion
 		}
 	}
 
-	void Renderer::LoadCubemap(const Shared<DummyCamera>& camera)
+	void Renderer::DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index, bool gammaCorrection)
 	{
-
+		
 		RenderCommand::SetDepthMask(false);
-
 
 		s_RenData3D.CubemapShader->Bind();
 
-		s_RenData3D.SceneCubeMap->Bind(1);
-		s_RenData3D.CubemapShader->SetInt("u_Cubemap", s_RenData3D.SceneCubeMap->GetCurrentSlot());
-		s_RenData3D.CubemapShader->SetMat4("u_Proj", camera->GetProjectionMatrix());
-		s_RenData3D.CubemapShader->SetMat4("u_View",glm::mat4(glm::mat3(camera->GetViewMatrix())));
+		s_RenData3D.SceneCubemaps[index]->Bind(1);
+
+		s_RenData3D.CubemapShader->SetInt("u_Cubemap", s_RenData3D.SceneCubemaps[index]->GetCurrentSlot());
+		s_RenData3D.CubemapShader->SetInt("u_GammaCorrection", gammaCorrection);
+
+		s_RenData3D.CubemapShader->SetMat4("u_ViewProj", camera->GetProjectionMatrix()  * glm::mat4(glm::mat3(camera->GetViewMatrix())));
 
 		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, nullptr,  0.0f });
 		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader);
+
 
 		RenderCommand::SetDepthMask(true);
 
@@ -359,13 +445,12 @@ namespace Orion
 		s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", modelMatrix);
 		model->Render(s_RenData3D.CurrentShader);
 	}
-	void Renderer::SetSceneCubemap(const Shared<Texture2D>& cubeMap)
+	void Renderer::AddSceneCubemap(const Shared<Texture2D>& cubeMap)
 	{
-		s_RenData3D.SceneCubeMap = cubeMap;
+		s_RenData3D.SceneCubemaps.push_back(cubeMap);
 	}
-	Shared<Model>& Renderer::GetSelectedModel()
-	{
-		return s_RenData3D.SelectedModel;
-	}
+	size_t Renderer::GetSceneCubemapCount() { return s_RenData3D.SceneCubemaps.size(); }
+	const Shared<Model>& Renderer::GetSelectedModel() { return s_RenData3D.SelectedModel; }
+
 
 }

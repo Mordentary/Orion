@@ -10,15 +10,14 @@ layout (location = 5) in vec2 a_TextureCoord;
 layout (location = 6) in float a_TextureSlot;
 
 
-uniform mat4 u_Proj;
-uniform mat4 u_View;
+uniform mat4 u_ViewProj;
 
 out vec3 v_CubeMapCoord;
 
 void main()
 {
 	v_CubeMapCoord = a_Position;
-	gl_Position = vec4(u_Proj * u_View *vec4(a_Position,1.0)).xyww;
+	gl_Position = vec4(u_ViewProj  * vec4(a_Position,1.0)).xyww;
 }
 
 
@@ -29,9 +28,21 @@ layout(location = 0) out vec4 f_Color;
 
 in vec3 v_CubeMapCoord;
 uniform samplerCube u_Cubemap;
+uniform bool u_GammaCorrection;
+
+
+
+const float gamma = 2.2f;
 
 void main()
 {
+	if (u_GammaCorrection)
+	{
+		f_Color = vec4(pow(texture(u_Cubemap, v_CubeMapCoord).rgb, vec3(gamma)), 1.0f);
+	}
+	else 
+	{
+		f_Color = vec4(texture(u_Cubemap, v_CubeMapCoord));
 
-	f_Color = texture(u_Cubemap, v_CubeMapCoord);
+	}
 }

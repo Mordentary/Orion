@@ -222,6 +222,12 @@ namespace Orion
 	{
 		UploadUniformIntArray(name, values, count);
 	}
+
+	void OpenGLShader::SetFloatArray(const std::string& name, const float *values, uint32_t count)
+	{
+		UploadUniformFloatArray(name, values, count);
+	}
+
 	void OpenGLShader::SetFloat(const std::string& name, float value)
 	{
 		UploadUniformFloat(name, value);
@@ -273,6 +279,14 @@ namespace Orion
 		if (location == -1) return;
 		glUniform1iv(location, count, values);
 	}
+
+	void OpenGLShader::UploadUniformFloatArray(const std::string& uniformName, const float* values, uint32_t count)
+	{
+		GLint location = GetUniformLocation(uniformName);
+		if (location == -1) return;
+		glUniform1fv(location, count, values);
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& uniformName, int value)
 	{
 		GLint location = GetUniformLocation(uniformName);

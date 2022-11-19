@@ -23,30 +23,30 @@ namespace Orion {
 		static void BeginScene(const Shared<DummyCamera>& camera);
 		static void EndScene();
 
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+		static void AddQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const glm::vec4& color);
+		static void AddQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const glm::vec4& color);
+		static void AddQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
+		static void AddQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
 		static void DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPos, glm::vec2& quadSize);
 
 
 
-		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
-		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture,  const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
-		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture,  const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
-		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<Texture2D>& texture,  const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture,  const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
 
 
-		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
-		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
-		static void DrawTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
-		static void DrawTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
+		static void AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const float rotation, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const float tilling = 1.0f);
+		static void AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
+		static void AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color = glm::vec4(1.0f), const bool flip = false);
 
 
 
-		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color);
-		static void DrawBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+		static void AddLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color);
+		static void AddBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
 		//Stats
 		struct Statistics

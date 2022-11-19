@@ -45,25 +45,25 @@ namespace Orion
         auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
 
 
-       // Orion::Renderer2D::DrawLine(glm::vec3(0.0f), m_LastHitedPoint, color + glm::vec4(0.2f));
+       // Orion::Renderer2D::AddLine(glm::vec3(0.0f), m_LastHitedPoint, color + glm::vec4(0.2f));
 
 
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, min.y, max.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, max.z), glm::vec3(min.x, min.y, max.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, min.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, min.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, min.y, max.z), glm::vec3(min.x, min.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, min.y, min.z), color);
 
 
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, max.y, min.z), glm::vec3(max.x, max.y, min.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, max.y, min.z), glm::vec3(max.x, max.y, max.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, max.y, max.z), glm::vec3(min.x, max.y, max.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, max.y, max.z), glm::vec3(min.x, max.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, max.y, min.z), glm::vec3(max.x, max.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, max.y, min.z), glm::vec3(max.x, max.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, max.y, max.z), glm::vec3(min.x, max.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, max.y, max.z), glm::vec3(min.x, max.y, min.z), color);
 
 
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, min.z), glm::vec3(min.x, max.y, min.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, max.y, min.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
-        Orion::Renderer2D::DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, min.z), glm::vec3(min.x, max.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, max.y, min.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(max.x, min.y, max.z), glm::vec3(max.x, max.y, max.z), color);
+        Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 
     }
 	void Model::Render(Shared<Shader>& shader)

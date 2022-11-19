@@ -16,7 +16,6 @@ namespace Orion {
 			m_Camera = Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f));
 			auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
 
-
 			Orion::CamerasController::AddCamera("OrthoCamera", m_Camera2);
 			Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 			m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
@@ -106,16 +105,16 @@ namespace Orion {
 
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
-			Orion::Renderer::SetSceneCubemap(m_CubeMap);
+			Orion::Renderer::AddSceneCubemap(m_CubeMap);
 		}
 
 		void Update(Orion::Timestep deltaTime) override
 		{
+			ORI_PROFILE_FUNCTION();
 			
 			Orion::CamerasController::Update(deltaTime);
-			Orion::Renderer::LightSettings(m_LightSettings.x, m_LightSettings.y);
+			Orion::Renderer::UpdateLightSettings(m_LightSettings.x, m_LightSettings.y);
 
-			ORI_PROFILE_FUNCTION();
 
 			glm::vec3 lightPos{};
 			float time = Orion::CurrentTime::GetCurrentTimeInSec();
@@ -149,8 +148,8 @@ namespace Orion {
 			
 			Orion::Renderer::EndScene();
 
+			Orion::Renderer::PostProcessing(m_Framebuffer,m_PostProcessSpec);
 		
-			Orion::Renderer::PostProcessing(m_Framebuffer);
 
 
 		}
@@ -317,12 +316,40 @@ namespace Orion {
 			}
 			ImGui::Begin("Setting");
 
-			ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
-			ImGui::SliderFloat3("DirLight ", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
-			ImGui::SliderFloat("LinearAttenuation", &m_LightSettings.x, 0.1f, 5.f);
-			ImGui::SliderFloat("QuadraticAttenuation", &m_LightSettings.y, 0.1f, 5.0f);
-			ImGui::Text("FPS: %f", ts.GetFPS());
 
+			if (ImGui::CollapsingHeader(("LightSetting"))) 
+			{
+
+				ImGui::ColorEdit4("PointLight Color", glm::value_ptr(m_Color));
+				ImGui::SliderFloat3("Directional Light ", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
+				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.1f, 5.f);
+				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.1f, 5.0f);
+			}
+			if (ImGui::CollapsingHeader(("PostProcess")))
+			{
+
+				//ImGui::("PointLight Color", glm::value_ptr(m_Color));
+				ImGui::SliderInt("Blur passes count", (int32_t*)& m_PostProcessSpec.NumberBlurPasses, 2, 20);
+				ImGui::SliderFloat("Exposure", &m_PostProcessSpec.Exposure, 0.1f, 5.f);
+				ImGui::Checkbox("Enable Bloom", &m_PostProcessSpec.BloomEnable);
+				ImGui::Checkbox("Enable HDR", &m_PostProcessSpec.HDR_Enable);
+				ImGui::Checkbox("Enable GammaCorrection", &m_PostProcessSpec.GammaCorrectionEnable);
+
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Enable Cubemaps", &m_PostProcessSpec.EnableCubemap);
+				ImGui::SliderInt("Cubemap selector:", (int32_t*)&m_PostProcessSpec.CubemapIndex, 0, Orion::Renderer::GetSceneCubemapCount()-1);
+
+
+			}
+
+			ImGui::Separator();
+
+			ImGui::Text("MS: %f | FPS: %f", ts.GetSeconds(), ts.GetFPS());
+
+
+			
 
 			ImGui::End();
 
@@ -435,6 +462,10 @@ namespace Orion {
 
 			ImGui::End();
 
+			bool openDemo = true;
+			ImGui::ShowDemoWindow(&openDemo);
+
+
 			ImGui::PopStyleVar();
 
 			ImGui::End();
@@ -463,7 +494,7 @@ namespace Orion {
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
-
+		Orion::Renderer::PostProcessSpec m_PostProcessSpec{};
 		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

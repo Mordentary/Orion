@@ -125,12 +125,12 @@ namespace Orion
 
 			ORI_CORE_INFO("NORMAL: Name: {0}, ID: {1}", animation->AnimationName, frameIndex);
 
-			//Orion::Renderer2D::DrawTexturedQuad(animP.Spec.Position, animP.Spec.Size, animation->Frames[frameIndex], animP.Spec.Color, animP.IsFlip);
+			//Orion::Renderer2D::AddTexturedQuad(animP.Spec.Position, animP.Spec.Size, animation->Frames[frameIndex], animP.Spec.Color, animP.IsFlip);
 		}
 	}
 	void AnimationRenderer2D::RenderAnimation(const Shared<Animation2D>& animation)
 	{
-		Orion::Renderer2D::DrawTexturedQuad
+		Orion::Renderer2D::AddTexturedQuad
 		(
 			*animation->Spec.Position,
 			*animation->Spec.Size,

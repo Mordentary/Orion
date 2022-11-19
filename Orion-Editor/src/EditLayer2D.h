@@ -75,15 +75,15 @@ namespace Orion {
 
 			Orion::Renderer2D::BeginScene(Orion::CamerasController::GetActiveCamera());
 
-			//Orion::Renderer2D::DrawQuad(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec2(0.5f, 0.5f), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
+			//Orion::Renderer2D::AddQuad(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec2(0.5f, 0.5f), glm::vec4(0.5f, 0.0f, 0.0f, 1.0f));
 			//float time = 90 * cos(Orion::CurrentTime::GetCurrentTimeInSec());
 				for (int32_t  j = 0; j < 10000; j++)
 				{
 					
 					
 
-					Orion::Renderer2D::DrawQuad(glm::vec3(-j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
-					//Orion::Renderer2D::DrawBorderedQuad(glm::vec3(j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+					Orion::Renderer2D::AddQuad(glm::vec3(-j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
+					//Orion::Renderer2D::AddBorderedQuad(glm::vec3(j, j, 0), m_Skeleton->GetSize(), glm::vec4(0.2f, 0.8f, 0.2f, 1.0f));
 				}
 			
 

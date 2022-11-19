@@ -31,6 +31,8 @@ namespace Orion {
 
 		virtual void SetIntArray(const std::string& name, const int* values, uint32_t count) = 0;
 
+		virtual void SetFloatArray(const std::string& name, const float* values, uint32_t count) = 0;
+
 		virtual void SetFloat(const std::string& name, float value) = 0;
 
 		virtual void SetFloat2(const std::string& name, const glm::vec2& value) = 0;

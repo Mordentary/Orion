@@ -115,7 +115,7 @@ namespace Orion
 			p2 = GetEndPoint();
 
 		}
-		Orion::Renderer2D::DrawLine(p1, p2, glm::vec4(0.7f,0.2f,0.2f,1.0f));
+		Orion::Renderer2D::AddLine(p1, p2, glm::vec4(0.7f,0.2f,0.2f,1.0f));
 	}
 
 	glm::vec3 CameraRay::GetEndPoint() const
