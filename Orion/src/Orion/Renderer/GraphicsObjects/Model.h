@@ -59,7 +59,7 @@ namespace Orion
         glm::mat4 m_ModelMatrix{1.0f};
 
 
-        glm::vec3 m_Position{1.0f};
+        glm::vec3 m_Position{0.0f};
         glm::vec3 m_Scale{ 1.0f };
         glm::vec3 m_Rotation{ 1.0f };
         float m_RotAngle = 0.0f;

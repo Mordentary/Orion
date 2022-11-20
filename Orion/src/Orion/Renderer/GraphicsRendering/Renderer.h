@@ -27,13 +27,18 @@ class Model;
 				bool HDR_Enable = false;
 				bool GammaCorrectionEnable = false;
 
+				float ReinhardWhitePoint = 0.05f;
 
-				float Exposure = 3.0f;
+				float Exposure = 1.0f;
+
+
 				uint32_t NumberBlurPasses = 10;
 				float GaussianCurve[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
 
 				bool EnableCubemap = true;
 				uint32_t CubemapIndex = 0;
+
+				int32_t HDR_CurrentModel = 0;
 
 			};
 

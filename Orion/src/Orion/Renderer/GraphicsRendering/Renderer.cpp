@@ -277,9 +277,9 @@ namespace Orion
 		s_RenData3D.ScreenFramebuffer->Bind();
 		if (s_RenData3D.SceneCubemaps.size() > spec.CubemapIndex && spec.EnableCubemap)
 			DrawCubemap(s_RenData3D.SceneCamera, spec.CubemapIndex, spec.GammaCorrectionEnable);
+		s_RenData3D.ScreenFramebuffer->Unbind();
 		
 
-		s_RenData3D.ScreenFramebuffer->Unbind();
 
 		s_RenData3D.ScreenFramebuffer->BlitToBuffer(horizontalPassBlur, 0, 0); // Use horizontal buffer because don't want to create new buffer
 
@@ -295,7 +295,13 @@ namespace Orion
 		s_RenData3D.PostProcessingShader->SetInt("u_SceneTex", horizontalPassBlur->GetColorAttachmentTexture(0)->GetCurrentSlot());
 
 		s_RenData3D.PostProcessingShader->SetInt("u_HDR", spec.HDR_Enable);
+		s_RenData3D.PostProcessingShader->SetInt("u_CurrentToneMappingModel", spec.HDR_CurrentModel);
+		s_RenData3D.PostProcessingShader->SetFloat("u_WhitePoint", spec.ReinhardWhitePoint);
+
+
+
 		s_RenData3D.PostProcessingShader->SetInt("u_GammaCorrection", spec.GammaCorrectionEnable);
+
 
 
 		s_RenData3D.PostProcessingShader->SetInt("u_Bloom", spec.BloomEnable);

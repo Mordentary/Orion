@@ -30,6 +30,10 @@ namespace Orion {
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Pig/source/model.dae");
+			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
+
+
+			//m_ModelScene->SetScale(glm::vec3(5.f));
 
 			m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
@@ -98,9 +102,12 @@ namespace Orion {
 
 
 			m_FramebufferMS = Orion::Framebuffer::Create(specFB);
-			m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
+			//m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
 
 			specFB.Samples = 1;
+			specFB.ColorAttachments = 1;
+			
+
 			m_Framebuffer = Orion::Framebuffer::Create(specFB);
 
 
@@ -127,7 +134,13 @@ namespace Orion {
 			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
 			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
+			//ORI_INFO("ScenePos {0}", glm::to_string(m_ModelScene->GetPosition()));
+			//ORI_INFO("SceneSize {0}", glm::to_string(m_ModelScene->GetScale()));
+
+
 			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
+
+
 			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
 			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
 			//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
@@ -137,8 +150,11 @@ namespace Orion {
 			//m_PointLight3->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
 
 
-			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time)) ;
+			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time));
+
 			m_DirLight->GetLightProperties().Direction = m_SunDirection;
+			m_DirLight->GetLightProperties().DiffuseLightColor = m_SunColor;
+			m_DirLight->GetLightProperties().SpecularLightColor = m_SunColor / 2.f;
 
 			
 
@@ -321,7 +337,13 @@ namespace Orion {
 			{
 
 				ImGui::ColorEdit4("PointLight Color", glm::value_ptr(m_Color));
-				ImGui::SliderFloat3("Directional Light ", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
+				ImGui::Separator();
+
+				ImGui::SliderFloat3("Sunlight Dir", glm::value_ptr(m_SunDirection), -1.0f, 1.0f);
+				ImGui::ColorEdit4("Sunlight Color", glm::value_ptr(m_SunColor));
+
+				ImGui::Separator();
+
 				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.1f, 5.f);
 				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.1f, 5.0f);
 			}
@@ -333,6 +355,19 @@ namespace Orion {
 				ImGui::SliderFloat("Exposure", &m_PostProcessSpec.Exposure, 0.1f, 5.f);
 				ImGui::Checkbox("Enable Bloom", &m_PostProcessSpec.BloomEnable);
 				ImGui::Checkbox("Enable HDR", &m_PostProcessSpec.HDR_Enable);
+				if (m_PostProcessSpec.HDR_Enable)
+				{
+				
+					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\0Reinhard\0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
+					ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
+
+					if (m_PostProcessSpec.HDR_CurrentModel == 2 || m_PostProcessSpec.HDR_CurrentModel == 3)
+					{
+						ImGui::SliderFloat("Reinhard whit point", &m_PostProcessSpec.ReinhardWhitePoint, 0.001f, 1.0f);
+					}
+
+				}
+
 				ImGui::Checkbox("Enable GammaCorrection", &m_PostProcessSpec.GammaCorrectionEnable);
 
 
@@ -490,7 +525,7 @@ namespace Orion {
 	private:
 		Orion::Shared<Orion::DummyCamera> m_Camera, m_LightDirCam;
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
-		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f };
+		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f }, m_SunColor{0.7f};
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
@@ -499,7 +534,7 @@ namespace Orion {
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra;
-		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon;
+		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
 	};

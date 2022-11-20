@@ -390,17 +390,17 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
          return vec4(vec3(diffuse + specular) * (1.f-shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 
     }
-    //else
-    //{
-    //    float distance    = length(light.position - fragPos);
-    //    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));  
+    else
+    {
+        float distance    = length(light.position - fragPos);
+        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));  
 
-    //    vec3 ambient  = light.ambient  * vec3(texture(u_Material.diffuse, v_TextCoord));
+        vec3 ambient  = light.ambient;
 
-    //    ambient  *= attenuation;
+        ambient  *= attenuation;
    
-    //    return vec4(vec3(ambient), texture(u_Material.diffuse, v_TextCoord).w);
-    //}
+        return vec4(vec3(ambient), texture(u_Material.diffuse, v_TextCoord).w);
+    }
     
 }
 
