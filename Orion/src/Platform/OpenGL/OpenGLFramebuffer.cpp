@@ -39,7 +39,12 @@ namespace Orion
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
 		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
@@ -115,13 +120,13 @@ namespace Orion
 
 				return;
 			}
-
+			
 
 
 			for (size_t i = 0; i < m_Specification.ColorAttachments; i++)
 			{
 
-				m_ColorAttachments.push_back(Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples, false));
+				m_ColorAttachments.push_back(Orion::Texture2D::Create(m_Specification.Width, m_Specification.Height, m_Specification.Samples, false, m_Specification.sRGB_ColorAttach));
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, m_Specification.Samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, m_ColorAttachments[i]->GetRendererID(), 0);
 		
 			}

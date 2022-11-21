@@ -15,6 +15,7 @@ namespace Orion{
 		bool OnlyDepthPass = false;
 		bool SwapChainTarget = false;
 		bool CubemapBuffer = false;
+		bool sRGB_ColorAttach = false;
 
 	};
 

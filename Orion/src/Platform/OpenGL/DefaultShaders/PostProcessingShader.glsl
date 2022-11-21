@@ -25,19 +25,19 @@ in vec2 v_TextCoord;
 uniform sampler2D u_GaussianBlurTex;
 uniform sampler2D u_SceneTex;
 
-uniform bool u_Bloom;
 
+uniform bool u_Bloom;
 uniform bool u_GammaCorrection;
 uniform bool u_HDR;
 
+
 uniform int u_CurrentToneMappingModel;
 
+
 uniform float u_WhitePoint;
-
-
 uniform float u_ExposureFactor;
+uniform float u_GammaFactor;
 
-const float gamma = 2.2;
 
 
 
@@ -149,7 +149,7 @@ void main()
     if (u_GammaCorrection) 
     {
         // also gamma correct while we're at it       
-        result = pow(result, vec3(1.0 / gamma));
+        result = pow(result, vec3(1.0 / u_GammaFactor));
     }
 
    

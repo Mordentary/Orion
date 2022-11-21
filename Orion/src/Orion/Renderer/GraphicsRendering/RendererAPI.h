@@ -28,6 +28,9 @@ namespace Orion
 		virtual void SetDepthMask(bool mode) = 0;
 		virtual void CullBackFace(bool cull) =0; //TODO: REMOVE
 
+		virtual void FramebufferSRGBEnable(bool mode) = 0;
+
+
 		virtual void DoDepthTest(bool enabled) = 0;
 		virtual void StencilMode(uint32_t mode, int32_t num, uint32_t bitmask) = 0;
 		virtual void StencilWrite(bool enabled) = 0;

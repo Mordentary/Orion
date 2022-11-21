@@ -22,7 +22,7 @@ namespace Orion {
 	}
 
 
-	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture)
+	Shared<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture, bool sRGB)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -31,7 +31,7 @@ namespace Orion {
 			return nullptr;
 
 		case RendererAPI::API::OpenGL:
-			return CreateShared<OpenGLTexture2D>(width, height, samples, depthTexture);
+			return CreateShared<OpenGLTexture2D>(width, height, samples, depthTexture, sRGB);
 
 		}
 	}

@@ -154,7 +154,6 @@ uniform PointLight u_Pointlight;
 uniform SpotLight u_Spotlight;
 uniform DirectionalLight u_Dirlight;
 
-uniform bool u_GammaCorrection;
 
 const float gamma = 2.2f;
 
@@ -186,8 +185,6 @@ void main()
     f_Color = vec4(result) * v_Color;
 
     float brightness = dot(f_Color.rgb, vec3(0.2126, 0.7152, 0.0722));
-
-   
 
     if (brightness > 1.0)
         f_BrightColor = vec4(f_Color);
@@ -316,19 +313,11 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
   			     light.quadratic * (distance * distance));    
     // combine results
     vec3 ambient  = light.ambient;
+    vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
+    vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
-    vec3 diffuse;
-    vec3 specular;
 
-    if (u_GammaCorrection) {
-          diffuse = light.diffuse * diff * pow(vec3(texture(u_Material.diffuse, v_TextCoord)), vec3(gamma));
-          specular = light.specular * spec * pow(vec3(texture(u_Material.specular, v_TextCoord)), vec3(gamma));
-    }
-    else 
-    {
-         diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
-         specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
-    }
+
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
@@ -336,6 +325,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float shadow = ShadowCalculationPoint(v_FragPos);
  
     vec3 finalColor = vec3(diffuse + specular) * (1.0f - shadow) + ambient;
+
  
 
     return vec4(finalColor, texture(u_Material.diffuse, v_TextCoord).w);
@@ -367,19 +357,9 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0); 
         // combine results
         vec3 ambient  = light.ambient;
-        vec3 diffuse;
-        vec3 specular;
+        vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
+        vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
-        if (u_GammaCorrection) 
-        {
-             diffuse = light.diffuse * diff * pow(vec3(texture(u_Material.diffuse, v_TextCoord)), vec3(gamma));
-             specular = light.specular * spec * pow(vec3(texture(u_Material.specular, v_TextCoord)), vec3(gamma));
-        }
-        else
-        {
-             diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
-             specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
-        }
 
         ambient  *= attenuation;
         diffuse  *= attenuation * intensity;
@@ -416,18 +396,8 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
     float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
     // combine results
     vec3 ambient  = light.ambient;
-    vec3 diffuse;
-    vec3 specular;
-
-    if (u_GammaCorrection) {
-         diffuse = light.diffuse * diff * pow(vec3(texture(u_Material.diffuse, v_TextCoord)), vec3(gamma));
-         specular = light.specular * spec * pow(vec3(texture(u_Material.specular, v_TextCoord)), vec3(gamma));
-    }
-    else
-    {
-        diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
-        specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
-    }
+    vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
+    vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
     float shadow = ShadowCalculationDir(v_FragPosDirLight);
 

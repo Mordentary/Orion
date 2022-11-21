@@ -106,9 +106,10 @@ namespace Orion {
 
 			specFB.Samples = 1;
 			specFB.ColorAttachments = 1;
-			
+			specFB.sRGB_ColorAttach = true;
 
-			m_Framebuffer = Orion::Framebuffer::Create(specFB);
+
+			m_FinalFramebuffer = Orion::Framebuffer::Create(specFB);
 
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
@@ -164,7 +165,7 @@ namespace Orion {
 			
 			Orion::Renderer::EndScene();
 
-			Orion::Renderer::PostProcessing(m_Framebuffer,m_PostProcessSpec);
+			Orion::Renderer::PostProcessing(m_FinalFramebuffer,m_PostProcessSpec);
 		
 
 
@@ -354,6 +355,7 @@ namespace Orion {
 				ImGui::SliderInt("Blur passes count", (int32_t*)& m_PostProcessSpec.NumberBlurPasses, 2, 20);
 				ImGui::SliderFloat("Exposure", &m_PostProcessSpec.Exposure, 0.1f, 5.f);
 				ImGui::Checkbox("Enable Bloom", &m_PostProcessSpec.BloomEnable);
+
 				ImGui::Checkbox("Enable HDR", &m_PostProcessSpec.HDR_Enable);
 				if (m_PostProcessSpec.HDR_Enable)
 				{
@@ -363,13 +365,18 @@ namespace Orion {
 
 					if (m_PostProcessSpec.HDR_CurrentModel == 2 || m_PostProcessSpec.HDR_CurrentModel == 3)
 					{
-						ImGui::SliderFloat("Reinhard whit point", &m_PostProcessSpec.ReinhardWhitePoint, 0.001f, 1.0f);
+						ImGui::SliderFloat("Reinhard whit point", &m_PostProcessSpec.ReinhardWhitePoint, 0.001f, 10.0f);
 					}
 
 				}
 
 				ImGui::Checkbox("Enable GammaCorrection", &m_PostProcessSpec.GammaCorrectionEnable);
+				if (m_PostProcessSpec.GammaCorrectionEnable) 
+				{
 
+					ImGui::SliderFloat("Gamma factor", &m_PostProcessSpec.GammaFactor, 0.1f, 3.0f);
+
+				}
 
 				ImGui::Separator();
 
@@ -487,13 +494,13 @@ namespace Orion {
 			{
 				m_ViewportSize = { size.x,size.y };
 				m_FramebufferMS->Resize(m_ViewportSize.x, m_ViewportSize.y);
-				m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+				m_FinalFramebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 
 				CamerasController::OnViewportResize(m_ViewportSize);
 			}
 			m_ViewportSize = {size.x,size.y};
 				
-			ImGui::Image((void*)m_Framebuffer->GetColorAttachmentID(0), size, ImVec2{0,1}, ImVec2{1,0});
+			ImGui::Image((void*)m_FinalFramebuffer->GetColorAttachmentID(0), size, ImVec2{0,1}, ImVec2{1,0});
 
 			ImGui::End();
 
@@ -533,7 +540,7 @@ namespace Orion {
 		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_Framebuffer, m_Framebuffer_Refra;
+		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;

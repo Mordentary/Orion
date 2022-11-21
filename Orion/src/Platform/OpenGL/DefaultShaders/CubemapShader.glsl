@@ -28,7 +28,7 @@ layout(location = 0) out vec4 f_Color;
 
 in vec3 v_CubeMapCoord;
 uniform samplerCube u_Cubemap;
-uniform bool u_GammaCorrection;
+
 
 
 
@@ -36,13 +36,6 @@ const float gamma = 2.2f;
 
 void main()
 {
-	if (u_GammaCorrection)
-	{
-		f_Color = vec4(pow(texture(u_Cubemap, v_CubeMapCoord).rgb, vec3(gamma)), 1.0f);
-	}
-	else 
-	{
 		f_Color = vec4(texture(u_Cubemap, v_CubeMapCoord));
 
-	}
 }

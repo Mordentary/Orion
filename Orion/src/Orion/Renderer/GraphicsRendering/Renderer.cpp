@@ -152,7 +152,6 @@ namespace Orion
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 		s_RenData3D.PhongShader->SetMat4("u_ViewProj", camera->GetProjectionViewMatrix());
 
-		s_RenData3D.PhongShader->SetInt("u_GammaCorrection", s_RenData3D.ScenePostProcessSpec.GammaCorrectionEnable);
 
 
 
@@ -241,7 +240,7 @@ namespace Orion
 
 		RenderCommand::SetClearColor(glm::vec4(0.0f));
 
-		for (uint32_t i = 0; i < spec.NumberBlurPasses; i++)
+		for (uint32_t i = 0; i < spec.NumberBlurPasses && spec.BloomEnable; i++)
 		{
 			s_RenData3D.GaussianBlurShader->Bind();
 			horizontalPassBlur->Bind();
@@ -274,6 +273,7 @@ namespace Orion
 			verticalPassBlur->Unbind();
 		}
 
+
 		s_RenData3D.ScreenFramebuffer->Bind();
 		if (s_RenData3D.SceneCubemaps.size() > spec.CubemapIndex && spec.EnableCubemap)
 			DrawCubemap(s_RenData3D.SceneCamera, spec.CubemapIndex, spec.GammaCorrectionEnable);
@@ -282,6 +282,8 @@ namespace Orion
 
 
 		s_RenData3D.ScreenFramebuffer->BlitToBuffer(horizontalPassBlur, 0, 0); // Use horizontal buffer because don't want to create new buffer
+
+		//Orion::RenderCommand::FramebufferSRGBEnable(spec.GammaCorrectionEnable);
 
 		finalFramebuffer->Bind();
 
@@ -301,6 +303,8 @@ namespace Orion
 
 
 		s_RenData3D.PostProcessingShader->SetInt("u_GammaCorrection", spec.GammaCorrectionEnable);
+		s_RenData3D.PostProcessingShader->SetFloat("u_GammaFactor", spec.GammaFactor);
+
 
 
 
@@ -317,6 +321,8 @@ namespace Orion
 
 		finalFramebuffer->Unbind();
 
+		//Orion::RenderCommand::FramebufferSRGBEnable(false);
+		
 
 
 	}
@@ -403,7 +409,6 @@ namespace Orion
 		s_RenData3D.SceneCubemaps[index]->Bind(1);
 
 		s_RenData3D.CubemapShader->SetInt("u_Cubemap", s_RenData3D.SceneCubemaps[index]->GetCurrentSlot());
-		s_RenData3D.CubemapShader->SetInt("u_GammaCorrection", gammaCorrection);
 
 		s_RenData3D.CubemapShader->SetMat4("u_ViewProj", camera->GetProjectionMatrix()  * glm::mat4(glm::mat3(camera->GetViewMatrix())));
 

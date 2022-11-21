@@ -102,7 +102,7 @@ namespace Orion
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
-			ORI_ASSERT(false, (import.GetErrorString()));
+    			ORI_ASSERT(false, (import.GetErrorString()));
 			return;
 		}
 
@@ -320,7 +320,7 @@ namespace Orion
                 mat->GetTexture(type, i, &str);
                 if (type == aiTextureType_DIFFUSE) 
                 {
-                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str(), {true, true});
 
                 }
                 else 
@@ -336,7 +336,7 @@ namespace Orion
 
                 if (type == aiTextureType_DIFFUSE && IsFileExists(path + "diffuse.jpg"))
                 {
-                    texture = Texture2D::Create(path + "diffuse.jpg");
+                    texture = Texture2D::Create(path + "diffuse.jpg", { true, true });
                 }
 
                 if (type == aiTextureType_HEIGHT && IsFileExists(path + "normalMap.png"))

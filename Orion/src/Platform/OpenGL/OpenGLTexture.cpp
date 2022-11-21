@@ -28,7 +28,7 @@ namespace Orion
 		if (channels == 4)
 		{
 			if(spec.sRGBA)
-				internalFormat = GL_SRGB_ALPHA;
+				internalFormat = GL_SRGB8_ALPHA8;
 			else 
 				internalFormat = GL_RGBA8;
 
@@ -37,7 +37,7 @@ namespace Orion
 		if (channels == 3)
 		{
 			if (spec.sRGBA)
-				internalFormat = GL_SRGB;
+				internalFormat = GL_SRGB8;
 			else
 				internalFormat = GL_RGB8;
 
@@ -76,7 +76,7 @@ namespace Orion
 		m_Width  = width;
 		m_Height = height;
 
-		m_InternalFormat = GL_RGBA16F;
+		m_InternalFormat = GL_SRGB8_ALPHA8;
 		m_DataFormat = GL_RGBA;
 
 		ORI_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported");
@@ -91,12 +91,12 @@ namespace Orion
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	}
 
-	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture)
+	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture, bool sRGB)
 	{
 
 		m_Width = width;
 		m_Height = height;
-
+		m_TextureParam.sRGBA = sRGB;
 	
 		if (depthTexture) 
 		{
@@ -106,6 +106,7 @@ namespace Orion
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -120,19 +121,27 @@ namespace Orion
 
 		if (samples > 1)
 		{
-
 			//////////////////////////////////////////
 			//////COLOR ATTACHMENT MULTISAMPLED///////
 			//////////////////////////////////////////
+			if (sRGB) 
+			{	
+
+				m_InternalFormat = GL_SRGB8_ALPHA8;
+				m_DataFormat = GL_RGBA;
+
+			}
+			else 
+			{
+
+				m_InternalFormat = GL_RGBA16F;
+				m_DataFormat = GL_RGBA;
+
+			}
+
 			glGenTextures(1, &m_RendererID);
 			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_RendererID);
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA16F, width, height, GL_TRUE);
-
-
-
-			m_InternalFormat = GL_RGBA16F;
-			m_DataFormat = GL_RGBA;
-
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, m_InternalFormat, width, height, GL_TRUE);
 
 			
 
@@ -143,15 +152,28 @@ namespace Orion
 		//////////////////////////////
 		//////COLOR ATTACHMENT///////
 		////////////////////////////
-		glGenTextures(1, &m_RendererID);
-		glBindTexture(GL_TEXTURE_2D, m_RendererID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			if (sRGB)
+			{
+				m_InternalFormat = GL_SRGB8_ALPHA8;
+				m_DataFormat = GL_RGBA;
+			}
+			else
+			{
+				m_InternalFormat = GL_RGBA32F;
+				m_DataFormat = GL_RGBA;
+			}
 
-		m_InternalFormat = GL_RGBA16F;
-		m_DataFormat = GL_RGBA;
+			glGenTextures(1, &m_RendererID);
+			glBindTexture(GL_TEXTURE_2D, m_RendererID);
+			glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, width, height, 0, m_DataFormat, GL_UNSIGNED_BYTE, nullptr);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
 
 	}
 
@@ -188,43 +210,41 @@ namespace Orion
 		stbi_set_flip_vertically_on_load(false);
 		GLenum internalFormat = 0, dataFormat = 0;
 		int width = 0, height = 0,channels = 0;
-		//stbi_uc* data = stbi_load(paths[0].c_str(), &width, &height, &channels, 0);
+		stbi_uc* data = stbi_load(paths[0].c_str(), &width, &height, &channels, 0);
 
-		//if (channels == 4)
-		//{
-		//	internalFormat = GL_RGBA8;
-		//	dataFormat = GL_RGBA;
-		//}
-		//if (channels == 3)
-		//{
-		//	internalFormat = GL_RGB8;
-		//	dataFormat = GL_RGB;
-		//}
-		//if (channels == 1)
-		//{
-		//	internalFormat = GL_R8;
-		//	dataFormat = GL_RED;
-		//}
-		//glTexStorage2D(GL_TEXTURE_CUBE_MAP, 0, internalFormat, width, height);
+		if (channels == 4)
+		{
+			internalFormat = GL_SRGB8_ALPHA8;
+			dataFormat = GL_RGBA;
+		}
+		if (channels == 3)
+		{
+			internalFormat = GL_SRGB8;
+			dataFormat = GL_RGB;
+		}
+		if (channels == 1)
+		{
+			internalFormat = GL_R8;
+			dataFormat = GL_RED;
+		}
 
-		for (uint32_t i = 0; i < paths.size(); i++)
+		glTexStorage2D(GL_TEXTURE_CUBE_MAP, 0, internalFormat, width, height);
+
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			ORI_CORE_ASSERT(data, std::string("Failed to load image!") + " STB_IMAGE_FAILURE_REASON: " + stbi_failure_reason() + "! Path: " + paths[0]);
+			stbi_image_free(data);
+		}
+
+
+		for (uint32_t i = 1; i < paths.size(); i++)
 		{
 			stbi_uc* data = stbi_load(paths[i].c_str(), &width, &height, &channels, 0);
-			if (channels == 4)
-			{
-				internalFormat = GL_RGBA8;
-				dataFormat = GL_RGBA;
-			}
-			if (channels == 3)
-			{
-				internalFormat = GL_RGB8;
-				dataFormat = GL_RGB;
-			}
-			if (channels == 1)
-			{
-				internalFormat = GL_R8;
-				dataFormat = GL_RED;
-			}
 			if (data)
 			{
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,internalFormat,width, height,0, dataFormat, GL_UNSIGNED_BYTE, data);

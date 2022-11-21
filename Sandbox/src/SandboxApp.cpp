@@ -17,7 +17,7 @@ public:
 	Sandbox() 
 	{
 		//PushLayer(new ExampleLayer2D());
-		//PushLayer(new ExampleLayer3D());
+		PushLayer(new ExampleLayer3D());
 
 	}
 	~Sandbox() 

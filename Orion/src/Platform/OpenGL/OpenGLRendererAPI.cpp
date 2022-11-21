@@ -10,13 +10,13 @@ namespace Orion {
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_MULTISAMPLE);
-
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		//glStencilMask(0x00);
-
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
+
+		//glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
 	void OpenGLRendererAPI::CullBackFace(bool cull)//TODO: REMOVE 
@@ -37,6 +37,16 @@ namespace Orion {
 
 
 	}
+
+
+	void OpenGLRendererAPI::FramebufferSRGBEnable(bool mode)
+	{
+		if (mode)
+			glEnable(GL_FRAMEBUFFER_SRGB);
+		else
+			glDisable(GL_FRAMEBUFFER_SRGB);
+	}
+
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

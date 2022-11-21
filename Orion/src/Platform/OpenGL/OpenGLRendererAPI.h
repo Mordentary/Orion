@@ -15,6 +15,7 @@ namespace Orion {
 		virtual void SetLineWidth(float width) override;
 		virtual void SetDepthMask(bool mode) override;
 
+		virtual void FramebufferSRGBEnable(bool mode) override;
 
 		virtual void CullBackFace(bool cull) override; //TODO: REMOVE
 

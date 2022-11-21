@@ -16,7 +16,7 @@ namespace Orion
 
 		OpenGLTexture2D(uint32_t width, uint32_t height); //Creates clean RGBA texture
 
-		OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture); //Creates texture for framebuffer
+		OpenGLTexture2D(uint32_t width, uint32_t height, uint32_t samples, bool depthTexture, bool sRGB); //Creates texture for framebuffer
 		OpenGLTexture2D(uint32_t width, uint32_t height, bool depthCubemap); //Creates cubemap for framebuffer //TODO: Depth cubemaps	
 		
 
