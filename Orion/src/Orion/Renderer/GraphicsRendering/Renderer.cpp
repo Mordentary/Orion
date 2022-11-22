@@ -48,6 +48,11 @@ namespace Orion
 		std::vector<Shared<Model>> Models;
 
 		Shared<DummyCamera> SceneCamera = nullptr;
+
+
+
+		Orion::Renderer::Statistics3D Stats;
+		
 	};
 
 	RendererData3D Renderer::s_RenData3D;
@@ -131,7 +136,10 @@ namespace Orion
 		s_RenData3D.SceneRenderFunc = renderFunc;
 		s_RenData3D.ScreenFramebuffer = screenFB;
 
+
+		s_RenData3D.Stats.m_ShadowMappingPass.Start();
 		PrepareLights();
+		s_RenData3D.Stats.m_ShadowMappingPass.End();
 
 
 		s_RenData3D.ScreenFramebuffer->Bind();
@@ -223,6 +231,8 @@ namespace Orion
 		auto& prop = Orion::Application::Get().GetWindow().GetSubWindowProp();
 		if (prop.Width <= 0 || prop.Height <= 0) return;
 
+		s_RenData3D.Stats.m_PostProcessStageTimer.Start();
+		
 
 		s_RenData3D.ScenePostProcessSpec = spec;
 
@@ -276,7 +286,7 @@ namespace Orion
 
 		s_RenData3D.ScreenFramebuffer->Bind();
 		if (s_RenData3D.SceneCubemaps.size() > spec.CubemapIndex && spec.EnableCubemap)
-			DrawCubemap(s_RenData3D.SceneCamera, spec.CubemapIndex, spec.GammaCorrectionEnable);
+			DrawCubemap(s_RenData3D.SceneCamera, spec.CubemapIndex);
 		s_RenData3D.ScreenFramebuffer->Unbind();
 		
 
@@ -323,6 +333,8 @@ namespace Orion
 
 		//Orion::RenderCommand::FramebufferSRGBEnable(false);
 		
+		s_RenData3D.Stats.m_PostProcessStageTimer.End();
+
 
 
 	}
@@ -399,7 +411,7 @@ namespace Orion
 		}
 	}
 
-	void Renderer::DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index, bool gammaCorrection)
+	void Renderer::DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index)
 	{
 		
 		RenderCommand::SetDepthMask(false);
@@ -463,5 +475,9 @@ namespace Orion
 	size_t Renderer::GetSceneCubemapCount() { return s_RenData3D.SceneCubemaps.size(); }
 	const Shared<Model>& Renderer::GetSelectedModel() { return s_RenData3D.SelectedModel; }
 
+	Orion::Renderer::Statistics3D& Renderer::GetStats()
+	{
+		return s_RenData3D.Stats;
+	}
 
 }

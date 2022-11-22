@@ -48,36 +48,41 @@ namespace Orion {
 		static void AddLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color);
 		static void AddBorderedQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
-		//Stats
-		struct Statistics
-		{
-		public:
-			 uint32_t GetTotalDrawCalls() { return DrawCalls; }
-			 uint32_t GetTotalQuadCount() { return QuadCount; }
-			 uint32_t GetTotalLineCount() { return LineCount; }
-			 uint32_t GetTotalVertexCount() { return (QuadCount * 4) + (LineCount * 2); }
-			 uint32_t GetTotalQuadIndexCount() { return QuadCount * 6; }
-
-
-		private:
-			friend struct RendererData2D;
-			uint32_t DrawCalls;
-			uint32_t QuadCount;
-			uint32_t LineCount;
-
-		};
-	
-		static Statistics GetStats();
-		static void ResetStats();
 
 
 	private:
+		friend struct RendererData2D;
 		static RendererData2D s_RenData2D;
 		static void ResetBatch();
 		static int32_t GetTextureSlot(const Shared<Texture2D>& textures);
 		static inline void AddQuadVertexToBatch(const glm::vec3& position, const glm::vec2& size, const glm::vec2& textureCoord, const uint32_t textureSlot, const glm::vec4& color);
 		static inline void AddLineVertexToBatch(const glm::vec3& p0, const glm::vec4& color);
 
+
+
+	//Stats
+
+	public:
+		struct Statistics2D
+		{
+		public:
+			uint32_t GetTotalDrawCalls() { return DrawCalls; }
+			uint32_t GetTotalQuadCount() { return QuadCount; }
+			uint32_t GetTotalLineCount() { return LineCount; }
+			uint32_t GetTotalVertexCount() { return (QuadCount * 4) + (LineCount * 2); }
+			uint32_t GetTotalQuadIndexCount() { return QuadCount * 6; }
+
+
+			friend class Renderer2D;
+		private:
+			uint32_t DrawCalls;
+			uint32_t QuadCount;
+			uint32_t LineCount;
+
+		};
+
+		static Statistics2D& GetStats();
+		static void ResetStats();
 	};
 
 }

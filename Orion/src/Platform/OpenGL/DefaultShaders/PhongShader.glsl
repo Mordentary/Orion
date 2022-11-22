@@ -144,9 +144,9 @@ in mat3 v_TBN;
 
 uniform sampler2D u_ShadowMapDir;
 uniform sampler2D u_ShadowMapSpot;
-
-
 uniform samplerCube u_ShadowCubemap;
+
+
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
 
@@ -154,8 +154,6 @@ uniform PointLight u_Pointlight;
 uniform SpotLight u_Spotlight;
 uniform DirectionalLight u_Dirlight;
 
-
-const float gamma = 2.2f;
 
 void main()
 {

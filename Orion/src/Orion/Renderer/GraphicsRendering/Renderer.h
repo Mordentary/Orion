@@ -24,8 +24,8 @@ class Model;
 			struct PostProcessSpec
 			{
 				bool BloomEnable = false;
-				bool HDR_Enable = false;
-				bool GammaCorrectionEnable = false;
+				bool HDR_Enable = true;
+				bool GammaCorrectionEnable = true;
 
 				float ReinhardWhitePoint = 1.0f;
 				float Exposure = 1.0f;
@@ -68,6 +68,8 @@ class Model;
 
 		static size_t GetSceneCubemapCount();
 		static const Shared<Model>& GetSelectedModel();
+		
+
 
 	private:
 		friend struct RendererData3D;
@@ -75,8 +77,39 @@ class Model;
 		static void ClosestObjectToRayHit();
 		static void PrepareLights();
 		static void LoadAndRenderLights();
-		static void DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index, bool gammaCorrection);
-		
+		static void DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index);
+
+
+
+	////////////////////////
+	/////////STATS/////////
+	//////////////////////
+
+	public:
+
+		struct Statistics3D
+		{
+		public:
+			float GetTotalTimePostProcessPass() { return m_PostProcessStageTimer.GetTimeSeconds(); }
+			float GetTotalTimeLightPass() { return m_LightPassTime.GetTimeSeconds(); }
+			float GetTotalTimeShadowMappingPass() { return m_ShadowMappingPass.GetTimeSeconds(); }
+
+			friend class Renderer;
+		private:
+			Orion::Timer  m_PostProcessStageTimer;
+			Orion::Timer  m_ShadowMappingPass;
+
+
+			Orion::Timer  m_LightPassTime;
+			Orion::Timer  m_GeometryPassTime;
+			//Add more
+
+		};
+
+		static Statistics3D& GetStats();
+		//static void ResetStats();
+
+
 	};
 	
 }

@@ -30,10 +30,6 @@ in vec3 v_CubeMapCoord;
 uniform samplerCube u_Cubemap;
 
 
-
-
-const float gamma = 2.2f;
-
 void main()
 {
 		f_Color = vec4(texture(u_Cubemap, v_CubeMapCoord));

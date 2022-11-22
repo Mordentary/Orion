@@ -119,7 +119,7 @@ void main()
     if (u_Bloom) 
     {
         vec3 bloomColor = texture(u_GaussianBlurTex, v_TextCoord).rgb;
-        hdrColor += bloomColor; // additive blending
+        hdrColor += bloomColor; 
     }
 
     if (u_HDR) 
@@ -148,7 +148,7 @@ void main()
     }
     if (u_GammaCorrection) 
     {
-        // also gamma correct while we're at it       
+             
         result = pow(result, vec3(1.0 / u_GammaFactor));
     }
 

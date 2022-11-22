@@ -49,10 +49,7 @@ namespace Orion
 		std::array<Shared<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotsIndex = 1;
 
-		Orion::Renderer2D::Statistics Stats;
-		uint32_t& DrawCalls = Stats.DrawCalls;
-		uint32_t& QuadCount = Stats.QuadCount;
-		uint32_t& LineCount = Stats.LineCount;
+		Orion::Renderer2D::Statistics2D Stats;
 	};
 
 	RendererData2D Renderer2D::s_RenData2D;
@@ -180,7 +177,7 @@ namespace Orion
 
 			s_RenData2D.QuadShader->Bind();
 			RenderCommand::DrawIndexed(s_RenData2D.QuadVertexArray, s_RenData2D.QuadIndexCount);
-			s_RenData2D.DrawCalls++;
+			s_RenData2D.Stats.DrawCalls++;
 
 			memset(s_RenData2D.QuadVertexBufferBase, 0, dataSize);
 			s_RenData2D.QuadVertexBuffer->SetData(s_RenData2D.QuadVertexBufferBase, dataSize);
@@ -196,7 +193,7 @@ namespace Orion
 			s_RenData2D.LineShader->Bind();
 			RenderCommand::SetLineWidth(s_RenData2D.LineWidth);
 			RenderCommand::DrawLines(s_RenData2D.LineVertexArray, s_RenData2D.LineVertexCount);
-			s_RenData2D.DrawCalls++;
+			s_RenData2D.Stats.DrawCalls++;
 
 			memset(s_RenData2D.LineVertexBufferBase, 0, dataSize);
 			s_RenData2D.LineVertexBuffer->SetData(s_RenData2D.LineVertexBufferBase, dataSize);
@@ -294,7 +291,7 @@ namespace Orion
 		RenderCommand::DoDepthTest(false);
 		shader->Bind();
 		RenderCommand::DrawIndexed(s_RenData2D.QuadVertexArray, 6);
-		s_RenData2D.DrawCalls++;
+		s_RenData2D.Stats.DrawCalls++;
 
 		RenderCommand::DoDepthTest(true);
 
@@ -324,7 +321,7 @@ namespace Orion
 
 		s_RenData2D.QuadIndexCount += 6;
 
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 	}
 
 	void Renderer2D::AddQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -344,7 +341,7 @@ namespace Orion
 		AddQuadVertexToBatch(position, { -size.x, size.y }, Constants::TextureCoord_TL, textureSlot, color);
 
 		s_RenData2D.QuadIndexCount += 6;
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 	}
 
 	/////////////////////////////////////////////
@@ -374,7 +371,7 @@ namespace Orion
 		AddQuadVertexToBatch(modelMatrix * glm::vec4(-size.x, size.y, 0.0f, 1.0f), { 0,0 }, Constants::TextureCoord_TL, textureSlot, color);
 
 		s_RenData2D.QuadIndexCount += 6;
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 	}
 	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
@@ -389,7 +386,7 @@ namespace Orion
 		AddQuadVertexToBatch(position, { -size.x, size.y }, Constants::TextureCoord_TL, textureSlot, color);
 
 		s_RenData2D.QuadIndexCount += 6;
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 	}
 	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<Texture2D>& texture, const glm::vec4& color, const float tilling)
 	{
@@ -424,7 +421,7 @@ namespace Orion
 		AddQuadVertexToBatch(modelMatrix * glm::vec4(-size.x, size.y, 0.0f, 1.0f), { 0,0 }, textureCoords[3], textureSlot, color);
 
 		s_RenData2D.QuadIndexCount += 6;
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 	}
 	void Renderer2D::AddTexturedQuad(const glm::vec3& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
 	{
@@ -445,7 +442,7 @@ namespace Orion
 		AddQuadVertexToBatch(position, { size.x,  size.y }, textureCoords[2], textureSlot, color);
 		AddQuadVertexToBatch(position, { -size.x, size.y }, textureCoords[3], textureSlot, color);
 
-		s_RenData2D.QuadCount++;
+		s_RenData2D.Stats.QuadCount++;
 		s_RenData2D.QuadIndexCount += 6;
 	}
 	void Renderer2D::AddTexturedQuad(const glm::vec2& position, const glm::vec2& size, const Shared<SubTexture2D>& subTexture, const glm::vec4& color, const bool flip)
@@ -465,7 +462,7 @@ namespace Orion
 		AddLineVertexToBatch(p0, color);
 		AddLineVertexToBatch(p1, color);
 
-		s_RenData2D.LineCount++;
+		s_RenData2D.Stats.LineCount++;
 		s_RenData2D.LineVertexCount += 2;
 	}
 
@@ -486,7 +483,7 @@ namespace Orion
 		AddLineVertexToBatch((position + glm::vec3(-size.x, -size.y, 0.0f)), color);
 		AddLineVertexToBatch((position + glm::vec3(-size.x, size.y, 0.0f)), color);
 
-		s_RenData2D.LineCount += 4;
+		s_RenData2D.Stats.LineCount += 4;
 		s_RenData2D.LineVertexCount += 8;
 	}
 
@@ -534,12 +531,12 @@ namespace Orion
 	// Render Statistic  ///////////////////////
 	///////////////////////////////////////////
 
-	Renderer2D::Statistics Renderer2D::GetStats()
+	Renderer2D::Statistics2D& Renderer2D::GetStats()
 	{
 		return s_RenData2D.Stats;
 	}
 	void Renderer2D::ResetStats()
 	{
-		memset(&s_RenData2D.Stats, 0, sizeof(Statistics));
+		memset(&s_RenData2D.Stats, 0, sizeof(Statistics2D));
 	}
 }

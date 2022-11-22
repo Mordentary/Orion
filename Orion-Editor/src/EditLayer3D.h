@@ -20,7 +20,6 @@ namespace Orion {
 			Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 			m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
 			m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
-			m_SkyTexture = Orion::Texture2D::Create("E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg");
 
 
 
@@ -81,18 +80,10 @@ namespace Orion {
 			Orion::Renderer::AddLightToScene(m_PointLight);
 			Orion::Renderer::AddLightToScene(m_DirLight);
 			
+			
+			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapSea"));
+			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapJapan"));
 
-			std::vector<std::string> cubeMapPaths
-			{
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/right.jpg",
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/left.jpg",
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/top.jpg",
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/bottom.jpg",
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/front.jpg",
-					"E:/Development/Orion/Sandbox/assets/textures/Cubemap/back.jpg"
-			};
-
-			m_CubeMap = Texture2D::CreateCubemap(cubeMapPaths);
 
 			Orion::FramebufferSpecification specFB;
 			specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
@@ -106,14 +97,12 @@ namespace Orion {
 
 			specFB.Samples = 1;
 			specFB.ColorAttachments = 1;
-			specFB.sRGB_ColorAttach = true;
 
 
 			m_FinalFramebuffer = Orion::Framebuffer::Create(specFB);
 
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
-			Orion::Renderer::AddSceneCubemap(m_CubeMap);
 		}
 
 		void Update(Orion::Timestep deltaTime) override
@@ -200,15 +189,17 @@ namespace Orion {
 		}
 		bool OnKeyPressed(Orion::KeyPressedEvent e)
 		{
-			if (e.GetKeyCode() == ORI_KEY_1)
-			{
-				Orion::CamerasController::SetActiveCamera("OrthoCamera");
-			}
-			if (e.GetKeyCode() == ORI_KEY_2)
-			{
-				Orion::CamerasController::SetActiveCamera("PerspectiveCamera");
-			}
+			
 
+				if (e.GetKeyCode() == ORI_KEY_1)
+				{
+					Orion::CamerasController::SetActiveCamera("OrthoCamera");
+				}
+				if (e.GetKeyCode() == ORI_KEY_2)
+				{
+					Orion::CamerasController::SetActiveCamera("PerspectiveCamera");
+				}
+			
 			return false;
 		}
 
@@ -361,7 +352,7 @@ namespace Orion {
 				{
 				
 					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\0Reinhard\0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
-					ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
+					//ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
 
 					if (m_PostProcessSpec.HDR_CurrentModel == 2 || m_PostProcessSpec.HDR_CurrentModel == 3)
 					{
@@ -381,16 +372,25 @@ namespace Orion {
 				ImGui::Separator();
 
 				ImGui::Checkbox("Enable Cubemaps", &m_PostProcessSpec.EnableCubemap);
-				ImGui::SliderInt("Cubemap selector:", (int32_t*)&m_PostProcessSpec.CubemapIndex, 0, Orion::Renderer::GetSceneCubemapCount()-1);
-
+				if (m_PostProcessSpec.EnableCubemap) 
+				{
+					ImGui::SliderInt("Cubemap selector:", (int32_t*)&m_PostProcessSpec.CubemapIndex, 0, Orion::Renderer::GetSceneCubemapCount() - 1);
+				}
 
 			}
 
-			ImGui::Separator();
+			if (ImGui::CollapsingHeader(("Performance")))
+			{
+				auto& stats = Orion::Renderer::GetStats();
 
-			ImGui::Text("MS: %f | FPS: %f", ts.GetSeconds(), ts.GetFPS());
+				ImGui::Text("TotalMs: %f | FPS: %f", ts.GetSeconds(), ts.GetFPS());
+				ImGui::Separator();
 
+				ImGui::Text("Shadow Mapping: %f", stats.GetTotalTimeShadowMappingPass());
+				ImGui::Separator();
 
+				ImGui::Text("Post-Process: %f", stats.GetTotalTimePostProcessPass());
+			}
 			
 
 			ImGui::End();
@@ -504,8 +504,8 @@ namespace Orion {
 
 			ImGui::End();
 
-			bool openDemo = true;
-			ImGui::ShowDemoWindow(&openDemo);
+			//bool openDemo = true;
+			//ImGui::ShowDemoWindow(&openDemo);
 
 
 			ImGui::PopStyleVar();
@@ -532,7 +532,7 @@ namespace Orion {
 	private:
 		Orion::Shared<Orion::DummyCamera> m_Camera, m_LightDirCam;
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
-		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f }, m_SunColor{0.7f};
+		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f }, m_SunColor{0.5f};
 		glm::vec3 m_Position{ 0,0,0 };
 		glm::vec3 m_SunDirection{ 0.1f,-1.f,0.1f };
 
@@ -543,6 +543,6 @@ namespace Orion {
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
-		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap, m_SkyTexture;
+		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap;
 	};
 }

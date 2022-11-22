@@ -185,6 +185,10 @@ namespace Orion
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        glm::vec3 colorLinear = glm::pow(glm::vec3(color.r, color.g, color.b),glm::vec3(2.2f));
+
+        color = aiColor3D(colorLinear.r, colorLinear.g, colorLinear.b);
+
         float shin = 0.f;
         material->Get(AI_MATKEY_SHININESS, shin);
      

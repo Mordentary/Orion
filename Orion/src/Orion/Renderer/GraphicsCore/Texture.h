@@ -57,6 +57,8 @@ namespace Orion
 
 
 			static Shared<Texture2D> CreateCubemap(const std::vector<std::string>& paths);
+			static Shared<Texture2D> CreateCubemap(const std::string& directory);
+
 			static Shared<Texture2D> CreateCubemap(uint32_t width, uint32_t height, bool depthCubemap = false);
 
 

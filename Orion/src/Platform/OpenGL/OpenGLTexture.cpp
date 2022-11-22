@@ -134,7 +134,7 @@ namespace Orion
 			else 
 			{
 
-				m_InternalFormat = GL_RGBA16F;
+				m_InternalFormat = GL_RGBA32F;
 				m_DataFormat = GL_RGBA;
 
 			}
@@ -273,6 +273,92 @@ namespace Orion
 
 	}
 	
+
+	OpenGLTexture2D::OpenGLTexture2D(const std::string& directory)
+	{
+
+		std::vector<std::string> paths;
+		paths.reserve(6);
+
+		paths.push_back(directory + "/" +"right.jpg");
+		paths.push_back(directory + "/" +"left.jpg");
+		paths.push_back(directory + "/" +"top.jpg");
+		paths.push_back(directory + "/" +"bottom.jpg");
+		paths.push_back(directory + "/" +"front.jpg");
+		paths.push_back(directory + "/" +"back.jpg");
+
+
+		glGenTextures(1, &m_RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+
+		//glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_RendererID);
+
+
+		stbi_set_flip_vertically_on_load(false);
+		GLenum internalFormat = 0, dataFormat = 0;
+		int width = 0, height = 0, channels = 0;
+		stbi_uc* data = stbi_load(paths[0].c_str(), &width, &height, &channels, 0);
+
+		if (channels == 4)
+		{
+			internalFormat = GL_SRGB8_ALPHA8;
+			dataFormat = GL_RGBA;
+		}
+		if (channels == 3)
+		{
+			internalFormat = GL_SRGB8;
+			dataFormat = GL_RGB;
+		}
+		if (channels == 1)
+		{
+			internalFormat = GL_R8;
+			dataFormat = GL_RED;
+		}
+
+		glTexStorage2D(GL_TEXTURE_CUBE_MAP, 0, internalFormat, width, height);
+
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			ORI_CORE_ASSERT(data, std::string("Failed to load image!") + " STB_IMAGE_FAILURE_REASON: " + stbi_failure_reason() + "! Path: " + paths[0]);
+			stbi_image_free(data);
+		}
+
+
+		for (uint32_t i = 1; i < paths.size(); i++)
+		{
+			stbi_uc* data = stbi_load(paths[i].c_str(), &width, &height, &channels, 0);
+			if (data)
+			{
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+				stbi_image_free(data);
+			}
+			else
+			{
+				ORI_CORE_ASSERT(data, std::string("Failed to load image!") + " STB_IMAGE_FAILURE_REASON: " + stbi_failure_reason() + "! Path: " + paths[i]);
+				stbi_image_free(data);
+			}
+		}
+
+		m_Width = width;
+		m_Height = height;
+
+		m_InternalFormat = internalFormat;
+		m_DataFormat = dataFormat;
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+
+	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
 	{

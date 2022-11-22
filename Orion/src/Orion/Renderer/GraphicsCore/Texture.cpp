@@ -66,6 +66,19 @@ namespace Orion {
 		}
 	}
 
+	Shared<Texture2D> Texture2D::CreateCubemap(const std::string& dir)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+
+		case RendererAPI::API::OpenGL:
+			return CreateShared<OpenGLTexture2D>(dir);
+
+		}
+	}
 
 	Shared<Texture2D> Texture2D::CreateCubemap(const std::vector<std::string>& paths)
 	{
