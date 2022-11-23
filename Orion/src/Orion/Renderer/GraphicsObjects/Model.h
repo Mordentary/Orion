@@ -82,7 +82,6 @@ namespace Orion
         void LoadModel(const std::string& path);
         void FindGreastestCoord(aiNode* rootNode, const aiScene* scene);
         void ProcessNode(aiNode* node, const aiScene* scene);
-        bool IsFileExists(const std::string& name);
         void RecalculateAABBInModelSpace();
         void DeduceModelName();
     };

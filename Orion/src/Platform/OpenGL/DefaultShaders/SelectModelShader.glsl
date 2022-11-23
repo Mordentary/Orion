@@ -10,7 +10,10 @@ layout(location = 4) in vec4 a_Color;
 layout(location = 5) in vec2 a_TextureCoord;
 layout(location = 6) in float a_TextureSlot;
 
-uniform mat4 u_ViewProj;
+layout(std140) uniform u_MatricesBuffer
+{
+    uniform mat4 u_ViewProj;
+};
 uniform mat4 u_ModelMatrix;
 
 

@@ -10,14 +10,14 @@ layout (location = 5) in vec2 a_TextureCoord;
 layout (location = 6) in float a_TextureSlot;
 
 
-uniform mat4 u_ViewProj;
 
+uniform mat4 u_ViewProj;
 out vec3 v_CubeMapCoord;
 
 void main()
 {
 	v_CubeMapCoord = a_Position;
-	gl_Position = vec4(u_ViewProj  * vec4(a_Position,1.0)).xyww;
+	gl_Position = vec4(u_ViewProj * vec4(a_Position,1.0)).xyww;
 }
 
 

@@ -70,6 +70,16 @@ namespace Orion
 	{
 		glUseProgram(0);
 	}
+
+
+	void OpenGLShader::LinkUniformBuffer(const Shared<UniformBuffer>& uniBuff)
+	{
+		uint32_t bufferIndex = glGetUniformBlockIndex(m_RendererID, uniBuff->GetBufferName().c_str());
+		glUniformBlockBinding(m_RendererID, bufferIndex, uniBuff->GetBindingSlot());
+	}
+
+
+
 	std::string OpenGLShader::ReadFile(const std::string& srcPath)
 	{
 		m_Path = srcPath;

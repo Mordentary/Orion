@@ -21,24 +21,24 @@ class Model;
 	class Renderer
 	{
 	public:
-			struct PostProcessSpec
+			struct PostProcessSpec //Using this order is important to dataCopy
 			{
-				bool BloomEnable = false;
-				bool HDR_Enable = true;
-				bool GammaCorrectionEnable = true;
+				int32_t BloomEnable = false;
+				int32_t GammaCorrectionEnable = true;
+				int32_t HDR_Enable = true;
 
 				float ReinhardWhitePoint = 1.0f;
 				float Exposure = 1.0f;
 				float GammaFactor = 2.2f;
 
-				uint32_t NumberBlurPasses = 10;
-				float GaussianCurve[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+				int32_t HDR_CurrentModel = 0;
+				//End Uniform buffer
 
 				bool EnableCubemap = true;
 				uint32_t CubemapIndex = 0;
 
-				int32_t HDR_CurrentModel = 0;
-
+				uint32_t NumberBlurPasses = 10;
+				float GaussianCurve[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
 			};
 
 	public:
@@ -77,7 +77,7 @@ class Model;
 		static void ClosestObjectToRayHit();
 		static void PrepareLights();
 		static void LoadAndRenderLights();
-		static void DrawCubemap(const Shared<DummyCamera>& camera, uint32_t index);
+		static void DrawCubemap();
 
 
 

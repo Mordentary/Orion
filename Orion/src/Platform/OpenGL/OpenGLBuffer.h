@@ -42,4 +42,48 @@ namespace Orion
 		uint32_t m_Count;
 		uint32_t m_RendererID;
 	};
+
+
+
+
+
+	class OpenGLUniformBuffer : public UniformBuffer 
+	{
+	public:
+		OpenGLUniformBuffer(const BufferLayout& layout, const std::string& name); // Initiliase and allocate memory
+
+		virtual ~OpenGLUniformBuffer();
+
+		virtual void Bind(uint32_t slot) override;
+		virtual void Unbind() const override;
+
+		virtual void SetData(const void* data, uint32_t size) override;
+		virtual void SetData(const void* data, uint32_t offset, uint32_t size) override;
+
+		virtual void SetDataUsingLayout(uint32_t indexOfElement,const void* data) override;
+
+
+		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
+		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; };
+
+		virtual const uint32_t& GetBindingSlot() const override { return m_BindingSlot; };
+		virtual void SetBindingSlot(const uint32_t slot) override { m_BindingSlot = slot; };
+
+		virtual const std::string& GetBufferName() const override { return m_BufferName; };
+
+
+	private:
+		BufferLayout m_Layout;
+
+		std::string m_BufferName;
+		uint32_t m_BindingSlot = 0;
+
+		uint32_t m_RendererID = 0;
+
+	};
+
+
+
+
+
 }

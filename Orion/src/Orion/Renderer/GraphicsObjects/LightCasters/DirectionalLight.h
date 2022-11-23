@@ -9,8 +9,8 @@ namespace Orion
 		{
 			FramebufferSpecification fb;
 			fb.OnlyDepthPass = true;
-			fb.Width = 4096;
-			fb.Height = 4096;
+			fb.Width = 3064;
+			fb.Height = 3064;
 
 			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
 			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);

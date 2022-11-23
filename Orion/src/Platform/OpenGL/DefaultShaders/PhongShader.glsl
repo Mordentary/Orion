@@ -29,8 +29,12 @@ out mat3 v_TBN;
 uniform mat4 u_DirLightMatrix;
 uniform mat4 u_SpotLightMatrix;
 
-uniform mat4 u_ViewProj;
 uniform mat4 u_ModelMatrix;
+
+layout(std140) uniform u_MatricesBuffer
+{
+    uniform mat4 u_ViewProj;
+};
 
 void main()
 {
@@ -120,9 +124,7 @@ struct SpotLight
 };
 
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-
 vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-
 vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 
 float ShadowCalculationDir(vec4 shadowFrag);
@@ -149,6 +151,8 @@ uniform samplerCube u_ShadowCubemap;
 
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
+
+
 
 uniform PointLight u_Pointlight;
 uniform SpotLight u_Spotlight;

@@ -224,13 +224,17 @@ namespace Orion
 		AddQuad(glm::vec3(position, 0), size, rotation, color);
 	}
 
-	void Renderer2D::DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPosScreenCoord, glm::vec2& quadSizeScreenCoord)
+	void Renderer2D::DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadMin, glm::vec2& quadMax)
 	{
 
 		auto& subScreenProp = Orion::Application::Get().GetWindow().GetSubWindowProp();
 		//ORI_INFO("X: {0}, Y: {1}", mouse_x, mouse_y);
-		float quadPosNDSx =  (quadPosScreenCoord.x - (subScreenProp.Width / 2.f)) / (subScreenProp.Width / 2.f);
-		float quadPosNDSy = (quadPosScreenCoord.y - (subScreenProp.Height / 2.f)) / (subScreenProp.Height / 2.f);
+
+		float width = static_cast<float>((subScreenProp.Width / 2.f));
+		float height = static_cast<float>((subScreenProp.Height / 2.f));
+
+		float quadPosNDSx =  (quadMin.x - width) / width;
+		float quadPosNDSy = (quadMin.y - height) / height;
 		float z = 1.0f;
 
 		glm::vec3 quadPosNDS = glm::vec3(quadPosNDSx, quadPosNDSy, z);
@@ -243,8 +247,8 @@ namespace Orion
 
 		//std::cout << glm::to_string(ray_wor) << "\n";
 
-		float quadSizeNDSx = (quadSizeScreenCoord.x - (subScreenProp.Width/ 2.f)) / (subScreenProp.Width / 2.f);
-		float quadSizeNDSy = (quadSizeScreenCoord.y - (subScreenProp.Height / 2.f)) / (subScreenProp.Height / 2.f);
+		float quadSizeNDSx = (quadMax.x - width) / width;
+		float quadSizeNDSy = (quadMax.y - height) / height;
 	
 
 		glm::vec3 quadSizeNDS = glm::vec3(quadSizeNDSx * 2, quadSizeNDSy * 2, z);

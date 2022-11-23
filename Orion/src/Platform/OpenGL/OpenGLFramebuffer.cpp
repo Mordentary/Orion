@@ -59,10 +59,13 @@ namespace Orion
 		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer)
+	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
-		m_Specification.Width = width;
+		if (m_Specification.Width == width && m_Specification.Height == height) return;
+
+		m_Specification.Width = width; 
 		m_Specification.Height = height;
+
 		Invalidate();
 	}
 

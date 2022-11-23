@@ -1,7 +1,6 @@
 #include "oripch.h"
 #include "Model.h"
-
-
+#include <filesystem> 
 
 namespace Orion
 {
@@ -336,14 +335,21 @@ namespace Orion
             }
             if (!mat->GetTextureCount(type)) 
             {
-                std::string path = this->m_Directory + '/' + "textures" + '/';
+               std::string path = this->m_Directory + '/' + "textures" + '/';
+               
+               int32_t bitField = 0;
+               bitField |= (std::filesystem::exists(path + "diffuse.jpg") | (int32_t)std::filesystem::exists(path + "diffuse.png") * 2);
 
-                if (type == aiTextureType_DIFFUSE && IsFileExists(path + "diffuse.jpg"))
+                if (type == aiTextureType_DIFFUSE && bitField)
                 {
+                    if(bitField & 1)
                     texture = Texture2D::Create(path + "diffuse.jpg", { true, true });
+
+                    if (bitField & 2)
+                        texture = Texture2D::Create(path + "diffuse.png", { true, true });
                 }
 
-                if (type == aiTextureType_HEIGHT && IsFileExists(path + "normalMap.png"))
+                if (type == aiTextureType_HEIGHT && std::filesystem::exists(path + "normalMap.png"))
                 {
                     texture = Texture2D::Create(path + "normalMap.png");
                 }
@@ -351,7 +357,7 @@ namespace Orion
                 textures.push_back(texture);
 
             }
-            
+             
             return textures;
             
 	}
@@ -425,10 +431,6 @@ namespace Orion
 
     }
 
-    inline bool Model::IsFileExists(const std::string& name)
-    {
-        struct stat buffer;
-        return (stat(name.c_str(), &buffer) == 0);
-    }
+ 
 
 }

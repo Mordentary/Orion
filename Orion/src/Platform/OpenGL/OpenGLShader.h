@@ -19,6 +19,9 @@ namespace Orion
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+        virtual void LinkUniformBuffer(const Shared<UniformBuffer>& uniBuff) override;
+
 	
         virtual inline std::string GetName() const { return m_Name; }
 

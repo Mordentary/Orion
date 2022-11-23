@@ -46,7 +46,7 @@ namespace Orion{
 			virtual FramebufferSpecification& GetFramebufferSpec() = 0;
 
 
-			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) = 0;
+			virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 			static Scoped<Framebuffer> Create(const FramebufferSpecification& spec);
 

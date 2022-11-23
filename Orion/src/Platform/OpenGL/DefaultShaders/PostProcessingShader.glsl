@@ -22,24 +22,22 @@ layout(location = 0) out vec4 f_Color;
 
 in vec2 v_TextCoord;
 
-uniform sampler2D u_GaussianBlurTex;
-uniform sampler2D u_SceneTex;
+layout(std140) uniform u_PostProcessSettings
+{
+    uniform bool u_Bloom;
+    uniform bool u_GammaCorrection;
+    uniform bool u_HDR;
+    
+    uniform float u_WhitePoint;
+    uniform float u_ExposureFactor;
+    uniform float u_GammaFactor;
+    
+    uniform int u_CurrentToneMappingModel;
+    
+};
 
-
-uniform bool u_Bloom;
-uniform bool u_GammaCorrection;
-uniform bool u_HDR;
-
-
-uniform int u_CurrentToneMappingModel;
-
-
-uniform float u_WhitePoint;
-uniform float u_ExposureFactor;
-uniform float u_GammaFactor;
-
-
-
+    uniform sampler2D u_GaussianBlurTex;
+    uniform sampler2D u_SceneTex;
 
 
 float RGBtoLuminance(vec3 v)

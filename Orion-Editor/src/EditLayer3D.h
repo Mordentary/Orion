@@ -24,11 +24,11 @@ namespace Orion {
 
 
 			m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
-			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform.FBX");
+			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx");
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
-			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Pig/source/model.dae");
+			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae");
 			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
@@ -55,7 +55,7 @@ namespace Orion {
 			//m_PointLight2 = Orion::CreateShared<Orion::PointLight>();
 			//m_PointLight3 = Orion::CreateShared<Orion::PointLight>();
 
-			m_PointLight = Orion::CreateShared<Orion::PointLight>();
+			m_PointLight = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024);
 			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
@@ -173,13 +173,11 @@ namespace Orion {
 
 		void OnEvent(Orion::Event& event) override
 		{
-			Orion::CamerasController::OnEvent(event);
 			m_Dispatcher = Orion::EventDispatcher::CreateDispatcher(event);
 			m_Dispatcher->Dispatch<Orion::KeyPressedEvent>(ORI_BIND_EVENT_FN(EditLayer3D::OnKeyPressed));
 			m_Dispatcher->Dispatch<Orion::MouseMovedEvent>(ORI_BIND_EVENT_FN(EditLayer3D::OnMouseMoved));
-
-
 			Orion::CamerasController::OnEvent(event);
+
 		}
 
 		bool OnMouseMoved(Orion::MouseMovedEvent e)
@@ -345,9 +343,9 @@ namespace Orion {
 				//ImGui::("PointLight Color", glm::value_ptr(m_Color));
 				ImGui::SliderInt("Blur passes count", (int32_t*)& m_PostProcessSpec.NumberBlurPasses, 2, 20);
 				ImGui::SliderFloat("Exposure", &m_PostProcessSpec.Exposure, 0.1f, 5.f);
-				ImGui::Checkbox("Enable Bloom", &m_PostProcessSpec.BloomEnable);
+				ImGui::Checkbox("Enable Bloom", (bool*)&m_PostProcessSpec.BloomEnable);
 
-				ImGui::Checkbox("Enable HDR", &m_PostProcessSpec.HDR_Enable);
+				ImGui::Checkbox("Enable HDR", (bool*)&m_PostProcessSpec.HDR_Enable);
 				if (m_PostProcessSpec.HDR_Enable)
 				{
 				
@@ -361,7 +359,7 @@ namespace Orion {
 
 				}
 
-				ImGui::Checkbox("Enable GammaCorrection", &m_PostProcessSpec.GammaCorrectionEnable);
+				ImGui::Checkbox("Enable GammaCorrection", (bool*)&m_PostProcessSpec.GammaCorrectionEnable);
 				if (m_PostProcessSpec.GammaCorrectionEnable) 
 				{
 
@@ -489,16 +487,12 @@ namespace Orion {
 			
 			Application::Get().GetWindow().SetSubWindowProp
 			({ "Viewport", (int32_t)size.x, (int32_t)size.y, {winA.x,winA.y}, {mouseA.x,mouseA.y} });
+			
+			m_FramebufferMS->Resize(size.x, size.y);
+			m_FinalFramebuffer->Resize(size.x, size.y);
 
-			if (m_ViewportSize != *(glm::vec2*)&size)
-			{
-				m_ViewportSize = { size.x,size.y };
-				m_FramebufferMS->Resize(m_ViewportSize.x, m_ViewportSize.y);
-				m_FinalFramebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-
-				CamerasController::OnViewportResize(m_ViewportSize);
-			}
-			m_ViewportSize = {size.x,size.y};
+			CamerasController::OnViewportResize({ size.x, size.y });
+			
 				
 			ImGui::Image((void*)m_FinalFramebuffer->GetColorAttachmentID(0), size, ImVec2{0,1}, ImVec2{1,0});
 
@@ -538,7 +532,6 @@ namespace Orion {
 
 		Orion::Renderer::PostProcessSpec m_PostProcessSpec{};
 		glm::vec2 m_LightSettings{2.0f,0.100f};
-		glm::vec2 m_ViewportSize;
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;

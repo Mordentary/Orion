@@ -117,8 +117,8 @@ namespace Orion {
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static Scoped<VertexBuffer> Create(float* vertices, uint32_t size);
-		static Scoped<VertexBuffer> Create(uint32_t size);
+		static Shared<VertexBuffer> Create(float* vertices, uint32_t size);
+		static Shared<VertexBuffer> Create(uint32_t size);
 	};
 
 	class IndexBuffer
@@ -131,9 +131,38 @@ namespace Orion {
 
 		virtual uint32_t GetCount() const = 0;
 
-		static Scoped<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+		static Shared<IndexBuffer> Create(uint32_t* indices, uint32_t count);
+	};
+
+	class ShaderStorageBuffer 
+	{
+
 	};
 
 
+	class UniformBuffer
+	{
+	public:
+		virtual ~UniformBuffer() = default;
+
+		virtual void Bind(uint32_t slot) = 0;
+		virtual void Unbind() const = 0;
+
+		virtual void SetData(const void* data, uint32_t size) = 0;
+		virtual void SetData(const void* data, uint32_t offset, uint32_t size) = 0;
+
+		virtual void SetDataUsingLayout(uint32_t indexOfElement, const void* data) = 0;
+
+
+		virtual const BufferLayout& GetLayout() const = 0;
+		virtual void SetLayout(const BufferLayout& layout) = 0;
+
+		virtual const uint32_t& GetBindingSlot() const = 0;
+		virtual void SetBindingSlot(const uint32_t slot) = 0;
+
+		virtual const std::string& GetBufferName() const = 0;
+
+		static Shared<UniformBuffer> Create(const BufferLayout& layout, const std::string& name);
+	};
 
 }

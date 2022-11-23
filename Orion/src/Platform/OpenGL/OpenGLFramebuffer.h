@@ -31,24 +31,24 @@ namespace Orion
 			virtual const FramebufferSpecification& GetFramebufferSpec() const { return m_Specification; }
 			virtual FramebufferSpecification& GetFramebufferSpec() { return m_Specification; }
 
-			virtual void Resize(uint32_t width, uint32_t height, bool generate_depth_renderbuffer = false) override;
+			virtual void Resize(uint32_t width, uint32_t height) override;
 
-			void Invalidate();
-			void Invalidate(const FramebufferSpecification& spec);
+
 
 
 		private:
 			FramebufferSpecification m_Specification;
 
-			Shared<Texture2D> m_DepthAttachment = nullptr;
-			//Shared<Texture2D> m_ColorAttachment = nullptr;
-
 			std::vector<Shared<Texture2D>> m_ColorAttachments;
-
+			Shared<Texture2D> m_DepthAttachment = nullptr;
 
 			uint32_t m_DepthStencilAttachment = 0;
 
+
 			uint32_t m_RendererID = 0;
+
+			void Invalidate();
+			void Invalidate(const FramebufferSpecification& spec);
 	};
 
 }

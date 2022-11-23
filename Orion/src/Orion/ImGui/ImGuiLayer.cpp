@@ -68,11 +68,18 @@ namespace Orion {
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
+			ImGuiIO& io = ImGui::GetIO();
 		if (m_BlockEvents)
 		{
-			ImGuiIO& io = ImGui::GetIO();
 			event.m_Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
 			event.m_Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+
+
+			//ORI_INFO("EventKey? {0}", event.IsInCategory(EventCategoryKeyboard));
+			//
+			//ORI_INFO("ImgUIWantKey? {0}", io.WantCaptureKeyboard);
+			
+			
 		}
 	}
 

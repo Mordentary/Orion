@@ -47,7 +47,7 @@ namespace Orion
 
 	void Application::OnEvent(Event& e)
 	{
-	
+		
 		EventDispatcher dispatcher(e);
 
 		dispatcher.Dispatch<WindowCloseEvent>(ORI_BIND_EVENT_FN(OnWindowClose));

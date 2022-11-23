@@ -13,7 +13,11 @@ layout (location = 6) in float a_TextureSlot;
 
 
 
-uniform mat4 u_ViewProj;
+layout(std140) uniform u_MatricesBuffer
+{
+    uniform mat4 u_ViewProj;
+};
+
 uniform mat4 u_ModelMatrix;
 
 void main()

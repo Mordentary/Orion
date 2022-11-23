@@ -28,7 +28,7 @@ namespace Orion {
 		static void AddQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		static void AddQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
 
-		static void DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadPos, glm::vec2& quadSize);
+		static void DrawBillboard(const Shared<Shader>& shader, const Shared<DummyCamera>& camera, glm::vec2& quadMin, glm::vec2& quadMax);
 
 
 

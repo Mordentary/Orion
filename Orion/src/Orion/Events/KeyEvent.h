@@ -11,7 +11,7 @@ namespace Orion
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
 
-		EVENT_CLASS_CATEGORY(EventCategoryKeyboard || EventCategoryInput)
+		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		KeyEvent(int keyCode) : m_KeyCode(keyCode) {}
 		int m_KeyCode;

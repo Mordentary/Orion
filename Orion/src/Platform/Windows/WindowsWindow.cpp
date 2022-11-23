@@ -67,7 +67,6 @@ namespace Orion
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
 
-		glfwWindowHint(GLFW_SAMPLES, 4);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(false);
 		
