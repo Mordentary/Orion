@@ -101,6 +101,9 @@ namespace Orion {
 
 			m_FinalFramebuffer = Orion::Framebuffer::Create(specFB);
 
+			specFB.ColorAttachments = 3;
+
+			m_G_Framebuffer = Orion::Framebuffer::Create(specFB);
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
 		}
@@ -124,21 +127,7 @@ namespace Orion {
 			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
 			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
 
-			//ORI_INFO("ScenePos {0}", glm::to_string(m_ModelScene->GetPosition()));
-			//ORI_INFO("SceneSize {0}", glm::to_string(m_ModelScene->GetScale()));
-
-
 			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
-
-
-			//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
-			//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
-			//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
-			//
-			//m_PointLight3->GetLightProperties().Position = lightPos * 4.f;
-			//m_PointLight3->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, 0.2f, m_Color.b);
-			//m_PointLight3->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
-
 
 			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time));
 
@@ -148,15 +137,16 @@ namespace Orion {
 
 			
 
-			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render();});
+			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, m_FinalFramebuffer, m_G_Framebuffer, [this]() {Render();});
 			
 				Render();
 			
+			Orion::Renderer::PostProcessing(m_PostProcessSpec);
+
 			Orion::Renderer::EndScene();
 
-			Orion::Renderer::PostProcessing(m_FinalFramebuffer,m_PostProcessSpec);
+			
 		
-
 
 		}
 		void Render() override 
@@ -390,6 +380,9 @@ namespace Orion {
 				ImGui::Text("Post-Process: %f", stats.GetTotalTimePostProcessPass());
 			}
 			
+			ImGui::Checkbox("Enable deferred pipeline", &Orion::Renderer::IsPipelineDeferred());
+
+
 
 			ImGui::End();
 
@@ -490,6 +483,8 @@ namespace Orion {
 			
 			m_FramebufferMS->Resize(size.x, size.y);
 			m_FinalFramebuffer->Resize(size.x, size.y);
+			m_G_Framebuffer->Resize(size.x, size.y);
+
 
 			CamerasController::OnViewportResize({ size.x, size.y });
 			
@@ -533,7 +528,7 @@ namespace Orion {
 		Orion::Renderer::PostProcessSpec m_PostProcessSpec{};
 		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_Framebuffer_Refra;
+		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_G_Framebuffer, m_Framebuffer_Refra;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap;

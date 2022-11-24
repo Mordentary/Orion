@@ -15,7 +15,7 @@ namespace Orion {
 		//glStencilMask(0x00);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
-
+		
 		//glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
@@ -101,7 +101,7 @@ namespace Orion {
 		glLineWidth(width);
 	}
 
-	void OpenGLRendererAPI::SetDepthMask(bool mode)
+	void OpenGLRendererAPI::DepthWrite(bool mode)
 	{
 		glDepthMask(mode ? GL_TRUE : GL_FALSE);
 	}

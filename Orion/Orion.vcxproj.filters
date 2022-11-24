@@ -120,6 +120,9 @@
     <ClInclude Include="src\Orion\Core\MouseButtonCodes.h">
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Core\OpenGLDefines.h">
+      <Filter>src\Orion\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Orion\Core\TimeHelper.h">
       <Filter>src\Orion\Core</Filter>
     </ClInclude>
@@ -1485,7 +1488,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Orion\Core\OpenGLDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
@@ -1610,6 +1612,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\DeferredShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\GBufferShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\GaussianBlurShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
@@ -1619,14 +1636,17 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\PostProcessingShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
-    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\SelectModelShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\GaussianBlurShader.glsl" />
-    <None Include="src\Platform\OpenGL\DefaultShaders\PostProcessingShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\SelectModelShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl">
+      <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

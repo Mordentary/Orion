@@ -25,8 +25,8 @@ namespace Orion
 		virtual void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void DrawArray(const Shared<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void SetLineWidth(float width) = 0;
-		virtual void SetDepthMask(bool mode) = 0;
 		virtual void CullBackFace(bool cull) =0; //TODO: REMOVE
+		virtual void DepthWrite(bool mode) = 0;
 
 		virtual void FramebufferSRGBEnable(bool mode) = 0;
 

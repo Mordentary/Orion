@@ -15,7 +15,6 @@ layout (location = 6) in float a_TextureSlot;
 
 out vec3 v_Normal;
 out vec4 v_Color;
-out vec3 v_CubeMapCoord;
 out vec2 v_TextCoord;
 out vec3 v_FragPos;
 out vec4 v_FragPosDirLight;
@@ -127,8 +126,8 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 
-float ShadowCalculationDir(vec4 shadowFrag);
-float ShadowCalculationSpot(vec4 shadowFrag);
+float ShadowCalculationDir(vec4 shadowFrag, vec3 normal);
+float ShadowCalculationSpot(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationPoint(vec3 shadowFrag);
 
 
@@ -195,7 +194,7 @@ void main()
 
 } 
 
-float ShadowCalculationDir(vec4 fragPosLightSpace)
+float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -206,7 +205,7 @@ float ShadowCalculationDir(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float bias = max(0.01 * (1.0 - dot(v_Normal, u_Dirlight.direction)), 0.005f);
+    float bias = max(0.01 * (1.0 - dot(normal, u_Dirlight.direction)), 0.005f);
 
     int filterSize = 4;
     int  halfFilterSize = filterSize / 2;
@@ -230,7 +229,7 @@ float ShadowCalculationDir(vec4 fragPosLightSpace)
     return shadow;
 }  
 
-float ShadowCalculationSpot(vec4 fragPosLightSpace)
+float ShadowCalculationSpot(vec4 fragPosLightSpace, vec3 normal)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -241,7 +240,7 @@ float ShadowCalculationSpot(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float bias = max(0.01 * (1.0 - dot(v_Normal, u_Spotlight.direction)), 0.005f);
+    float bias = max(0.01 * (1.0 - dot(normal, u_Spotlight.direction)), 0.005f);
 
     int filterSize = 5;
     int  halfFilterSize = filterSize / 2;
@@ -324,7 +323,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     diffuse  *= attenuation;
     specular *= attenuation;
 
-    float shadow = ShadowCalculationPoint(v_FragPos);
+    float shadow = ShadowCalculationPoint(fragPos);
  
     vec3 finalColor = vec3(diffuse + specular) * (1.0f - shadow) + ambient;
 
@@ -367,7 +366,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
         diffuse  *= attenuation * intensity;
         specular *= attenuation * intensity;
 
-        float shadow = ShadowCalculationSpot(v_FragPosSpotLight);
+        float shadow = ShadowCalculationSpot(v_FragPosSpotLight, normal);
 
          return vec4(vec3(diffuse + specular) * (1.f-shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 
@@ -401,7 +400,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir)
     vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
-    float shadow = ShadowCalculationDir(v_FragPosDirLight);
+    float shadow = ShadowCalculationDir(v_FragPosDirLight, normal);
 
     return vec4(vec3(diffuse + specular) * (1.f-shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 

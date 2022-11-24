@@ -34,7 +34,7 @@ namespace Orion
 
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
-		virtual void LoadToLightShader() override;
+		virtual void LoadToLightShader(const Shared<Shader>& shader) override;
 
 	};
 }

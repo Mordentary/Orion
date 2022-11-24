@@ -25,9 +25,9 @@ namespace Orion
 			s_RendererAPI->SetViewport( x,  y,  width,  height);
 		}
 
-		inline static void SetDepthMask(bool mode)
+		inline static void DepthWrite(bool mode)
 		{
-			s_RendererAPI->SetDepthMask(mode);
+			s_RendererAPI->DepthWrite(mode);
 		}
 
 

@@ -52,9 +52,9 @@ namespace Orion
 
 		m_ShadowMap->Unbind();
 	}
-	void PointLight::LoadToLightShader()
+	void PointLight::LoadToLightShader(const Shared<Shader>& shader)
 	{
-		auto& shader = Orion::ShaderLibrary::Get("PhongShader");
+		
 	
 		shader->Bind();
 		shader->SetFloat3("u_Pointlight.position", m_LightProp.Position);

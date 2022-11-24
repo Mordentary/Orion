@@ -30,7 +30,7 @@ namespace Orion
 		{
 			
 		}
-		virtual void LoadToLightShader() = 0;
+		virtual void LoadToLightShader(const Shared<Shader>& shader) = 0;
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) = 0;
 		virtual void RenderLightModel(Shared<Shader>& shader) = 0;
 

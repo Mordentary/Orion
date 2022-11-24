@@ -40,10 +40,10 @@ namespace Orion
 
 		
 	}
-	void SpotLight::LoadToLightShader()
+	void SpotLight::LoadToLightShader(const Shared<Shader>& shader)
 	{
 
-		auto& shader = Orion::ShaderLibrary::Get("PhongShader");
+		
 
 
 		shader->SetFloat3("u_Spotlight.position", m_LightProp.Position);

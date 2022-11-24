@@ -43,7 +43,7 @@ class Model;
 
 	public:
 		static void Init();
-		static void BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& screenFB, std::function<void()> renderFunc);
+		static void BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& screenFB, const Shared<Framebuffer>& finalFramebuffer, const Shared<Framebuffer>& gBuffer, std::function<void()> renderFunc);
 		static void EndScene();
 
 		static void DrawScene();
@@ -63,20 +63,23 @@ class Model;
 		static void AddSphereToScene(const glm::mat4& modelMatrix, const Material& material);
 		static void AddModelToScene(const Shared<Model>& model);
 
-		static void PostProcessing(Shared<Framebuffer>& finalFramebuffer, const PostProcessSpec& spec);
-
+		static void PostProcessing(const PostProcessSpec& spec);
 
 		static size_t GetSceneCubemapCount();
 		static const Shared<Model>& GetSelectedModel();
 		
-
+		static bool& IsPipelineDeferred();
 
 	private:
 		friend struct RendererData3D;
 		static RendererData3D s_RenData3D;
+		static void GeometryPass();
+		static void LightingPass();
+
 		static void ClosestObjectToRayHit();
 		static void PrepareLights();
-		static void LoadAndRenderLights();
+		static void LoadAndRenderLights(const Shared<Shader>& shader);
+		static void LoadLightsToShader(const Shared<Shader>& shader);
 		static void DrawCubemap();
 
 

@@ -145,8 +145,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\BatchShader.glsl" />
+    <None Include="assets\shaders\CubemapDepth.glsl" />
+    <None Include="assets\shaders\CubemapShader.glsl" />
+    <None Include="assets\shaders\LightShader.glsl" />
+    <None Include="assets\shaders\LineShader.glsl" />
+    <None Include="assets\shaders\OnlyDepthShader.glsl" />
     <None Include="assets\shaders\OnlyTexture.glsl" />
+    <None Include="assets\shaders\PhongShader.glsl" />
     <None Include="assets\shaders\Quad.glsl" />
+    <None Include="assets\shaders\QuadShader.glsl" />
     <None Include="assets\shaders\Triangle.glsl" />
   </ItemGroup>
   <ItemGroup>

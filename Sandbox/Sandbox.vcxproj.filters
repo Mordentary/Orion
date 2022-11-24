@@ -37,10 +37,31 @@
     <None Include="assets\shaders\BatchShader.glsl">
       <Filter>assets\shaders</Filter>
     </None>
+    <None Include="assets\shaders\CubemapDepth.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\CubemapShader.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\LightShader.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\LineShader.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\OnlyDepthShader.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
     <None Include="assets\shaders\OnlyTexture.glsl">
       <Filter>assets\shaders</Filter>
     </None>
+    <None Include="assets\shaders\PhongShader.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
     <None Include="assets\shaders\Quad.glsl">
+      <Filter>assets\shaders</Filter>
+    </None>
+    <None Include="assets\shaders\QuadShader.glsl">
       <Filter>assets\shaders</Filter>
     </None>
     <None Include="assets\shaders\Triangle.glsl">

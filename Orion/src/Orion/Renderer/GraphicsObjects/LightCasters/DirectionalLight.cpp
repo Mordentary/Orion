@@ -44,10 +44,9 @@ namespace Orion
 		m_ShadowMap->Unbind();
 
 	}
-	void DirectionalLight::LoadToLightShader()
+	void DirectionalLight::LoadToLightShader(const Shared<Shader>& shader)
 	{
 
-		auto& shader = Orion::ShaderLibrary::Get("PhongShader");
 
 		shader->Bind();
 		shader->SetFloat3("u_Dirlight.direction", m_LightProp.Direction);

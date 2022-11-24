@@ -159,15 +159,15 @@ public:
 
 
 
-		Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render(); });
-
-		Render();
-
-		Orion::Renderer::EndScene();
-
-		Orion::Renderer::PostProcessing(m_FinalFramebuffer, m_PostProcessSpec);
-
-		m_FinalFramebuffer->BlitToDefaultBuffer();
+		///Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, [this]() {Render(); });
+		///
+		///Render();
+		///
+		///Orion::Renderer::EndScene();
+		///
+		///Orion::Renderer::PostProcessing(m_FinalFramebuffer, m_PostProcessSpec);
+		///
+		///m_FinalFramebuffer->BlitToDefaultBuffer();
 
 		
 
