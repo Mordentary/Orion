@@ -57,6 +57,8 @@ layout(location = 2) out vec4 f_AlbedoSpec;
 
 
 
+
+
 struct Material {
     sampler2D diffuse;
     sampler2D specular;

@@ -34,12 +34,19 @@ namespace Orion{
 			virtual uint32_t GetDepthAttachmentID() const = 0;
 
 			virtual Shared<Texture2D> GetColorAttachmentTexture(uint32_t index) const = 0;
+
+			virtual void ActivateDrawingToColorTexture(uint32_t index) = 0;
+			virtual void ActivateDrawingToAllTextures() = 0;
+
+
 			virtual Shared<Texture2D> GetDepthAttachmentTexture() const = 0;
 			
 			virtual uint32_t GetRendererID() const = 0;
 
 			virtual void BlitToDefaultBuffer() = 0;
-			virtual void BlitToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t ThisFBColorAttachIndex = 0, uint32_t colorAttachIndex = 0) = 0;
+			virtual void BlitColorToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t ThisFBColorAttachIndex = 0, uint32_t colorAttachIndex = 0) = 0;
+			virtual void BlitDepthToBuffer(Orion::Shared<Framebuffer>& fb) = 0;
+
 
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const = 0;

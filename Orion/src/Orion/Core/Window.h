@@ -25,7 +25,7 @@ namespace Orion
 	struct SubWindow
 	{
 		std::string Title;
-		int32_t Width, Height;
+		int32_t Width = 0, Height = 0;
 		glm::vec2 ScreenPosInAbs{};
 		glm::vec2 MousePosInAbs{};
 	};

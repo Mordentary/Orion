@@ -88,22 +88,8 @@ namespace Orion {
 			Orion::FramebufferSpecification specFB;
 			specFB.Width = Orion::Application::Get().GetWindow().GetWidth();
 			specFB.Height = Orion::Application::Get().GetWindow().GetHeight();
-			specFB.Samples = 4;
-			specFB.ColorAttachments = 2;
-
-
-			m_FramebufferMS = Orion::Framebuffer::Create(specFB);
-			//m_Framebuffer_Refra = Orion::Framebuffer::Create(specFB);
-
-			specFB.Samples = 1;
-			specFB.ColorAttachments = 1;
-
-
+			
 			m_FinalFramebuffer = Orion::Framebuffer::Create(specFB);
-
-			specFB.ColorAttachments = 3;
-
-			m_G_Framebuffer = Orion::Framebuffer::Create(specFB);
 
 			//Orion::Renderer::SetSceneCubemap(m_PointLight->GetShadowmap());
 		}
@@ -137,16 +123,13 @@ namespace Orion {
 
 			
 
-			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FramebufferMS, m_FinalFramebuffer, m_G_Framebuffer, [this]() {Render();});
+			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FinalFramebuffer, [this]() {Render();});
 			
 				Render();
-			
-			Orion::Renderer::PostProcessing(m_PostProcessSpec);
 
 			Orion::Renderer::EndScene();
 
-			
-		
+			Orion::Renderer::PostProcessing(m_PostProcessSpec);
 
 		}
 		void Render() override 
@@ -155,7 +138,7 @@ namespace Orion {
 
 			Orion::Renderer::DrawScene();
 
-			Orion::CamerasController::GetActiveCamera()->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY()).DebugDraw();
+			//Orion::CamerasController::GetActiveCamera()->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY()).DebugDraw();
 			
 
 		}
@@ -324,8 +307,8 @@ namespace Orion {
 
 				ImGui::Separator();
 
-				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.1f, 5.f);
-				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.1f, 5.0f);
+				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.01f, 5.f);
+				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.01f, 5.0f);
 			}
 			if (ImGui::CollapsingHeader(("PostProcess")))
 			{
@@ -481,9 +464,7 @@ namespace Orion {
 			Application::Get().GetWindow().SetSubWindowProp
 			({ "Viewport", (int32_t)size.x, (int32_t)size.y, {winA.x,winA.y}, {mouseA.x,mouseA.y} });
 			
-			m_FramebufferMS->Resize(size.x, size.y);
 			m_FinalFramebuffer->Resize(size.x, size.y);
-			m_G_Framebuffer->Resize(size.x, size.y);
 
 
 			CamerasController::OnViewportResize({ size.x, size.y });
@@ -528,7 +509,7 @@ namespace Orion {
 		Orion::Renderer::PostProcessSpec m_PostProcessSpec{};
 		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-		Orion::Shared<Orion::Framebuffer> m_FramebufferMS, m_FinalFramebuffer, m_G_Framebuffer, m_Framebuffer_Refra;
+		Orion::Shared<Orion::Framebuffer>  m_FinalFramebuffer;
 		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap;

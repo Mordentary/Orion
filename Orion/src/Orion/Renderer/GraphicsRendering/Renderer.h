@@ -43,7 +43,7 @@ class Model;
 
 	public:
 		static void Init();
-		static void BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& screenFB, const Shared<Framebuffer>& finalFramebuffer, const Shared<Framebuffer>& gBuffer, std::function<void()> renderFunc);
+		static void BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& finalFramebuffer, std::function<void()> renderFunc);
 		static void EndScene();
 
 		static void DrawScene();
@@ -80,6 +80,8 @@ class Model;
 		static void PrepareLights();
 		static void LoadAndRenderLights(const Shared<Shader>& shader);
 		static void LoadLightsToShader(const Shared<Shader>& shader);
+		static void RenderLights();
+
 		static void DrawCubemap();
 
 

@@ -130,8 +130,6 @@ float ShadowCalculationDir(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationSpot(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationPoint(vec3 shadowFrag);
 
-
-
 in vec3 v_Normal;
 in vec4 v_Color;
 in vec2 v_TextCoord;
@@ -142,16 +140,12 @@ in vec4 v_FragPosSpotLight;
 in mat3 v_TBN;
 
 
-
 uniform sampler2D u_ShadowMapDir;
 uniform sampler2D u_ShadowMapSpot;
 uniform samplerCube u_ShadowCubemap;
 
-
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
-
-
 
 uniform PointLight u_Pointlight;
 uniform SpotLight u_Spotlight;
@@ -176,8 +170,8 @@ void main()
     vec4 result = vec4(0.0f);
 
 
-    result += CalcSpotLight(u_Spotlight, normal, v_FragPos, viewDir);
     result += CalcPointLight(u_Pointlight, normal, v_FragPos, viewDir);
+    result += CalcSpotLight(u_Spotlight, normal, v_FragPos, viewDir);
     result += CalcDirectionalLight(u_Dirlight, normal, viewDir);
 
 
@@ -185,12 +179,8 @@ void main()
 
     f_Color = vec4(result) * v_Color;
 
-    float brightness = dot(f_Color.rgb, vec3(0.2126, 0.7152, 0.0722));
-
-    if (brightness > 1.0)
-        f_BrightColor = vec4(f_Color);
-    else
-        f_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    f_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 } 
 
@@ -240,7 +230,7 @@ float ShadowCalculationSpot(vec4 fragPosLightSpace, vec3 normal)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float bias = max(0.01 * (1.0 - dot(normal, u_Spotlight.direction)), 0.005f);
+    float bias = max(0.01 * (1.0 - dot(normal, u_Spotlight.direction)), 0.2f);
 
     int filterSize = 5;
     int  halfFilterSize = filterSize / 2;
@@ -316,8 +306,6 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 ambient  = light.ambient;
     vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord));
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
-
-
 
     ambient  *= attenuation;
     diffuse  *= attenuation;

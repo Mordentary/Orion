@@ -48,7 +48,7 @@ namespace Orion
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
-	void OpenGLFramebuffer::BlitToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex, uint32_t colorAttachIndex)
+	void OpenGLFramebuffer::BlitColorToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex, uint32_t colorAttachIndex)
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
@@ -59,6 +59,34 @@ namespace Orion
 		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_COLOR_BUFFER_BIT , GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
+
+	void OpenGLFramebuffer::BlitDepthToBuffer(Orion::Shared<Framebuffer>& fb) 
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
+
+		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	}
+	void OpenGLFramebuffer::ActivateDrawingToColorTexture(uint32_t index)
+	{
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + index);
+	}
+	void OpenGLFramebuffer::ActivateDrawingToAllTextures()
+	{
+		GLenum* attachments = new GLenum[m_Specification.ColorAttachments];
+		for (size_t i = 0; i < m_Specification.ColorAttachments; i++)
+		{
+			attachments[i] = GL_COLOR_ATTACHMENT0 + i;
+		}
+
+		glDrawBuffers(m_Specification.ColorAttachments, attachments);
+
+		delete[] attachments;
+	}
+
 	inline void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
 		if (m_Specification.Width == width && m_Specification.Height == height) return;

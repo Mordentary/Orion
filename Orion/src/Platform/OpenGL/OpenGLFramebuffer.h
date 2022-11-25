@@ -26,7 +26,11 @@ namespace Orion
 			virtual Shared<Texture2D> GetDepthAttachmentTexture() const override { return m_DepthAttachment; }
 
 			virtual void BlitToDefaultBuffer() override;
-			virtual void BlitToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex , uint32_t colorAttachIndex ) override;
+			virtual void BlitColorToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex , uint32_t colorAttachIndex ) override;
+			virtual void BlitDepthToBuffer(Orion::Shared<Framebuffer>& fb) override;
+
+			virtual void ActivateDrawingToColorTexture(uint32_t index) override;
+			virtual void ActivateDrawingToAllTextures() override;
 
 			virtual const FramebufferSpecification& GetFramebufferSpec() const { return m_Specification; }
 			virtual FramebufferSpecification& GetFramebufferSpec() { return m_Specification; }
