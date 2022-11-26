@@ -14,14 +14,13 @@ layout(std140) uniform u_MatricesBuffer
 {
     uniform mat4 u_ViewProj;
 };
-uniform mat4 u_ModelMatrix;
 
+uniform mat4 u_ModelMatrix;
 
 out vec2 v_TextCoord;
 
 void main()
 {
-
     v_TextCoord = a_TextureCoord;
     gl_Position = (u_ViewProj * u_ModelMatrix * vec4(a_Position + a_Normal * 0.005, 1.0));
 }

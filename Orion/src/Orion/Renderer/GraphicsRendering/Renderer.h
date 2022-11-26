@@ -58,7 +58,6 @@ class Model;
 
 		static void AddSceneCubemap(const Shared<Texture2D>& cubeMap);
 		static void AddLightToScene(const Shared<LightSource>& light);
-
 		static void AddCubeToScene(const glm::mat4& modelMatrix, const Material& material);
 		static void AddSphereToScene(const glm::mat4& modelMatrix, const Material& material);
 		static void AddModelToScene(const Shared<Model>& model);
@@ -81,7 +80,7 @@ class Model;
 		static void LoadAndRenderLights(const Shared<Shader>& shader);
 		static void LoadLightsToShader(const Shared<Shader>& shader);
 		static void RenderLights();
-
+		static void RenderSelectedModelOutline();
 		static void DrawCubemap();
 
 

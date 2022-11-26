@@ -28,6 +28,8 @@ namespace Orion
 			virtual void BlitToDefaultBuffer() override;
 			virtual void BlitColorToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t thisFBColorAttachIndex , uint32_t colorAttachIndex ) override;
 			virtual void BlitDepthToBuffer(Orion::Shared<Framebuffer>& fb) override;
+			virtual void OpenGLFramebuffer::BlitStencilToBuffer(Orion::Shared<Framebuffer>& fb) override;
+
 
 			virtual void ActivateDrawingToColorTexture(uint32_t index) override;
 			virtual void ActivateDrawingToAllTextures() override;

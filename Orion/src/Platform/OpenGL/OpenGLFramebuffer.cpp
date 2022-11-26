@@ -70,6 +70,19 @@ namespace Orion
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}
+
+	void OpenGLFramebuffer::BlitStencilToBuffer(Orion::Shared<Framebuffer>& fb) 
+	{
+
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb->GetRendererID());
+
+		glBlitFramebuffer(0, 0, m_Specification.Width, m_Specification.Height, 0, 0, m_Specification.Width, m_Specification.Height, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+
 	void OpenGLFramebuffer::ActivateDrawingToColorTexture(uint32_t index)
 	{
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + index);

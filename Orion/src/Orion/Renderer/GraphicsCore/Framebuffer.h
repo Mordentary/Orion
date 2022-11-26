@@ -46,6 +46,8 @@ namespace Orion{
 			virtual void BlitToDefaultBuffer() = 0;
 			virtual void BlitColorToBuffer(Orion::Shared<Framebuffer>& fb, uint32_t ThisFBColorAttachIndex = 0, uint32_t colorAttachIndex = 0) = 0;
 			virtual void BlitDepthToBuffer(Orion::Shared<Framebuffer>& fb) = 0;
+			virtual void BlitStencilToBuffer(Orion::Shared<Framebuffer>& fb) = 0;
+
 
 
 

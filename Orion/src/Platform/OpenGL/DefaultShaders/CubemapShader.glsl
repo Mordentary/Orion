@@ -25,7 +25,6 @@ void main()
 #version 450 core
 			
 layout(location = 0) out vec4 f_Color;
-//layout(location = 1) out vec4 f_LightSources;
 
 
 in vec3 v_CubeMapCoord;
@@ -35,7 +34,4 @@ uniform samplerCube u_Cubemap;
 void main()
 {
 		f_Color = vec4(texture(u_Cubemap, v_CubeMapCoord));
-
-		//f_LightSources = vec4(0.0f);
-
 }
