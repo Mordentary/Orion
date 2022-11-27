@@ -18,7 +18,6 @@ namespace Orion
 
 			float nearPlane = 0.1f;
 			float farPlane = 25.0f;
-			m_FarPlane = farPlane;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 		};
 		SpotLight(Shared<Model>& model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512) : LightSource(model)
@@ -33,8 +32,7 @@ namespace Orion
 
 			float nearPlane = 2.0f;
 			float farPlane = 25.0f;
-			m_FarPlane = farPlane;
-			m_ProjMatrix = glm::perspective(glm::radians(m_OuterCutOff*2), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);;
+			m_ProjMatrix = glm::perspective(glm::radians(m_Prop.OuterCutOff*2), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);;
 
 				
 				//glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
@@ -44,14 +42,19 @@ namespace Orion
 		
 
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
-		virtual void LoadToLightShader(const Shared<Shader>& shader) override;
+		virtual void LoadLightToUBO(const Shared<UniformBuffer>& ubo) override;
+		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
 
+		virtual void SetLighAttenuation(float linear, float quadratic) override;
 
-		inline float& GetInnerCutOff() { return m_InnerCutOff; }
-		inline float& GetOuterCutOff() { return m_OuterCutOff; }
+		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
+
+		inline float& GetInnerCutOff() { return m_Prop.InnerCutOff; }
+		inline float& GetOuterCutOff() { return m_Prop.OuterCutOff; }
 
 	private: 
-		float m_InnerCutOff = 20.f, m_OuterCutOff = 25.f, m_FarPlane = 0.f;
+
+		Orion::LightSource::SpotLightProp m_Prop;
 	};
 }

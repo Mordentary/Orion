@@ -60,8 +60,8 @@ public:
 		m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
 		m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
-		m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
-		m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
+		m_SpotLight->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+		m_SpotLight->GetGeneralLightProp().Position = glm::vec3(0.0f, 3.0f, 0.0f);
 
 
 
@@ -131,9 +131,9 @@ public:
 		lightPos.y = 4.0f;
 		lightPos.z = cos(time) * 2.0f;
 
-		m_PointLight->GetLightProperties().Position = lightPos / 3.f;
-		m_PointLight->GetLightProperties().DiffuseLightColor = m_Color;
-		m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
+		m_PointLight->GetGeneralLightProp().Position = lightPos / 3.f;
+		m_PointLight->GetGeneralLightProp().DiffuseLightColor = m_Color;
+		m_PointLight->GetGeneralLightProp().SpecularLightColor = m_Color / 2.f;
 
 		//ORI_INFO("ScenePos {0}", glm::to_string(m_ModelScene->GetPosition()));
 		//ORI_INFO("SceneSize {0}", glm::to_string(m_ModelScene->GetScale()));
@@ -142,20 +142,20 @@ public:
 		m_ModelCar->SetPosition(m_ModelCar->GetPosition());
 
 
-		//m_PointLight2->GetLightProperties().Position = lightPos * 1.f;
-		//m_PointLight2->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
-		//m_PointLight2->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
+		//m_PointLight2->GetGeneralLightProp().Position = lightPos * 1.f;
+		//m_PointLight2->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.2f, m_Color.g, 0.2f);
+		//m_PointLight2->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
 		//
-		//m_PointLight3->GetLightProperties().Position = lightPos * 4.f;
-		//m_PointLight3->GetLightProperties().DiffuseLightColor = glm::vec3(0.2f, 0.2f, m_Color.b);
-		//m_PointLight3->GetLightProperties().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
+		//m_PointLight3->GetGeneralLightProp().Position = lightPos * 4.f;
+		//m_PointLight3->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.2f, 0.2f, m_Color.b);
+		//m_PointLight3->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.2f, m_Color.g, 0.2f)  / 2.f;
 
 
-		m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time), 3.0f, sin(time));
+		m_SpotLight->GetGeneralLightProp().Position = glm::vec3(cos(time), 3.0f, sin(time));
 
-		m_DirLight->GetLightProperties().Direction = m_SunDirection;
-		m_DirLight->GetLightProperties().DiffuseLightColor = m_SunColor;
-		m_DirLight->GetLightProperties().SpecularLightColor = m_SunColor / 2.f;
+		m_DirLight->GetGeneralLightProp().Direction = m_SunDirection;
+		m_DirLight->GetGeneralLightProp().DiffuseLightColor = m_SunColor;
+		m_DirLight->GetGeneralLightProp().SpecularLightColor = m_SunColor / 2.f;
 
 
 

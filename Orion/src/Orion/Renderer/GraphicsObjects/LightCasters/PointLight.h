@@ -17,9 +17,9 @@ namespace Orion
 
 			float nearPlane = 0.1f;
 			float farPlane = 25.0f;
-			m_FarPlane = farPlane;
+			m_Prop.FarPlane = farPlane;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
-		
+
 		}
 		PointLight(Shared<Model> model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512) : LightSource(model)
 		{
@@ -33,7 +33,7 @@ namespace Orion
 
 			float nearPlane = 0.1f;
 			float farPlane = 25.0f;
-			m_FarPlane = farPlane;
+			m_Prop.FarPlane = farPlane;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 
 		}
@@ -41,10 +41,19 @@ namespace Orion
 
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
-		virtual void LoadToLightShader(const Shared<Shader>& shader) override;
+		virtual void LoadLightToUBO(const Shared<UniformBuffer>& ubo) override;
+		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
+
+		virtual void SetLighAttenuation(float linear, float quadratic) override;
+
+		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
+
 
 	private:
-		float m_FarPlane = 0.0f;
+
+		Orion::LightSource::PointLightProp m_Prop;
+
+		void CalculateBoundingVolume();
 
 	};
 }

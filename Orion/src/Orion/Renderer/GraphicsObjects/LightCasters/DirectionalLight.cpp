@@ -8,21 +8,21 @@ namespace Orion
 {
 	void DirectionalLight::RenderLightModel(Shared<Shader>& shader)
 	{
-		if (m_LightModel) 
+		/*if (m_LightModel) 
 		{
 			shader->Bind();
 			shader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f), m_LightProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
 			shader->SetFloat3("u_LightColor", m_LightProp.DiffuseLightColor);
 
 			m_LightModel->Render(shader);
-		}
+		}*/
 	}
 	void DirectionalLight::SetupLight(
 		Shared<Shader>& currentShader, 
 		std::vector<Shared<LightSource>>& otherLights, 
 		std::function<void()> renderFunc)
 	{
-		m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
+		m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_Prop.GeneralProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
 
 
 		auto& depthShader = Orion::ShaderLibrary::Get("TextureDepthShader");
@@ -44,21 +44,21 @@ namespace Orion
 		m_ShadowMap->Unbind();
 
 	}
-	void DirectionalLight::LoadToLightShader(const Shared<Shader>& shader)
+	void DirectionalLight::LoadLightToShader(const Shared<Shader>& shader)
 	{
-
-
-		shader->Bind();
-		shader->SetFloat3("u_Dirlight.direction", m_LightProp.Direction);
-		shader->SetFloat3("u_Dirlight.ambient", m_LightProp.AmbientLightColor );
-		shader->SetFloat3("u_Dirlight.diffuse", m_LightProp.DiffuseLightColor );
-		shader->SetFloat3("u_Dirlight.specular", m_LightProp.SpecularLightColor );
-
-		m_ShadowMap->GetDepthAttachmentTexture()->Bind(4);
+		m_ShadowMap->GetDepthAttachmentTexture()->Bind(13);
 		shader->SetInt("u_ShadowMapDir", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
-		shader->SetMat4("u_DirLightMatrix", m_ProjMatrix * m_ViewMatrix);
 
 	}
 
+	void DirectionalLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)
+	{
+		m_Prop.ViewProj = m_ProjMatrix * m_ViewMatrix;
+
+		
+
+		ubo->SetData(&m_Prop, sizeof(LightSource::SpotLightProp) + sizeof(LightSource::PointLightProp), sizeof(m_Prop));
+
+	}
 
 }

@@ -12,7 +12,7 @@ namespace Orion
 			fb.Width = 3064;
 			fb.Height = 3064;
 
-			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
+			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_Prop.GeneralProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
 			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
 
 			m_ShadowMap = Framebuffer::Create(fb);
@@ -25,16 +25,25 @@ namespace Orion
 			fb.Width = shadowWidth;
 			fb.Height = shadowHeight;
 
-			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_LightProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
+			m_ViewMatrix = glm::lookAt(glm::vec3(0.f), m_Prop.GeneralProp.Direction, glm::vec3(0.0f, 1.0f, 0.0f));
 			m_ProjMatrix = glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
 
 			m_ShadowMap = Framebuffer::Create(fb);
 		}
 
-
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
-		virtual void LoadToLightShader(const Shared<Shader>& shader) override;
+		virtual void LoadLightToUBO(const Shared<UniformBuffer>& ubo) override;
+		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
+
+		virtual void SetLighAttenuation(float linear, float quadratic) override {};
+
+		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
+
+
+	private:
+		
+		Orion::LightSource::DirectionalLightProp m_Prop;
 
 	};
 }

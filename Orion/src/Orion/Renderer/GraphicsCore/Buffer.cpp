@@ -52,7 +52,7 @@ namespace Orion
 	}
 	
 
-	Shared<UniformBuffer> UniformBuffer::Create(const BufferLayout& layout, const std::string& name)
+	Shared<UniformBuffer> UniformBuffer::Create(const BufferLayout& layout, const std::string& name, uint32_t numOfLayouts)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -61,11 +61,23 @@ namespace Orion
 			return nullptr;
 			break;
 		case RendererAPI::API::OpenGL:
-			return  CreateScoped<OpenGLUniformBuffer>(layout, name);
+			return  CreateScoped<OpenGLUniformBuffer>(layout, name, numOfLayouts);
 			break;
 		}
 	}
 
-
+	Shared<UniformBuffer> UniformBuffer::Create(uint32_t size, const std::string& name)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			ORI_CORE_ASSERT(false, "RendererAPI: None is currently none supported!");
+			return nullptr;
+			break;
+		case RendererAPI::API::OpenGL:
+			return  CreateScoped<OpenGLUniformBuffer>(size, name);
+			break;
+		}
+	}
 
 }

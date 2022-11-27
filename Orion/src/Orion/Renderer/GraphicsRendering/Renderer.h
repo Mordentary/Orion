@@ -77,8 +77,11 @@ class Model;
 
 		static void ClosestObjectToRayHit();
 		static void PrepareLights();
-		static void LoadAndRenderLights(const Shared<Shader>& shader);
+		static void LoadLightsToUBO(const Shared<UniformBuffer>& ubo);
+
+		static void LoadLightsToShaderAndRender(const Shared<Shader>& shader);
 		static void LoadLightsToShader(const Shared<Shader>& shader);
+
 		static void RenderLights();
 		static void RenderSelectedModelOutline();
 		static void DrawCubemap();

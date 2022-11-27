@@ -91,12 +91,21 @@ namespace Orion
 	// UniformBuffer /////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////
 
-	OpenGLUniformBuffer::OpenGLUniformBuffer(const BufferLayout& layout, const std::string& name)
+	OpenGLUniformBuffer::OpenGLUniformBuffer(const BufferLayout& layout, const std::string& name, uint32_t numOfLayouts)
 		: m_BufferName(name), m_Layout(layout)
 	{
 		glGenBuffers(1, &m_RendererID);
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride(), nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride() * numOfLayouts, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, const std::string& name)
+		: m_BufferName(name)
+	{
+		glGenBuffers(1, &m_RendererID);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
@@ -132,8 +141,6 @@ namespace Orion
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
 		glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
-
-
 	}
 
 	void  OpenGLUniformBuffer::SetDataUsingLayout(uint32_t indexOfElement, const void* data) 

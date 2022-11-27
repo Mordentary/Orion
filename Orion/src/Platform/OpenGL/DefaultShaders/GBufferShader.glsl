@@ -69,7 +69,7 @@ struct Material {
 
 
 
-in vec3 v_Normal;
+in vec3 v_Normal; 
 in vec4 v_Color;
 in vec2 v_TextCoord;
 in vec3 v_FragPos;

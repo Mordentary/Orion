@@ -153,7 +153,6 @@ namespace Orion {
 
 		virtual void SetDataUsingLayout(uint32_t indexOfElement, const void* data) = 0;
 
-
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
@@ -162,7 +161,11 @@ namespace Orion {
 
 		virtual const std::string& GetBufferName() const = 0;
 
-		static Shared<UniformBuffer> Create(const BufferLayout& layout, const std::string& name);
+		static Shared<UniformBuffer> Create(const BufferLayout& layout, const std::string& name,  uint32_t numOfLayouts = 1);
+
+
+		static Shared<UniformBuffer> Create(uint32_t size, const std::string& name);
+
 	};
 
 }

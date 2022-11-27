@@ -59,8 +59,8 @@ namespace Orion {
 			m_SpotLight = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp);
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
-			m_SpotLight->GetLightProperties().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
-			m_SpotLight->GetLightProperties().Position = glm::vec3(0.0f, 3.0f, 0.0f);
+			m_SpotLight->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(0.0f, 3.0f, 0.0f);
 
 		
 
@@ -109,20 +109,20 @@ namespace Orion {
 			lightPos.y = 4.0f;
 			lightPos.z = cos(time) * 2.0f;
 
-			m_PointLight->GetLightProperties().Position = lightPos / 3.f;
-			m_PointLight->GetLightProperties().DiffuseLightColor =  m_Color;
-			m_PointLight->GetLightProperties().SpecularLightColor = m_Color / 2.f;
+			m_PointLight->GetGeneralLightProp().Position = lightPos / 3.f;
+			m_PointLight->GetGeneralLightProp().DiffuseLightColor =  m_Color;
+			m_PointLight->GetGeneralLightProp().SpecularLightColor = m_Color / 2.f;
 
 			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
 
-			m_SpotLight->GetLightProperties().Position = glm::vec3(cos(time) , 3.0f, sin(time));
+			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(cos(time) , 3.0f, sin(time));
 
-			m_DirLight->GetLightProperties().Direction = m_SunDirection;
-			m_DirLight->GetLightProperties().DiffuseLightColor = m_SunColor;
-			m_DirLight->GetLightProperties().SpecularLightColor = m_SunColor / 2.f;
+			m_DirLight->GetGeneralLightProp().Direction = m_SunDirection;
+			m_DirLight->GetGeneralLightProp().DiffuseLightColor = m_SunColor;
+			m_DirLight->GetGeneralLightProp().SpecularLightColor = m_SunColor / 2.f;
 
 			
-
+			
 			Orion::Renderer::BeginScene(Orion::CamerasController::GetActiveCamera(), m_FinalFramebuffer, [this]() {Render();});
 			
 				Render();

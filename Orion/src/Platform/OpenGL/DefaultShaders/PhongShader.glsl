@@ -25,8 +25,8 @@ out mat3 v_TBN;
 
 
 
-uniform mat4 u_DirLightMatrix;
-uniform mat4 u_SpotLightMatrix;
+//uniform mat4 u_DirLightMatrix;
+//uniform mat4 u_SpotLightMatrix;
 
 uniform mat4 u_ModelMatrix;
 
@@ -50,8 +50,8 @@ void main()
    v_TBN = mat3(T, B, N);
 
    v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
-   v_FragPosDirLight = u_DirLightMatrix * vec4(v_FragPos, 1.0);
-   v_FragPosSpotLight = u_SpotLightMatrix * vec4(v_FragPos, 1.0);
+   //v_FragPosDirLight = u_DirLightMatrix * vec4(v_FragPos, 1.0);
+   //v_FragPosSpotLight = u_SpotLightMatrix * vec4(v_FragPos, 1.0);
 
    gl_Position =  u_ViewProj * vec4(v_FragPos, 1.0);
 
@@ -79,47 +79,54 @@ struct Material {
 }; 
 
 
+struct DirectionalLight
+{
+    vec3 ambient; //4+
+    vec3 diffuse; //4+
+    vec3 specular; //4+
 
-struct DirectionalLight {
-    vec3 direction;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 position; //4+
+    vec3 direction; //4+
 
+    mat4 VPMatrix;
 };
 
 
 
-struct PointLight {
-
-    vec3 position;
-
+struct PointLight
+{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 
+    vec3 position;
+    vec3 direction;
 
-    float farPlane;
     float constant;
     float linear;
     float quadratic;
+
+    float farPlane;
+    float radius;
 };
 
 struct SpotLight
 {
-    vec3 position;
-    vec3 direction;
-    float innerCutOff;
-    float outerCutOff;
-
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 
-     float constant;
+    vec3 position;
+    vec3 direction;
+
+    float constant;
     float linear;
     float quadratic;
+
+    float innerCutOff;
+    float outerCutOff;
+
+    mat4 VPMatrix;
 };
 
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -129,6 +136,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir);
 float ShadowCalculationDir(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationSpot(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationPoint(vec3 shadowFrag);
+
 
 in vec3 v_Normal;
 in vec4 v_Color;
@@ -147,9 +155,14 @@ uniform samplerCube u_ShadowCubemap;
 uniform vec3 u_CameraPos;
 uniform Material u_Material;
 
-uniform PointLight u_Pointlight;
-uniform SpotLight u_Spotlight;
-uniform DirectionalLight u_Dirlight;
+
+layout(std140) uniform u_LightSources
+{
+  PointLight u_Pointlight;
+  SpotLight   u_Spotlight;
+  DirectionalLight u_Dirlight;
+};
+
 
 
 void main()
@@ -169,7 +182,6 @@ void main()
     vec3 viewDir = normalize(u_CameraPos - v_FragPos);
     vec4 result = vec4(0.0f);
 
-
     result += CalcPointLight(u_Pointlight, normal, v_FragPos, viewDir);
     result += CalcSpotLight(u_Spotlight, normal, v_FragPos, viewDir);
     result += CalcDirectionalLight(u_Dirlight, normal, viewDir);
@@ -181,6 +193,8 @@ void main()
     f_LightSources = vec4(0.0, 0.0, 0.0, 1.0);
 
 } 
+
+
 
 float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
 {

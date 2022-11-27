@@ -50,7 +50,9 @@ namespace Orion
 	class OpenGLUniformBuffer : public UniformBuffer 
 	{
 	public:
-		OpenGLUniformBuffer(const BufferLayout& layout, const std::string& name); // Initiliase and allocate memory
+		OpenGLUniformBuffer(const BufferLayout& layout, const std::string& name, uint32_t numOfLayouts); // Initiliase and allocate memory
+		OpenGLUniformBuffer(uint32_t size, const std::string& name); // Initiliase and allocate memory
+
 
 		virtual ~OpenGLUniformBuffer();
 

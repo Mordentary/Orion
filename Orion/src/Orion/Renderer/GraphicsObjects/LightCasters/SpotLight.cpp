@@ -8,8 +8,8 @@ namespace Orion
 		if (m_LightModel)
 		{
 			shader->Bind();
-			shader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f), m_LightProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
-			shader->SetFloat3("u_LightColor", m_LightProp.DiffuseLightColor);
+			shader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f), m_Prop.GeneralProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
+			shader->SetFloat3("u_LightColor", m_Prop.GeneralProp.DiffuseLightColor);
 
 			m_LightModel->Render(shader);
 		}
@@ -17,7 +17,7 @@ namespace Orion
 	void SpotLight::SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc)
 	{
 	
-		m_ViewMatrix = glm::lookAt(m_LightProp.Position, m_LightProp.Position + glm::normalize(m_LightProp.Direction), glm::vec3(0.0, 0.0, 1.0));
+		m_ViewMatrix = glm::lookAt(m_Prop.GeneralProp.Position, m_Prop.GeneralProp.Position + glm::normalize(m_Prop.GeneralProp.Direction), glm::vec3(0.0, 0.0, 1.0));
 
 		auto& depthShader = Orion::ShaderLibrary::Get("TextureDepthShader");
 		depthShader->Bind();
@@ -40,30 +40,26 @@ namespace Orion
 
 		
 	}
-	void SpotLight::LoadToLightShader(const Shared<Shader>& shader)
+	void SpotLight::SetLighAttenuation(float linear, float quadratic)
+	{
+		m_Prop.LinearAttenuation = linear;
+		m_Prop.QuadraticAttenuation= quadratic;
+
+	}
+
+	void SpotLight::LoadLightToShader(const Shared<Shader>& shader) 
+	{
+		m_ShadowMap->GetDepthAttachmentTexture()->Bind(14);
+		shader->SetInt("u_ShadowMapSpot", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
+	}
+
+	void SpotLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)
 	{
 
+		m_Prop.ViewProj = m_ProjMatrix * m_ViewMatrix;
+
+		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp), sizeof(m_Prop));
 		
-
-
-		shader->SetFloat3("u_Spotlight.position", m_LightProp.Position);
-		shader->SetFloat3("u_Spotlight.direction", m_LightProp.Direction);
-
-		shader->SetFloat("u_Spotlight.innerCutOff", cos(glm::radians(m_InnerCutOff)));
-		shader->SetFloat("u_Spotlight.outerCutOff", cos(glm::radians(m_OuterCutOff)));
-
-		shader->SetFloat3("u_Spotlight.ambient", m_LightProp.AmbientLightColor);
-		shader->SetFloat3("u_Spotlight.diffuse", m_LightProp.DiffuseLightColor);
-		shader->SetFloat3("u_Spotlight.specular", m_LightProp.SpecularLightColor);
-
-		shader->SetFloat("u_Spotlight.constant", m_LightProp.ConstantAttenuation);
-		shader->SetFloat("u_Spotlight.linear", m_LightProp.LinearAttenuation);
-		shader->SetFloat("u_Spotlight.quadratic", m_LightProp.QuadraticAttenuation);
-
-		m_ShadowMap->GetDepthAttachmentTexture()->Bind(6);
-		shader->SetInt("u_ShadowMapSpot", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
-
-		shader->SetMat4("u_SpotLightMatrix", m_ProjMatrix * m_ViewMatrix);
 
 	}
 
