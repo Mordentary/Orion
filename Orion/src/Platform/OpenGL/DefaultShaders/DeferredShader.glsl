@@ -69,8 +69,8 @@ struct SpotLight
     float linear;
     float quadratic;
 
-    float innerCutOff;
     float outerCutOff;
+    float innerCutOff;
 
     mat4 VPMatrix;
 };
@@ -104,8 +104,8 @@ uniform vec3 u_CameraPos;
 layout(std140) uniform u_LightSources
 {
   PointLight u_PointLights;
-  SpotLight   u_SpotLights;
   DirectionalLight u_DirLight; 
+  SpotLight   u_SpotLights;
 };
 
 
@@ -121,16 +121,14 @@ void main()
 
 
     float distance = length(u_PointLights.position - FragPos);
-
-    if (distance < u_PointLights.radius)
-     //   result += vec4(0.4f);
-    result += CalcPointLight(u_PointLights, Normal, FragPos, viewDir);
-    
-
-    vec4 FragPosSpotLight = u_SpotLights.VPMatrix * vec4(FragPos, 1.0f);
-    result += CalcSpotLight(u_SpotLights, Normal, FragPos, viewDir, FragPosSpotLight);
-
     vec4 FragPosDirLight = u_DirLight.VPMatrix * vec4(FragPos, 1.0f);
+    vec4 FragPosSpotLight = u_SpotLights.VPMatrix * vec4(FragPos, 1.0f);
+
+     //   result += vec4(0.4f);
+    if (distance < u_PointLights.radius)
+    result += CalcPointLight(u_PointLights, Normal, FragPos, viewDir);
+
+    result += CalcSpotLight(u_SpotLights, Normal, FragPos, viewDir, FragPosSpotLight);
     result += CalcDirectionalLight(u_DirLight, Normal, viewDir, FragPosDirLight);
     
 
@@ -281,53 +279,33 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragPosLightSpace)
 {
-
-
     vec3 lightDir = normalize(light.position - fragPos);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float spec = pow(max(dot(normal, halfwayDir), 0.0),32.f);
+    // attenuation
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    // spotlight intensity
     float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = light.innerCutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    // combine results
+    vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
+    vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
+    vec3 specular = light.specular * spec * texture(u_gAlbedoSpec, v_TextCoord).a;
 
-    if (theta > light.outerCutOff)
-    {
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
 
-        // diffuse shading
-        float diff = max(dot(normal, lightDir), 0.0);
-        // specular shading
-       // vec3 reflectDir = reflect(-lightDir, normal);
-        vec3 halfwayDir = normalize(lightDir + viewDir);
+    float shadow = ShadowCalculationSpot(fragPosLightSpace, normal);
 
-        float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
-        // attenuation
-        float distance = length(light.position - fragPos);
-        float attenuation = 1.0 / (light.constant + light.linear * distance +
-            light.quadratic * (distance * distance));
-        float epsilon = light.innerCutOff - light.outerCutOff;
-        float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-        // combine results
-        vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-        vec3 diffuse = light.diffuse * diff * vec3(texture(u_gAlbedoSpec, v_TextCoord));
-        vec3 specular = light.specular * spec * texture(u_gAlbedoSpec, v_TextCoord).a;
+    return vec4((diffuse + specular) * (1.0f - shadow) + ambient, 1.0f);
 
-
-        ambient *= attenuation;
-        diffuse *= attenuation * intensity;
-        specular *= attenuation * intensity;
-
-        float shadow = ShadowCalculationSpot(fragPosLightSpace, normal);
-
-        return vec4(vec3(diffuse + specular) * (1.f - shadow) + ambient, 1.0f);
-
-    }
-    else
-    {
-        float distance = length(light.position - fragPos);
-        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-
-        vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-
-        ambient *= attenuation;
-
-        return vec4(vec3(ambient), 1.0f);
-    }
 
 }
 

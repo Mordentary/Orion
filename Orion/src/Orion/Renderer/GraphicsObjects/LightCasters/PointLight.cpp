@@ -62,7 +62,9 @@ namespace Orion
 	void PointLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)
 	{
 		CalculateBoundingVolume();
-		
+
+		//ORI_ASSERT(alignof(LightSource::PointLightProp) == 16, "Inproper alignment");
+
 		ubo->SetData(&m_Prop, 0, sizeof(m_Prop));
 
 	}

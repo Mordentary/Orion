@@ -31,6 +31,7 @@ namespace Orion
 
 			float padding0;
 
+
 			glm::mat4 ViewProj{ 1.0f };
 		};
 
@@ -56,9 +57,9 @@ namespace Orion
 			float ConstantAttenuation = 1.0f;
 			float LinearAttenuation = 0.065f;
 			float QuadraticAttenuation = 0.1f;
-
-			float InnerCutOff = 20.0f;
-			float OuterCutOff = 25.0f;
+			
+			float OuterCutOff = 6.0f;
+			float InnerCutOff = 5.f;
 
 
 			glm::mat4 ViewProj{1.0f};

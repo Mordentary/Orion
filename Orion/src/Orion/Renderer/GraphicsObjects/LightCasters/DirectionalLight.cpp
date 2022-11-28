@@ -55,9 +55,11 @@ namespace Orion
 	{
 		m_Prop.ViewProj = m_ProjMatrix * m_ViewMatrix;
 
-		
+		//uint32_t  align = alignof(LightSource::DirectionalLightProp);
+		//ORI_ASSERT(alignof(LightSource::DirectionalLightProp) == 16, "Inproper alignment");
 
-		ubo->SetData(&m_Prop, sizeof(LightSource::SpotLightProp) + sizeof(LightSource::PointLightProp), sizeof(m_Prop));
+
+		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp), sizeof(m_Prop));
 
 	}
 

@@ -60,7 +60,6 @@ namespace Orion {
 			m_DirLight = Orion::CreateShared<Orion::DirectionalLight>();
 
 			m_SpotLight->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
-			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(0.0f, 3.0f, 0.0f);
 
 		
 
@@ -76,9 +75,9 @@ namespace Orion {
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
 
 
+			Orion::Renderer::AddLightToScene(m_DirLight);
 			Orion::Renderer::AddLightToScene(m_SpotLight);
 			Orion::Renderer::AddLightToScene(m_PointLight);
-			Orion::Renderer::AddLightToScene(m_DirLight);
 			
 			
 			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapSea"));
@@ -115,7 +114,7 @@ namespace Orion {
 
 			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
 
-			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(cos(time) , 3.0f, sin(time));
+			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(cos(time) , -1.0f, sin(time));
 
 			m_DirLight->GetGeneralLightProp().Direction = m_SunDirection;
 			m_DirLight->GetGeneralLightProp().DiffuseLightColor = m_SunColor;
