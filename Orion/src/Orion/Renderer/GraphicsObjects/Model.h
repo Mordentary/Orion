@@ -15,6 +15,7 @@ namespace Orion
         {
              LoadModel(path);
              DeduceModelName();
+             RecalculateAABBInModelSpace();
         }
         void Render(Shared<Shader>& shader);
         bool IsIntersect(const CameraRay& ray);
@@ -73,10 +74,21 @@ namespace Orion
         float m_MaxDivider = 0.f;
 
         std::vector<Shared<Mesh>> m_Meshes;
-      
+
+        uint32_t m_MeshIndex = 0;
+
+
+        enum FILE_FORMATS 
+        {
+            PNG = BIT(0),
+            JPEG = BIT(1),
+            JPG = BIT(2)
+
+        };
+
     private:
         void RenderModelAABB();
-        std::vector<Shared<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+        Shared<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
         void RecalculateModelMatrix();
         void LoadModel(const std::string& path);

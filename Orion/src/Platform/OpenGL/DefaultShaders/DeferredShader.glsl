@@ -104,8 +104,8 @@ uniform vec3 u_CameraPos;
 layout(std140) uniform u_LightSources
 {
   PointLight u_PointLights;
-  DirectionalLight u_DirLight; 
   SpotLight   u_SpotLights;
+  DirectionalLight u_DirLight; 
 };
 
 
@@ -216,7 +216,7 @@ float ShadowCalculationPoint(vec3 fragPos)
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
-    float bias = 0.05;
+    float bias = 0.1;
     float samples = 2.0;
     float offset = 0.01;
     for (float x = -offset; x < offset; x += offset / (samples * 0.5))

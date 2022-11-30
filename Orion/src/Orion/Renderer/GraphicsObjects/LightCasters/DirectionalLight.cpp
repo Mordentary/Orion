@@ -59,7 +59,7 @@ namespace Orion
 		//ORI_ASSERT(alignof(LightSource::DirectionalLightProp) == 16, "Inproper alignment");
 
 
-		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp), sizeof(m_Prop));
+		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp) + sizeof(LightSource::SpotLightProp), sizeof(m_Prop));
 
 	}
 

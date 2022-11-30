@@ -187,6 +187,7 @@ namespace Orion
 		);
 
 		
+
 		s_RenData3D.LigthSourcesUniformBuffer->Bind(2);
 		s_RenData3D.DeferredShader->LinkUniformBuffer(s_RenData3D.LigthSourcesUniformBuffer);
 		s_RenData3D.PhongShader->LinkUniformBuffer(s_RenData3D.LigthSourcesUniformBuffer);
@@ -234,7 +235,7 @@ namespace Orion
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& finalFramebuffer, std::function<void()> renderFunc)
 	{
 		
-		//Renderer2D::BeginScene(camera);
+		Renderer2D::BeginScene(camera);
 
 		s_RenData3D.SceneCamera = camera;
 		s_RenData3D.SceneRenderFunc = renderFunc;
@@ -260,6 +261,8 @@ namespace Orion
 		s_RenData3D.HorizontalPassBlur->Resize(mainSpec.Width, mainSpec.Height);
 		s_RenData3D.VerticalPassBlur->Resize(mainSpec.Width, mainSpec.Height);
 		s_RenData3D.WhiteTexture->Bind(0);
+
+
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
 
@@ -395,8 +398,6 @@ namespace Orion
 
 			s_RenData3D.HorizontalPassBlur->Unbind();
 
-
-
 			s_RenData3D.GaussianBlurShader->Bind();
 
 			s_RenData3D.VerticalPassBlur->Bind();
@@ -460,7 +461,7 @@ namespace Orion
 		if(s_RenData3D.DeferredPipeline)
 		LightingPass();
 
-		//Renderer2D::EndScene();
+		Renderer2D::EndScene();
 
 		
 

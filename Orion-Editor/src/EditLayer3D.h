@@ -32,6 +32,10 @@ namespace Orion {
 			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
+			m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
+			m_ModelShield= Orion::CreateShared<Orion::Model>("assets/models/Armor/Shield/model.dae");
+		
+
 			//m_ModelScene->SetScale(glm::vec3(5.f));
 
 			m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
@@ -63,16 +67,19 @@ namespace Orion {
 
 		
 
-			Orion::Renderer::AddSphereToScene(glm::mat4(1.0f), { nullptr,nullptr,nullptr,0 });
-			Orion::Renderer::AddCubeToScene(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.f)), { nullptr,nullptr,nullptr, 2.f });
+			Orion::Renderer::AddSphereToScene(glm::mat4(1.0f), { nullptr,nullptr,nullptr, 32.f });
+			Orion::Renderer::AddCubeToScene(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.f)), { nullptr,nullptr,nullptr, 32.f  });
 			
 
 
 			Orion::Renderer::AddModelToScene(m_ModelCat);
 			Orion::Renderer::AddModelToScene(m_ModelPlatform);
-			Orion::Renderer::AddModelToScene(m_ModelTree);
+			Orion::Renderer::AddModelToScene(m_ModelTree);   
 			Orion::Renderer::AddModelToScene(m_ModelCar);
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
+
+			Orion::Renderer::AddModelToScene(m_ModelCrate);
+			Orion::Renderer::AddModelToScene(m_ModelShield);
 
 
 			Orion::Renderer::AddLightToScene(m_DirLight);
@@ -401,39 +408,63 @@ namespace Orion {
 				for (auto& mesh : selectedObject->GetMeshes())
 				{
 					
-					if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
+					if (ImGui::CollapsingHeader("Material Properties"))
 					{
-
-						auto& mat = mesh->GetMaterial();
-
-						if (mat.diffuseMap) 
+						if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
 						{
-							ImGui::Text("DiffuseTexture:");
-							ImGui::Image((void*)mat.diffuseMap->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
-							ImGui::Separator();
+								auto& mat = mesh->GetMaterial();
 
+								if (mat.diffuseMap)
+								{
+									ImGui::Text("DiffuseTexture:");
+									ImGui::Image((void*)mat.diffuseMap->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+								if (mat.specularMap)
+								{
+									ImGui::Text("SpecularTexture:");
+									ImGui::Image((void*)mat.specularMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+								if (mat.normalMap)
+								{
+									ImGui::Text("NormalMap:");
+									ImGui::Image((void*)mat.normalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+
+								ImGui::SliderFloat("Shininess factor: ", &mesh->GetMaterial().shininess, 16.0f, 128.f);
 						}
-						if (mat.specularMap) 
-						{
-							ImGui::Text("SpecularTexture:");
-							ImGui::Image((void*)mat.specularMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
-							ImGui::Separator();
-
-						}
-						if (mat.normalMap)
-						{
-							ImGui::Text("NormalMap:");
-							ImGui::Image((void*)mat.normalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
-							ImGui::Separator();
-
-						}
-
-						ImGui::SliderFloat("Shininess factor: ", &mesh->GetMaterial().shininess, 10.0f, 128.f);
 					}
 
 						++index;
+
 				}
 
+					if (ImGui::CollapsingHeader("Transformation"))
+					{
+						glm::vec3 scale = selectedObject->GetScale();
+						ImGui::SliderFloat3("Scale factor:", glm::value_ptr(scale), 0.1f, 50.f);
+
+						selectedObject->SetScale(scale);
+						
+						glm::vec3 pos = selectedObject->GetPosition();
+						ImGui::SliderFloat3("Position:", glm::value_ptr(pos), -10.f, 10.f);
+
+						selectedObject->SetPosition(pos);
+
+						/*
+						glm::vec3 rotation = selectedObject->GetRotation();
+						ImGui::Text("Rotation:");
+						ImGui::SliderFloat3("Scale factor: ", glm::value_ptr(rotation), -180.f, 180.f);
+						*/
+
+
+					}
+					//selectedObject->SetModelMatrix(modelMatrix);
 			}
 
 			ImGui::End();
@@ -509,7 +540,7 @@ namespace Orion {
 		glm::vec2 m_LightSettings{2.0f,0.100f};
 		glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 		Orion::Shared<Orion::Framebuffer>  m_FinalFramebuffer;
-		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene;
+		Orion::Shared<Orion::Model> m_ModelCat, m_ModelPlatform, m_ModelLamp, m_ModelTree, m_ModelCar, m_ModelDragon, m_ModelScene, m_ModelCrate, m_ModelShield, m_ModelArmor;
 		Orion::Shared<Orion::LightSource> m_SpotLight, m_DirLight, m_PointLight, m_PointLight2, m_PointLight3;
 		Orion::Shared<Orion::Texture2D> m_DiffuseMap, m_SpecularMap, m_CubeMap;
 	};

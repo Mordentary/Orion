@@ -59,8 +59,8 @@ struct SpotLight
     float linear;
     float quadratic;
 
-    float innerCutOff;
     float outerCutOff;
+    float innerCutOff;
 
     mat4 VPMatrix;
 };
@@ -78,8 +78,8 @@ out mat3 v_TBN;
 layout(std140) uniform u_LightSources
 {
   PointLight u_Pointlight;
-  DirectionalLight u_Dirlight;
   SpotLight   u_Spotlight;
+  DirectionalLight u_Dirlight;
 };
 
 layout(std140) uniform u_MatricesBuffer
@@ -176,8 +176,8 @@ struct SpotLight
     float linear;
     float quadratic;
 
-    float innerCutOff;
     float outerCutOff;
+    float innerCutOff;
 
     mat4 VPMatrix;
 };
@@ -212,8 +212,8 @@ uniform Material u_Material;
 layout(std140) uniform u_LightSources
 {
   PointLight u_Pointlight;
-  DirectionalLight u_Dirlight;
   SpotLight   u_Spotlight;
+  DirectionalLight u_Dirlight;
 };
 
 

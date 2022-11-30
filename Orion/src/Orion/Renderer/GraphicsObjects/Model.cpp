@@ -32,8 +32,7 @@ namespace Orion
     void Model::RecalculateModelMatrix() 
     {
         m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) * glm::scale(glm::mat4(1.0f), m_Scale);
-        //m_Position = glm::vec3(m_ModelMatrix[3][0], m_ModelMatrix[3][1], m_ModelMatrix[3][2]);
-       // m_LastHitedPoint = glm::vec4(m_LastHitedPoint, 1.0f) * m_ModelMatrix; //TODO: MAYBE USEFUL FOR FUTURE DECALS
+
         RecalculateAABBInModelSpace(); 
     }
 
@@ -71,7 +70,7 @@ namespace Orion
         for (auto& mesh : m_Meshes)
             mesh->Render(shader);
 
-       // RenderModelAABB();
+        //RenderModelAABB(); //Works only in forward pipeline
 
 	}
 
@@ -81,6 +80,7 @@ namespace Orion
 		Assimp::Importer import;
  
 		const aiScene* scene = import.ReadFile(path, 
+
             aiProcess_Triangulate  | 
             aiProcess_SortByPType |
             aiProcess_RemoveRedundantMaterials |
@@ -148,7 +148,7 @@ namespace Orion
 
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
-            
+      
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
             {
@@ -156,6 +156,8 @@ namespace Orion
                 // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
                 m_Meshes.push_back(ProcessMesh(mesh, scene));
+
+                ++m_MeshIndex;
             }
             // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
             for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -279,87 +281,97 @@ namespace Orion
 
      
         // 1. diffuse maps
-        std::vector<Shared<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        Shared<Texture2D> diffuseMap = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "DiffuseMap");
         // 2. specular maps
-        std::vector<Shared<Texture2D>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        Shared<Texture2D> specularMap = LoadMaterialTextures(material, aiTextureType_SPECULAR, "SpecularMap");
         // 3. normal maps
-        std::vector<Shared<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        Shared<Texture2D> normalMap = LoadMaterialTextures(material, aiTextureType_HEIGHT, "NormalMap");
         // 4. shineness maps
-        std::vector<Shared<Texture2D>> shininessMaps = LoadMaterialTextures(material, aiTextureType_SHININESS, "texture_height");
-        textures.insert(textures.end(), shininessMaps.begin(), shininessMaps.end());
+        Shared<Texture2D> shininessMap = LoadMaterialTextures(material, aiTextureType_SHININESS, "HeightMap");
         // 4. base color maps
-        std::vector<Shared<Texture2D>> colorMaps = LoadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_color");
-        textures.insert(textures.end(), colorMaps.begin(), colorMaps.end());
+        Shared<Texture2D> colorMap = LoadMaterialTextures(material, aiTextureType_BASE_COLOR, "ColorMap");
        
 
 
 
-        if (!diffuseMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
-            mat.diffuseMap = diffuseMaps[0];
-        if (!normalMaps.empty()) //TODO: MAKE IT WORK WITH MULTIPLY TEXTURES
-            mat.normalMap = normalMaps[0];
-       if(!specularMaps.empty())
-            mat.specularMap = specularMaps[0];
+        if (diffuseMap) 
+            mat.diffuseMap = diffuseMap;
+        if (normalMap) 
+            mat.normalMap = normalMap;
+       if(specularMap)
+            mat.specularMap = specularMap;
         
-            mat.shininess = 32.f;
+       if (shin)
+           mat.shininess = shin;
+       else
+           mat.shininess = 32.f;
         
 
         // return a mesh object created from the extracted mesh data
             
-            return CreateShared<Mesh>(vertices, indices, mat);
+        return CreateShared<Mesh>(vertices, indices, mat);
             
     }
 
-    std::vector<Shared<Texture2D>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
+    Shared<Texture2D> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
-            std::vector<Shared<Texture2D>> textures;
-            Shared<Texture2D> texture;
-            for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+            if (mat->GetTextureCount(type) != 0) 
             {
                 aiString str;
-                mat->GetTexture(type, i, &str);
-                if (type == aiTextureType_DIFFUSE) 
+                mat->GetTexture(type, 0, &str);
+
+                if (type == aiTextureType_DIFFUSE)
                 {
-                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str(), {true, true});
+                    return Texture2D::Create(this->m_Directory + '/' + str.C_Str(), { true, true });
+                }
+                else
+                {
+                    return Texture2D::Create(this->m_Directory + '/' + str.C_Str());
 
                 }
-                else 
-                {
-                    texture = Texture2D::Create(this->m_Directory + '/' + str.C_Str());
-
-                }
-                textures.push_back(texture);
             }
-            if (!mat->GetTextureCount(type)) 
+
+            // If textures didn't link to the model then manually search for them.
+
+            std::string path = this->m_Directory + '/' + "textures" + '/' + std::to_string(m_MeshIndex) + "_";
+
+            int32_t bitField = 0;
+
+            if (type == aiTextureType_DIFFUSE)
             {
-               std::string path = this->m_Directory + '/' + "textures" + '/';
-               
-               int32_t bitField = 0;
-               bitField |= (std::filesystem::exists(path + "diffuse.jpg") | (int32_t)std::filesystem::exists(path + "diffuse.png") * 2);
+                bitField |= (std::filesystem::exists(path + "albedo.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "albedo.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "albedo.png") * FILE_FORMATS::PNG) ;
 
-                if (type == aiTextureType_DIFFUSE && bitField)
-                {
-                    if(bitField & 1)
-                    texture = Texture2D::Create(path + "diffuse.jpg", { true, true });
+                if (bitField & FILE_FORMATS::JPG)
+                    return Texture2D::Create(path + "albedo.jpg", { true, true });
 
-                    if (bitField & 2)
-                        texture = Texture2D::Create(path + "diffuse.png", { true, true });
-                }
+                if (bitField & FILE_FORMATS::JPEG)
+                    return Texture2D::Create(path + "albedo.jpeg", { true, true });
 
-                if (type == aiTextureType_HEIGHT && std::filesystem::exists(path + "normalMap.png"))
-                {
-                    texture = Texture2D::Create(path + "normalMap.png");
-                }
-
-                textures.push_back(texture);
+                if (bitField & FILE_FORMATS::PNG)
+                    return  Texture2D::Create(path + "albedo.png", { true, true });
 
             }
-             
-            return textures;
+
+            if (type == aiTextureType_HEIGHT && std::filesystem::exists(path + "normal.png"))
+            {
+                return  Texture2D::Create(path + "normal.png");
+            }
+
+
+            if (type == aiTextureType_SPECULAR)
+            {
+                bitField |= (std::filesystem::exists(path + "specular.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "specular.jpeg") * FILE_FORMATS::JPEG);
+
+                if (bitField & FILE_FORMATS::JPG)
+                    return Texture2D::Create(path + "specular.jpg");
+
+                if (bitField & FILE_FORMATS::JPEG)
+                    return Texture2D::Create(path + "specular.jpeg");
+            }
+
+
             
+            return nullptr;
 	}
 
     void Model::BindAllTexture()
