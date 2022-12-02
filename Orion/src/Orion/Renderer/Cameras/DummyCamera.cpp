@@ -78,12 +78,8 @@ namespace Orion
 				}
 			}
 
-			glm::mat4 modelTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(
-				pointIntersection.x,
-				pointIntersection.y,
-				pointIntersection.z)) * glm::scale(glm::mat4(1.0f), model->GetScale());
 
-			model->SetModelMatrix(modelTranslate);
+			model->SetPosition(pointIntersection);
 
 		}
 	}

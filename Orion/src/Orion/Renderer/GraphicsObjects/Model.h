@@ -24,7 +24,7 @@ namespace Orion
 
         inline void SetPosition(const glm::vec3& position) { m_Position = position; RecalculateModelMatrix();}
         inline void SetScale(const glm::vec3& scale) { m_Scale = scale; RecalculateModelMatrix();}
-        inline void SetRotation(const glm::vec3& rotation) { m_Rotation = rotation; RecalculateModelMatrix();}
+        inline void SetRotationAngles(const glm::vec3& rotation) { m_RotationAngles = rotation; RecalculateModelMatrix();}
         inline float GetMaxModelDivider() { return m_MaxDivider; }
 
 
@@ -35,7 +35,7 @@ namespace Orion
 
         inline const glm::vec3& GetPosition() { return m_Position; }
         inline const glm::vec3& GetScale() { return m_Scale; }
-        inline const glm::vec3& GetRotation() { return m_Rotation; }
+        inline const glm::vec3& GetRotationAngles() { return m_RotationAngles; }
 
 
         inline const glm::vec3& GetLastHitedPoint() { return m_LastHitedPoint; }
@@ -43,7 +43,7 @@ namespace Orion
 
         //inline  glm::vec3 GetPosition() { return m_Position; }
         //inline  glm::vec3 GetScale() { return m_Scale; }
-        //inline  glm::vec3 GetRotation() { return m_Rotation; }
+        //inline  glm::vec3 GetRotationAngles() { return m_Rotation; }
 
 
         void SetModelMatrix(const glm::mat4& mat);
@@ -62,8 +62,7 @@ namespace Orion
 
         glm::vec3 m_Position{0.0f};
         glm::vec3 m_Scale{ 1.0f };
-        glm::vec3 m_Rotation{ 1.0f };
-        float m_RotAngle = 0.0f;
+        glm::vec3 m_RotationAngles{ 0.0f };
 
         glm::vec3 m_LastHitedPoint{};
 

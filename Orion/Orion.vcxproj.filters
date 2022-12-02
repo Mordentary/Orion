@@ -1488,6 +1488,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
@@ -1553,9 +1554,6 @@
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp">
       <Filter>src\Orion\Renderer\GraphicsObjects\LightCasters</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp">
-      <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Mesh.cpp">
       <Filter>src\Orion\Renderer\GraphicsObjects</Filter>
     </ClCompile>
@@ -1610,6 +1608,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl">

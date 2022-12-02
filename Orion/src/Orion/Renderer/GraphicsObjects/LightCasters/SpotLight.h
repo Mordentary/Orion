@@ -47,7 +47,8 @@ namespace Orion
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override;
-
+		virtual void IncreaseLightCounter(LightHandler& lightHandler) override;
+		 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 
 		inline float& GetInnerCutOff() { return m_Prop.InnerCutOff; }

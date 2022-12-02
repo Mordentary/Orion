@@ -156,6 +156,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightHandler.h" />
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h" />
     <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h" />
@@ -648,7 +649,7 @@
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.cpp" />
-    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightSource.cpp" />
+    <ClCompile Include="src\Orion\Renderer\GraphicsObjects\LightHandler.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Mesh.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsObjects\Model.cpp" />
     <ClCompile Include="src\Orion\Renderer\GraphicsRendering\AnimationRenderer2D.cpp" />

@@ -31,7 +31,14 @@ namespace Orion
 
     void Model::RecalculateModelMatrix() 
     {
-        m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotAngle), m_Rotation) * glm::scale(glm::mat4(1.0f), m_Scale);
+        m_ModelMatrix = glm::translate(glm::mat4(1.0f), m_Position) 
+            * glm::scale(glm::mat4(1.0f), m_Scale)
+
+            * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotationAngles.z), glm::vec3(0, 0, 1))
+            * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotationAngles.y), glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(1.0f), glm::radians<float>(m_RotationAngles.x), glm::vec3(1, 0, 0));
+
+                
 
         RecalculateAABBInModelSpace(); 
     }

@@ -1,6 +1,6 @@
 #include "oripch.h"
 #include "SpotLight.h"
-
+#include "../LightHandler.h"
 namespace Orion
 {
 	void SpotLight::RenderLightModel(Shared<Shader>& shader)
@@ -40,6 +40,13 @@ namespace Orion
 
 		
 	}
+
+	void SpotLight::IncreaseLightCounter(LightHandler& lightHandler) 
+	{
+		++lightHandler.GetSpotLightsCount();
+	}
+
+
 	void SpotLight::SetLighAttenuation(float linear, float quadratic)
 	{
 		m_Prop.LinearAttenuation = linear;

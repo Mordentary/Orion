@@ -25,7 +25,7 @@ namespace Orion {
 
 		virtual const Cameras Get() { return Cameras::Orthographic; }
 		void SetProjection(float left, float right, float bottom, float top);
-		void inline SetRotation(float rotation) { m_CameraRotation = rotation; RecalculateView(); }
+		void inline SetRotationAngles(float rotation) { m_CameraRotation = rotation; RecalculateView(); }
 	
 		virtual void RecalculateView() override;
 		virtual void RecalculateViewProjection() override;

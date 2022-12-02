@@ -6,6 +6,7 @@
 
 #include"Platform/OpenGL/OpenGLShader.h"
 #include"../GraphicsObjects/LightSource.h"
+#include"../GraphicsObjects/LightHandler.h"
 #include"../GraphicsObjects/Mesh.h"
 #include"../GraphicsObjects/Model.h"
 #include "Orion/Core/KeyCodes.h"
@@ -20,7 +21,6 @@ namespace Orion
 		Shared<Texture2D> WhiteTexture = nullptr;
 
 		Shared<Shader> PhongShader = nullptr;
-		Shared<Shader> LightShader = nullptr;
 		Shared<Shader> CubemapShader = nullptr;
 		Shared<Shader> GaussianBlurShader = nullptr;
 		Shared<Shader> PostProcessingShader = nullptr;
@@ -44,7 +44,8 @@ namespace Orion
 		
 		Material DefaultMaterial;
 
-		std::vector<Shared<LightSource>> LightSources;
+
+		LightHandler LightManager;
 
 		std::vector<Shared<Texture2D>> SceneCubemaps;
 		std::vector<Shared<Model>> Models;
@@ -100,7 +101,6 @@ namespace Orion
 		//Shader preparing
 
 		s_RenData3D.PhongShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PhongShader.glsl");
-		s_RenData3D.LightShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl");
 		s_RenData3D.CubemapShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapShader.glsl");
 		s_RenData3D.DepthCubemapShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/CubemapDepthShader.glsl");
 		s_RenData3D.DepthTextureShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/TextureDepthShader.glsl");
@@ -108,6 +108,7 @@ namespace Orion
 		s_RenData3D.GaussianBlurShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GaussianBlurShader.glsl");
 		s_RenData3D.PostProcessingShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PostProcessingShader.glsl");
 
+		s_RenData3D.LightManager.SetLightShader(ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl"));
 
 
 		s_RenData3D.GBufferShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GBufferShader.glsl");
@@ -126,9 +127,9 @@ namespace Orion
 		s_RenData3D.MatricesUniformBuffer->Bind(0);
 
 		s_RenData3D.PhongShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
-		s_RenData3D.LightShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 		s_RenData3D.SelectModelShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 		s_RenData3D.GBufferShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
+		s_RenData3D.LightManager.GetLightShader()->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 
 		Orion::FramebufferSpecification specFB;
 		specFB.Width =  Orion::Application::Get().GetWindow().GetWidth();
@@ -224,14 +225,6 @@ namespace Orion
 
 	}
 
-	void Renderer::PrepareLights()
-	{
-		for (auto& light : s_RenData3D.LightSources)
-		{
-			light->SetupLight(s_RenData3D.CurrentShader, s_RenData3D.LightSources, s_RenData3D.SceneRenderFunc);
-		}
-	}
-
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& finalFramebuffer, std::function<void()> renderFunc)
 	{
 		
@@ -251,10 +244,10 @@ namespace Orion
 		//Orion::RenderCommand::SetClearColor(glm::vec4(0.850f, 0.796f, 0.937f, 1.0f));
 
 		s_RenData3D.Stats.m_ShadowMappingPass.Start();
-		PrepareLights();
+		s_RenData3D.LightManager.PrepareLights(s_RenData3D.CurrentShader, renderFunc);
 		s_RenData3D.Stats.m_ShadowMappingPass.End();
 
-		LoadLightsToUBO(s_RenData3D.LigthSourcesUniformBuffer);
+		s_RenData3D.LightManager.LoadLightsToUBO(s_RenData3D.LigthSourcesUniformBuffer);
 
 		ClosestObjectToRayHit();
 
@@ -286,7 +279,7 @@ namespace Orion
 			Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 
 			s_RenData3D.CurrentShader = s_RenData3D.PhongShader;
-			LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
+			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
 		}
 	}
 
@@ -463,8 +456,11 @@ namespace Orion
 
 		Renderer2D::EndScene();
 
-		
+	}
 
+	void Renderer::UpdateLightSettings(float linear, float quadratic)
+	{
+		s_RenData3D.LightManager.UpdateLightSettings(linear, quadratic);
 	}
 
 	void Renderer::GeometryPass()
@@ -472,7 +468,6 @@ namespace Orion
 		s_RenData3D.GBuffer->Bind();
 		RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 		s_RenData3D.CurrentShader = s_RenData3D.GBufferShader;
-
 	}
 
 	void Renderer::LightingPass() 
@@ -496,7 +491,8 @@ namespace Orion
 		s_RenData3D.DeferredShader->SetInt("u_gPosition", s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->GetCurrentSlot());
 		s_RenData3D.DeferredShader->SetInt("u_gNormal", s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->GetCurrentSlot());
 		s_RenData3D.DeferredShader->SetInt("u_gAlbedoSpec", s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->GetCurrentSlot());
-		LoadLightsToShader(s_RenData3D.DeferredShader);
+
+		s_RenData3D.LightManager.LoadLightsToShader(s_RenData3D.DeferredShader);
 
 		Renderer2D::DrawBillboard(s_RenData3D.DeferredShader, s_RenData3D.SceneCamera, glm::vec2(0, 0), glm::vec2(prop.Width, prop.Height));
 
@@ -511,7 +507,7 @@ namespace Orion
 
 		s_RenData3D.DeferredShadingBuffer->Bind();
 
-		RenderLights();
+		s_RenData3D.LightManager.RenderLights();
 
 		s_RenData3D.DeferredShadingBuffer->Unbind();
 
@@ -524,7 +520,7 @@ namespace Orion
 		{
 			light->SetLightModel(s_RenData3D.Sphere);
 		}
-		s_RenData3D.LightSources.push_back(light);
+		s_RenData3D.LightManager.AddLightSource(light);
 		
 	}
 
@@ -555,68 +551,7 @@ namespace Orion
 		s_RenData3D.Models.push_back(CreateShared<Model>(model));
 	}
 
-	void Renderer::LoadLightsToShaderAndRender(const Shared<Shader>& shader)
-	{
-		if (!s_RenData3D.LightSources.empty())
-		{
-			for (auto& lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->LoadLightToShader(shader);
-			}
-
-			for (auto& lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->RenderLightModel(s_RenData3D.LightShader);
-			}
-		}
-
-	}
-	void Renderer::LoadLightsToShader(const Shared<Shader>& shader)
-	{
-		if (!s_RenData3D.LightSources.empty())
-		{
-			for (auto& lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->LoadLightToShader(shader);
-			}
-		}
-
-	}
-	void Renderer::LoadLightsToUBO(const Shared<UniformBuffer>& ubo)
-	{
-		if (!s_RenData3D.LightSources.empty())
-		{
-			for (auto& lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->LoadLightToUBO(ubo);
-			}
-		}
-	}
-
-
-	void Renderer::RenderLights() 
-	{
-		if (!s_RenData3D.LightSources.empty())
-		{
-			for (auto& lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->RenderLightModel(s_RenData3D.LightShader);
-			}
-		}
-
-	}
-
-
-	void Renderer::UpdateLightSettings(float linearAttenuation, float quadraticAttenuation) 
-	{
-		if (!s_RenData3D.LightSources.empty())
-		{
-			for (auto&lightSrc : s_RenData3D.LightSources)
-			{
-				lightSrc->SetLighAttenuation(linearAttenuation, quadraticAttenuation);
-			}
-		}
-	}
+	
 
 	void Renderer::DrawCubemap()
 	{

@@ -1,5 +1,7 @@
 #include "oripch.h"
 #include "PointLight.h"
+#include"../LightHandler.h"
+
 namespace Orion
 {
 	void PointLight::RenderLightModel(Shared<Shader>& shader)
@@ -67,6 +69,11 @@ namespace Orion
 
 		ubo->SetData(&m_Prop, 0, sizeof(m_Prop));
 
+	}
+
+	void PointLight::IncreaseLightCounter(LightHandler& lightHandler)
+	{
+		++lightHandler.GetPointLightsCount();
 	}
 
 	void PointLight::SetLighAttenuation(float linear, float quadratic)

@@ -1,6 +1,6 @@
 #include "oripch.h"
 #include "DirectionalLight.h"
-
+#include"../LightHandler.h"
 
 
 
@@ -49,6 +49,11 @@ namespace Orion
 		m_ShadowMap->GetDepthAttachmentTexture()->Bind(13);
 		shader->SetInt("u_ShadowMapDir", m_ShadowMap->GetDepthAttachmentTexture()->GetCurrentSlot());
 
+	}
+
+	void DirectionalLight::IncreaseLightCounter(LightHandler& lightHandler)
+	{
+		++lightHandler.GetDirLightsCount();
 	}
 
 	void DirectionalLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)

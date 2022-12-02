@@ -446,21 +446,33 @@ namespace Orion {
 
 					if (ImGui::CollapsingHeader("Transformation"))
 					{
-						glm::vec3 scale = selectedObject->GetScale();
-						ImGui::SliderFloat3("Scale factor:", glm::value_ptr(scale), 0.1f, 50.f);
 
-						selectedObject->SetScale(scale);
-						
+						static bool checkBoxScale = false;
+						ImGui::Checkbox("Scale per axis", &checkBoxScale);
+						if (checkBoxScale)
+						{
+							glm::vec3 scale = selectedObject->GetScale();
+							ImGui::SliderFloat3("Scale factor", glm::value_ptr(scale), 0.1f, 30.f);
+							selectedObject->SetScale(scale);
+
+						}
+						else
+						{
+							float scale = selectedObject->GetScale()[0];
+							ImGui::SliderFloat("Scale factor", &scale, 0.1f, 30.f);
+							selectedObject->SetScale(glm::vec3(scale));
+						}
+
+
 						glm::vec3 pos = selectedObject->GetPosition();
-						ImGui::SliderFloat3("Position:", glm::value_ptr(pos), -10.f, 10.f);
-
+						ImGui::SliderFloat3("Position", glm::value_ptr(pos), -10.f, 10.f);
 						selectedObject->SetPosition(pos);
 
-						/*
-						glm::vec3 rotation = selectedObject->GetRotation();
-						ImGui::Text("Rotation:");
-						ImGui::SliderFloat3("Scale factor: ", glm::value_ptr(rotation), -180.f, 180.f);
-						*/
+						
+						glm::vec3 rotation = selectedObject->GetRotationAngles();
+						ImGui::SliderFloat3("Rotation ", glm::value_ptr(rotation), -180.f, 180.f);
+						selectedObject->SetRotationAngles(rotation);
+
 
 
 					}

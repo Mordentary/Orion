@@ -2,11 +2,12 @@
 #include"Model.h"
 #include"../GraphicsCore/Shader.h"
 #include"../GraphicsCore/Framebuffer.h"
+
+
 namespace Orion
 {
 
-
-
+	class LightHandler;
 
 	class LightSource 
 	{
@@ -64,6 +65,7 @@ namespace Orion
 
 			glm::mat4 ViewProj{1.0f};
 		};
+
 	public:
 
 		LightSource() = default;
@@ -82,7 +84,8 @@ namespace Orion
 
 		virtual GeneralLightProp& GetGeneralLightProp() = 0;
 		virtual void SetLighAttenuation(float linear, float quadratic) = 0;
-
+		 
+		virtual void IncreaseLightCounter(LightHandler& lightHanlder) = 0;
 
 
 		const Shared<Model> GetLightModel() const {return m_LightModel;}
@@ -93,6 +96,7 @@ namespace Orion
 
 
 	protected:
+
 		Shared<Framebuffer> m_ShadowMap = nullptr;
 		Shared<Model> m_LightModel = nullptr;
 		glm::mat4 m_ProjMatrix{ 1.0f };

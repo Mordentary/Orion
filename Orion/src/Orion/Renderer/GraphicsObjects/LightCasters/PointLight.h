@@ -45,6 +45,7 @@ namespace Orion
 		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override;
+		virtual void IncreaseLightCounter(LightHandler& lightHanlder) override;
 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 

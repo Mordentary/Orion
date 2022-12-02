@@ -74,17 +74,11 @@ class Model;
 		static RendererData3D s_RenData3D;
 		static void GeometryPass();
 		static void LightingPass();
-
-		static void ClosestObjectToRayHit();
-		static void PrepareLights();
-		static void LoadLightsToUBO(const Shared<UniformBuffer>& ubo);
-
-		static void LoadLightsToShaderAndRender(const Shared<Shader>& shader);
-		static void LoadLightsToShader(const Shared<Shader>& shader);
-
-		static void RenderLights();
 		static void RenderSelectedModelOutline();
 		static void DrawCubemap();
+
+		static void ClosestObjectToRayHit();
+		
 
 
 
