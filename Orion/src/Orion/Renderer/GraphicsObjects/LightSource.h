@@ -85,7 +85,7 @@ namespace Orion
 		virtual GeneralLightProp& GetGeneralLightProp() = 0;
 		virtual void SetLighAttenuation(float linear, float quadratic) = 0;
 		 
-		virtual void IncreaseLightCounter(LightHandler& lightHanlder) = 0;
+		virtual void IncreaseLightCounter() = 0;
 
 
 		const Shared<Model> GetLightModel() const {return m_LightModel;}

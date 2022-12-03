@@ -76,12 +76,12 @@ struct SpotLight
 };
 
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragLightSpace);
-vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec4 fragLightSpace);
+vec4 CalcSpotLight (SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragLightSpace);
+vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir ,  vec4 fragLightSpace);
 
 float ShadowCalculationDir(vec4 shadowFrag,  vec3 normal);
-float ShadowCalculationSpot(vec4 shadowFrag, vec3 normal);
-float ShadowCalculationPoint(vec3 shadowFrag);
+float ShadowCalculationPoint(PointLight light, vec3 shadowFrag);
+float ShadowCalculationSpot (SpotLight light, vec4 shadowFrag, vec3 normal);
 
 
 in vec2 v_TextCoord;
@@ -100,12 +100,19 @@ uniform sampler2D u_gAlbedoSpec;
 uniform vec3 u_CameraPos;
 
 
+#define MAX_LIGHTS 25
 
 layout(std140) uniform u_LightSources
 {
-  PointLight u_PointLights;
-  SpotLight   u_SpotLights;
+
+  PointLight u_PointLights[MAX_LIGHTS];
+  SpotLight  u_SpotLights[MAX_LIGHTS];
   DirectionalLight u_DirLight; 
+
+  int PointLightCount;
+  int SpotLightCount;
+  int DirLightCount;
+
 };
 
 
@@ -119,16 +126,19 @@ void main()
     vec4 result = vec4(0.0f);
 
 
+    for (int i = 0; i < PointLightCount; i++)
+    {
+        float distance = length(u_PointLights[i].position - FragPos);
+        if (distance < u_PointLights[i].radius)
+        result += CalcPointLight(u_PointLights[i], Normal, FragPos, viewDir);
+    }
+    for (int i = 0; i < SpotLightCount; i++)
+    {
+        vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(FragPos, 1.0f);
+        result += CalcSpotLight(u_SpotLights[i], Normal, FragPos, viewDir, FragPosSpotLight);
+    }
 
-    float distance = length(u_PointLights.position - FragPos);
     vec4 FragPosDirLight = u_DirLight.VPMatrix * vec4(FragPos, 1.0f);
-    vec4 FragPosSpotLight = u_SpotLights.VPMatrix * vec4(FragPos, 1.0f);
-
-     //   result += vec4(0.4f);
-    if (distance < u_PointLights.radius)
-    result += CalcPointLight(u_PointLights, Normal, FragPos, viewDir);
-
-    result += CalcSpotLight(u_SpotLights, Normal, FragPos, viewDir, FragPosSpotLight);
     result += CalcDirectionalLight(u_DirLight, Normal, viewDir, FragPosDirLight);
     
 
@@ -174,7 +184,7 @@ float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
     return shadow;
 }
 
-float ShadowCalculationSpot(vec4 fragPosLightSpace, vec3 normal)
+float ShadowCalculationSpot(SpotLight light, vec4 fragPosLightSpace, vec3 normal)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -185,7 +195,7 @@ float ShadowCalculationSpot(vec4 fragPosLightSpace, vec3 normal)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    float bias = max(0.01 * (1.0 - dot(normal, u_SpotLights.direction)), 0.01f);
+    float bias = max(0.01 * (1.0 - dot(normal, light.direction)), 0.01f);
 
     int filterSize = 5;
     int  halfFilterSize = filterSize / 2;
@@ -208,9 +218,9 @@ float ShadowCalculationSpot(vec4 fragPosLightSpace, vec3 normal)
     return shadow;
 }
 
-float ShadowCalculationPoint(vec3 fragPos)
+float ShadowCalculationPoint(PointLight light, vec3 fragPos)
 {
-    vec3 fragToLight = fragPos - u_PointLights.position;
+    vec3 fragToLight = fragPos - light.position;
 
 
     float currentDepth = length(fragToLight);
@@ -219,6 +229,7 @@ float ShadowCalculationPoint(vec3 fragPos)
     float bias = 0.1;
     float samples = 2.0;
     float offset = 0.01;
+
     for (float x = -offset; x < offset; x += offset / (samples * 0.5))
     {
         for (float y = -offset; y < offset; y += offset / (samples * 0.5))
@@ -226,7 +237,7 @@ float ShadowCalculationPoint(vec3 fragPos)
             for (float z = -offset; z < offset; z += offset / (samples * 0.5))
             {
                 float closestDepth = texture(u_ShadowCubemap, fragToLight + vec3(x, y, z)).r;
-                closestDepth *= u_PointLights.farPlane;   // undo mapping [0;1]
+                closestDepth *= light.farPlane;   // undo mapping [0;1]
                 if (currentDepth - bias > closestDepth)
                     shadow += 1.0;
             }
@@ -267,11 +278,9 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     diffuse *= attenuation;
     specular *= attenuation;
 
-    float shadow = ShadowCalculationPoint(fragPos);
+    float shadow = ShadowCalculationPoint(light, fragPos);
 
-    vec3 finalColor = vec3(diffuse + specular) * (1.f - shadow) + ambient;
-
-
+    vec3 finalColor = vec3(diffuse + specular) * (1.f - 0.0f) + ambient;
 
     return vec4(finalColor, 1.0f);
 
@@ -302,9 +311,9 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    float shadow = ShadowCalculationSpot(fragPosLightSpace, normal);
+    float shadow = ShadowCalculationSpot(light, fragPosLightSpace, normal);
 
-    return vec4((diffuse + specular) * (1.0f - shadow) + ambient, 1.0f);
+    return vec4((diffuse + specular) * (1.0f - 0.0f) + ambient, 1.0f);
 
 
 }

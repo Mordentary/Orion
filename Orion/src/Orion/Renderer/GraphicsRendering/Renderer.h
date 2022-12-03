@@ -78,7 +78,8 @@ class Model;
 		static void DrawCubemap();
 
 		static void ClosestObjectToRayHit();
-		
+		static void ClosestLightToRayHit();
+
 
 
 

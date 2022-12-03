@@ -45,16 +45,18 @@ namespace Orion
 		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override;
-		virtual void IncreaseLightCounter(LightHandler& lightHanlder) override;
+		virtual void IncreaseLightCounter() override;
 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 
 
 	private:
 
+		uint32_t m_LightIndex;
 		Orion::LightSource::PointLightProp m_Prop;
-
+		
 		void CalculateBoundingVolume();
+
 
 	};
 }

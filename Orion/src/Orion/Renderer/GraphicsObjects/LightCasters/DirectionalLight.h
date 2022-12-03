@@ -38,7 +38,7 @@ namespace Orion
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override {};
 
-		virtual void IncreaseLightCounter(LightHandler& lightHanlder) override;
+		virtual void IncreaseLightCounter() override;
 
 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };

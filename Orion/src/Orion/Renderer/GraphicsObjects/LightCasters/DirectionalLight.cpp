@@ -51,9 +51,9 @@ namespace Orion
 
 	}
 
-	void DirectionalLight::IncreaseLightCounter(LightHandler& lightHandler)
+	void DirectionalLight::IncreaseLightCounter()
 	{
-		++lightHandler.GetDirLightsCount();
+		++Orion::LightHandler::m_LightCounters.DirLightCount;
 	}
 
 	void DirectionalLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)
@@ -64,7 +64,7 @@ namespace Orion
 		//ORI_ASSERT(alignof(LightSource::DirectionalLightProp) == 16, "Inproper alignment");
 
 
-		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp) + sizeof(LightSource::SpotLightProp), sizeof(m_Prop));
+		ubo->SetData(&m_Prop,  (sizeof(LightSource::PointLightProp) + sizeof(LightSource::SpotLightProp)) * Orion::LightHandler::MAX_LIGHTS, sizeof(m_Prop));
 
 	}
 

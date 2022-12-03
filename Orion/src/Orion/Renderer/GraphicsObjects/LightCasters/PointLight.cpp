@@ -67,13 +67,14 @@ namespace Orion
 
 		//ORI_ASSERT(alignof(LightSource::PointLightProp) == 16, "Inproper alignment");
 
-		ubo->SetData(&m_Prop, 0, sizeof(m_Prop));
+		ubo->SetData(&m_Prop, sizeof(LightSource::PointLightProp) * m_LightIndex, sizeof(m_Prop));
 
 	}
 
-	void PointLight::IncreaseLightCounter(LightHandler& lightHandler)
+	void PointLight::IncreaseLightCounter()
 	{
-		++lightHandler.GetPointLightsCount();
+		m_LightIndex = Orion::LightHandler::m_LightCounters.PointLightCount;
+		++Orion::LightHandler::m_LightCounters.PointLightCount;
 	}
 
 	void PointLight::SetLighAttenuation(float linear, float quadratic)

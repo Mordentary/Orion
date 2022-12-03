@@ -41,9 +41,11 @@ namespace Orion
 		
 	}
 
-	void SpotLight::IncreaseLightCounter(LightHandler& lightHandler) 
+	void SpotLight::IncreaseLightCounter() 
 	{
-		++lightHandler.GetSpotLightsCount();
+		m_LightIndex = Orion::LightHandler::m_LightCounters.SpotLightCount;
+
+		++Orion::LightHandler::m_LightCounters.SpotLightCount;
 	}
 
 
@@ -67,7 +69,11 @@ namespace Orion
 
 		//ORI_ASSERT(alignof(LightSource::SpotLightProp) == 16, "Inproper alignment");
 
-		ubo->SetData(&m_Prop,  sizeof(LightSource::PointLightProp), sizeof(m_Prop));
+	
+		ubo->SetData(&m_Prop, sizeof(LightSource::PointLightProp) * Orion::LightHandler::MAX_LIGHTS + sizeof(LightSource::SpotLightProp) * m_LightIndex, sizeof(m_Prop));
+		
+
+		
 		
 
 	}

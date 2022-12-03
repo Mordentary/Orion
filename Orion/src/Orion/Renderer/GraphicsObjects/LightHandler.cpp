@@ -4,10 +4,10 @@
 
 namespace Orion
 {
-
+	LightHandler::LightCounters LightHandler::m_LightCounters;
 	void LightHandler::AddLightSource(const Shared<LightSource>& light) 
 	{
-		light->IncreaseLightCounter(*this);
+		light->IncreaseLightCounter();
 		m_LightSources.push_back(light);
 	}
 
@@ -60,6 +60,9 @@ namespace Orion
 				lightSrc->LoadLightToUBO(ubo);
 			}
 		}
+
+		ubo->SetData(&m_LightCounters, (sizeof(Orion::LightSource::SpotLightProp) + sizeof(Orion::LightSource::PointLightProp)) * MAX_LIGHTS + sizeof(Orion::LightSource::DirectionalLightProp), sizeof(LightCounters));
+
 	}
 
 

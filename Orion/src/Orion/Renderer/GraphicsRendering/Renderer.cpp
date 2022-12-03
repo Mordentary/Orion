@@ -77,10 +77,6 @@ namespace Orion
 		bool DeferredPipeline = true;
 
 
-		//////////////////////////////////////////////////////////////////////// Const values
-		const uint32_t MAX_LIGHTS_FOR_EVERY_TYPE = 25;
-
-
 	};
 
 	RendererData3D Renderer::s_RenData3D;
@@ -178,7 +174,7 @@ namespace Orion
 		s_RenData3D.PostProcessUniformBuffer->Bind(1);
 		s_RenData3D.PostProcessingShader->LinkUniformBuffer(s_RenData3D.PostProcessUniformBuffer);
 
-		uint32_t  sizeOfUBO = (sizeof(Orion::LightSource::PointLightProp) + sizeof(Orion::LightSource::SpotLightProp)) + sizeof(Orion::LightSource::DirectionalLightProp);
+		uint32_t  sizeOfUBO = (sizeof(Orion::LightSource::PointLightProp) + sizeof(Orion::LightSource::SpotLightProp)) * s_RenData3D.LightManager.GetMaxLightsPerType() + sizeof(Orion::LightSource::DirectionalLightProp) + (sizeof(int32_t) * 3);
 		s_RenData3D.LigthSourcesUniformBuffer = UniformBuffer::Create
 		(
 			sizeOfUBO
@@ -225,6 +221,27 @@ namespace Orion
 
 	}
 
+	void Renderer::ClosestLightToRayHit()
+	{
+
+		for (auto& light : s_RenData3D.LightManager.GetLights())
+		{
+			if (light->GetLightModel()->IsIntersect(s_RenData3D.SceneCamera->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY())) && Orion::Input::IsKeyPressed(ORI_KEY_F))
+			{
+				if (!s_RenData3D.SelectedModel || !s_RenData3D.SelectedModel->IsIntersect(s_RenData3D.SceneCamera->Raycast(Input::GetLocalWindowMouseX(), Input::GetLocalWindowMouseY())))
+					s_RenData3D.SelectedModel = light->GetLightModel();
+
+				if (glm::distance(s_RenData3D.SceneCamera->GetPosition(), light->GetLightModel()->GetLastHitedPoint()) <
+					glm::distance(s_RenData3D.SceneCamera->GetPosition(), s_RenData3D.SelectedModel->GetLastHitedPoint()))
+					s_RenData3D.SelectedModel = light->GetLightModel();
+			}
+
+		}
+
+
+	}
+
+
 	void Renderer::BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& finalFramebuffer, std::function<void()> renderFunc)
 	{
 		
@@ -247,9 +264,12 @@ namespace Orion
 		s_RenData3D.LightManager.PrepareLights(s_RenData3D.CurrentShader, renderFunc);
 		s_RenData3D.Stats.m_ShadowMappingPass.End();
 
+		
 		s_RenData3D.LightManager.LoadLightsToUBO(s_RenData3D.LigthSourcesUniformBuffer);
 
 		ClosestObjectToRayHit();
+		//ClosestLightToRayHit();
+
 
 		s_RenData3D.HorizontalPassBlur->Resize(mainSpec.Width, mainSpec.Height);
 		s_RenData3D.VerticalPassBlur->Resize(mainSpec.Width, mainSpec.Height);

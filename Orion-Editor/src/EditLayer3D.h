@@ -84,7 +84,9 @@ namespace Orion {
 
 			Orion::Renderer::AddLightToScene(m_DirLight);
 			Orion::Renderer::AddLightToScene(m_SpotLight);
-			Orion::Renderer::AddLightToScene(m_PointLight);
+
+			//Orion::Renderer::AddLightToScene(Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024));
+			//Orion::Renderer::AddLightToScene(m_PointLight);
 			
 			
 			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapSea"));
