@@ -20,7 +20,6 @@ namespace Orion
         void Render(Shared<Shader>& shader);
         bool IsIntersect(const CameraRay& ray);
 
-        void BindAllTexture(); //TODO: REMOVE THIS 
 
         inline void SetPosition(const glm::vec3& position) { m_Position = position; RecalculateModelMatrix();}
         inline void SetScale(const glm::vec3& scale) { m_Scale = scale; RecalculateModelMatrix();}

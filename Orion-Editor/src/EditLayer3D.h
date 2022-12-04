@@ -29,14 +29,14 @@ namespace Orion {
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae");
-			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
+		//	m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
 			m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
 			m_ModelShield= Orion::CreateShared<Orion::Model>("assets/models/Armor/Shield/model.dae");
 		
 
-			//m_ModelScene->SetScale(glm::vec3(5.f));
+			//m_ModelScene->SetScale(glm::vec3(50.f));
 
 			m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
@@ -79,15 +79,45 @@ namespace Orion {
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
 
 			Orion::Renderer::AddModelToScene(m_ModelCrate);
-			Orion::Renderer::AddModelToScene(m_ModelShield);
+		//	Orion::Renderer::AddModelToScene(m_ModelScene);
 
 
 			Orion::Renderer::AddLightToScene(m_DirLight);
 			Orion::Renderer::AddLightToScene(m_SpotLight);
 
-			//Orion::Renderer::AddLightToScene(Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024));
-			//Orion::Renderer::AddLightToScene(m_PointLight);
-			
+			Orion::Renderer::AddLightToScene(m_PointLight);
+			Shared<LightSource> light;
+			for (int32_t i = 0; i < 11; i++)
+			{
+				for (int32_t j = 0; j < 9; j++)
+				{
+					light = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024, glm::vec3(-i, rand() % 5, -j));
+					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+					light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF,  0.45f * randF);
+					light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
+
+					Orion::Renderer::AddLightToScene(light);
+				}
+			}
+
+			for (int32_t i = 0; i < 11; i++)
+			{
+				for (int32_t j = 1; j < 9; j++)
+				{
+					 light = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp, 1024, 1024, glm::vec3(i, rand() % 5, j));
+					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+					light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF);
+					light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
+					light->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+
+					Orion::Renderer::AddLightToScene(light);
+				}
+			}
+
 			
 			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapSea"));
 			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapJapan"));
@@ -400,18 +430,51 @@ namespace Orion {
 			ImVec2& winSize = ImGui::GetContentRegionAvail();
 			float AR = winSize.x / winSize.y;
 
+
+
+
 			auto& selectedObject = Orion::Renderer::GetSelectedModel();
-			
+
 			if (selectedObject) 
 			{
 				ImGui::Text("ModelName: %s", selectedObject->GetModelName().c_str());
-				uint32_t index = 0;
-			
-				for (auto& mesh : selectedObject->GetMeshes())
+				if (ImGui::CollapsingHeader("Transformation"))
 				{
-					
-					if (ImGui::CollapsingHeader("Material Properties"))
+
+					static bool checkBoxScale = false;
+					ImGui::Checkbox("Scale per axis", &checkBoxScale);
+					if (checkBoxScale)
 					{
+						glm::vec3 scale = selectedObject->GetScale();
+						ImGui::SliderFloat3("Scale factor", glm::value_ptr(scale), 0.1f, 30.f);
+						selectedObject->SetScale(scale);
+
+					}
+					else
+					{
+						float scale = selectedObject->GetScale()[0];
+						ImGui::SliderFloat("Scale factor", &scale, 0.1f, 30.f);
+						selectedObject->SetScale(glm::vec3(scale));
+					}
+
+
+					glm::vec3 pos = selectedObject->GetPosition();
+					ImGui::SliderFloat3("Position", glm::value_ptr(pos), -10.f, 10.f);
+					selectedObject->SetPosition(pos);
+
+
+					glm::vec3 rotation = selectedObject->GetRotationAngles();
+					ImGui::SliderFloat3("Rotation ", glm::value_ptr(rotation), -180.f, 180.f);
+					selectedObject->SetRotationAngles(rotation);
+
+				}
+				uint32_t index = 0;
+				if (ImGui::CollapsingHeader("Material Properties"))
+				{
+					for (auto& mesh : selectedObject->GetMeshes())
+					{
+					
+					
 						if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
 						{
 								auto& mat = mesh->GetMaterial();
@@ -440,45 +503,10 @@ namespace Orion {
 
 								ImGui::SliderFloat("Shininess factor: ", &mesh->GetMaterial().shininess, 16.0f, 128.f);
 						}
-					}
-
 						++index;
-
+					}
 				}
 
-					if (ImGui::CollapsingHeader("Transformation"))
-					{
-
-						static bool checkBoxScale = false;
-						ImGui::Checkbox("Scale per axis", &checkBoxScale);
-						if (checkBoxScale)
-						{
-							glm::vec3 scale = selectedObject->GetScale();
-							ImGui::SliderFloat3("Scale factor", glm::value_ptr(scale), 0.1f, 30.f);
-							selectedObject->SetScale(scale);
-
-						}
-						else
-						{
-							float scale = selectedObject->GetScale()[0];
-							ImGui::SliderFloat("Scale factor", &scale, 0.1f, 30.f);
-							selectedObject->SetScale(glm::vec3(scale));
-						}
-
-
-						glm::vec3 pos = selectedObject->GetPosition();
-						ImGui::SliderFloat3("Position", glm::value_ptr(pos), -10.f, 10.f);
-						selectedObject->SetPosition(pos);
-
-						
-						glm::vec3 rotation = selectedObject->GetRotationAngles();
-						ImGui::SliderFloat3("Rotation ", glm::value_ptr(rotation), -180.f, 180.f);
-						selectedObject->SetRotationAngles(rotation);
-
-
-
-					}
-					//selectedObject->SetModelMatrix(modelMatrix);
 			}
 
 			ImGui::End();

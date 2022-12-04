@@ -93,14 +93,10 @@ namespace Orion
             aiProcess_RemoveRedundantMaterials |
             aiProcess_PreTransformVertices |
             aiProcess_OptimizeMeshes |
-            
             aiProcess_OptimizeGraph |
+            aiProcess_JoinIdenticalVertices |
             aiProcess_GenBoundingBoxes | 
-            aiProcess_GenSmoothNormals | 
-            aiProcess_FixInfacingNormals |
-            aiProcess_FindInvalidData |
-            aiProcess_ValidateDataStructure | 
-           
+            aiProcess_ImproveCacheLocality |
            // aiProcess_FlipUVs | 
             aiProcess_GenUVCoords |
             aiProcess_CalcTangentSpace);
@@ -120,7 +116,7 @@ namespace Orion
         float scale = 1.0f / m_MaxDivider;
         m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * scale;
         m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * scale;
-
+        m_Meshes.reserve(scene->mNumMeshes);
 		ProcessNode(scene->mRootNode, scene);
 
 	}
@@ -155,7 +151,7 @@ namespace Orion
 
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
-      
+            
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
             {
@@ -183,11 +179,7 @@ namespace Orion
 
         std::vector<uint32_t> indices;
          indices.reserve(mesh->mNumFaces * 3);
-
-         
-        std::vector<Shared<Texture2D>> textures;
-        // walk through each of the mesh's vertices
-        
+                 
        
         float scale = 1.0f / m_MaxDivider;
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -200,10 +192,10 @@ namespace Orion
         float shin = 0.f;
         material->Get(AI_MATKEY_SHININESS, shin);
      
+        MeshVertex vertex{};
+        glm::vec3 vector{};
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
         {
-            MeshVertex vertex;
-            glm::vec3 vector; 
             //we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
             // positions
             vector.x = mesh->mVertices[i].x * scale;
@@ -381,24 +373,7 @@ namespace Orion
             return nullptr;
 	}
 
-    void Model::BindAllTexture()
-    {
-
-      /*  uint32_t index = 1;
-        for (auto& mesh : m_Meshes)
-        {
-            if (mesh->GetMaterial().diffuseMap) {
-                mesh->GetMaterial().diffuseMap->Bind(index);
-
-            }
-            if (mesh->GetMaterial().specularMap) {
-                mesh->GetMaterial().specularMap->Bind(++index);
-            }
-            index++;
-
-        }*/
-    }
-
+   
     bool Model::IsIntersect(const CameraRay& ray)
     {
         

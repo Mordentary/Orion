@@ -44,7 +44,6 @@ namespace Orion
 	void SpotLight::IncreaseLightCounter() 
 	{
 		m_LightIndex = Orion::LightHandler::m_LightCounters.SpotLightCount;
-
 		++Orion::LightHandler::m_LightCounters.SpotLightCount;
 	}
 

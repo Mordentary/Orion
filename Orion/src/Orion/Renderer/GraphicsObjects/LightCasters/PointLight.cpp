@@ -70,6 +70,9 @@ namespace Orion
 		ubo->SetData(&m_Prop, sizeof(LightSource::PointLightProp) * m_LightIndex, sizeof(m_Prop));
 
 	}
+	
+
+
 
 	void PointLight::IncreaseLightCounter()
 	{
@@ -85,8 +88,10 @@ namespace Orion
 	void PointLight::CalculateBoundingVolume()
 	{
 		float MaxColor = std::fmaxf(std::fmaxf(m_Prop.GeneralProp.DiffuseLightColor.r, m_Prop.GeneralProp.DiffuseLightColor.g), m_Prop.GeneralProp.DiffuseLightColor.b);
+
+		
 		m_Prop.Radius =
-			(-m_Prop.LinearAttenuation + std::sqrtf(m_Prop.LinearAttenuation * m_Prop.LinearAttenuation - 4 * m_Prop.QuadraticAttenuation* (m_Prop.ConstantAttenuation - (256.f / 5.0) * MaxColor)))
+			(-m_Prop.LinearAttenuation + std::sqrtf(m_Prop.LinearAttenuation * m_Prop.LinearAttenuation - 4 * m_Prop.QuadraticAttenuation* (m_Prop.ConstantAttenuation - (256 / 5.0) * MaxColor)))
 			/ (2 * m_Prop.QuadraticAttenuation);
 
 	}

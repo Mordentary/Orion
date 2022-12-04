@@ -299,6 +299,9 @@ namespace Orion
 			Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 
 			s_RenData3D.CurrentShader = s_RenData3D.PhongShader;
+
+			Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
+			Orion::RenderCommand::StencilWrite(false);
 			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
 		}
 	}
@@ -307,8 +310,6 @@ namespace Orion
 	{
 		s_RenData3D.CurrentShader->Bind();
 
-		Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
-		Orion::RenderCommand::StencilWrite(false);
 
 		for  (Shared<Model>& model : s_RenData3D.Models)
 		{
@@ -488,6 +489,8 @@ namespace Orion
 		s_RenData3D.GBuffer->Bind();
 		RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 		s_RenData3D.CurrentShader = s_RenData3D.GBufferShader;
+		Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
+		Orion::RenderCommand::StencilWrite(false);
 	}
 
 	void Renderer::LightingPass() 
@@ -578,6 +581,7 @@ namespace Orion
 		
 		RenderCommand::StencilWrite(false);
 		RenderCommand::DepthWrite(false);
+		RenderCommand::CullBackFace(false);
 
 
 		s_RenData3D.CubemapShader->Bind();
@@ -591,6 +595,7 @@ namespace Orion
 		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, nullptr,  0.0f });
 		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader);
 
+		RenderCommand::CullBackFace(true);
 		RenderCommand::DepthWrite(true);
 		RenderCommand::StencilWrite(true);
 

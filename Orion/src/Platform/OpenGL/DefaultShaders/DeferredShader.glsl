@@ -100,7 +100,7 @@ uniform sampler2D u_gAlbedoSpec;
 uniform vec3 u_CameraPos;
 
 
-#define MAX_LIGHTS 25
+#define MAX_LIGHTS 100
 
 layout(std140) uniform u_LightSources
 {
@@ -128,8 +128,8 @@ void main()
 
     for (int i = 0; i < PointLightCount; i++)
     {
-        float distance = length(u_PointLights[i].position - FragPos);
-        if (distance < u_PointLights[i].radius)
+        /*float distance = length(u_PointLights[i].position - FragPos);
+            if (distance < u_PointLights[i].radius)*/
         result += CalcPointLight(u_PointLights[i], Normal, FragPos, viewDir);
     }
     for (int i = 0; i < SpotLightCount; i++)
@@ -137,7 +137,7 @@ void main()
         vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(FragPos, 1.0f);
         result += CalcSpotLight(u_SpotLights[i], Normal, FragPos, viewDir, FragPosSpotLight);
     }
-
+        
     vec4 FragPosDirLight = u_DirLight.VPMatrix * vec4(FragPos, 1.0f);
     result += CalcDirectionalLight(u_DirLight, Normal, viewDir, FragPosDirLight);
     
@@ -262,7 +262,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
     //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0f);
     // attenuation
     float distance = length(light.position - fragPos);
@@ -271,7 +271,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // combine results
     vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
     vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec * texture(u_gAlbedoSpec, v_TextCoord).a;
+    vec3 specular = light.specular * spec;
 
 
     ambient *= attenuation;
@@ -294,7 +294,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     // specular shading
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
-    float spec = pow(max(dot(normal, halfwayDir), 0.0),32.f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
     // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -305,7 +305,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     // combine results
     vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
     vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec * texture(u_gAlbedoSpec, v_TextCoord).a;
+    vec3 specular = light.specular * spec ;
 
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
@@ -327,11 +327,11 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
     //vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
     // combine results
     vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
     vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec * texture(u_gAlbedoSpec, v_TextCoord).a;
+    vec3 specular = light.specular * spec;
 
     float shadow = ShadowCalculationDir(fragPosLightSpace, normal);
 

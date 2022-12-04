@@ -43,12 +43,6 @@ void main()
    v_TBN = mat3(T, B, N);
 
    v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
-  /* for (int i = 0; i < SpotLightCount; i++)
-   {
-        v_FragPosSpotLight[i] = u_SpotLights[i].VPMatrix * vec4(v_FragPos, 1.0);
-   }
-
-   v_FragPosDirLight = u_DirLight.VPMatrix * vec4(v_FragPos, 1.0);*/
 
    gl_Position =  u_ViewProj * vec4(v_FragPos, 1.0);
 
@@ -134,7 +128,7 @@ float ShadowCalculationPoint(PointLight light, vec3 shadowFrag);
 float ShadowCalculationSpot(SpotLight light,  vec4 shadowFrag, vec3 normal);
 
 
-#define MAX_LIGHTS 25
+#define MAX_LIGHTS 100
 
 in vec3 v_Normal;
 in vec4 v_Color;
@@ -187,8 +181,7 @@ void main()
 
     for (int i = 0; i < PointLightCount; i++)
     {
-        float distance = length(u_PointLights[i].position - v_FragPos);
-        if (distance < u_PointLights[i].radius)
+       
             result += CalcPointLight(u_PointLights[i], Normal, v_FragPos, viewDir);
     }
     for (int i = 0; i < SpotLightCount; i++)

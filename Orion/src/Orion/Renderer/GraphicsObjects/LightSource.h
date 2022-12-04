@@ -86,7 +86,7 @@ namespace Orion
 		virtual void SetLighAttenuation(float linear, float quadratic) = 0;
 		 
 		virtual void IncreaseLightCounter() = 0;
-
+		virtual uint32_t GetLightIndex() = 0;
 
 		const Shared<Model> GetLightModel() const {return m_LightModel;}
 		void SetLightModel(Shared<Model> model) { m_LightModel = model; }

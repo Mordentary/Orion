@@ -36,6 +36,8 @@ namespace Orion
         void SetLightShader(const Shared<Shader>& shader) { m_LightShader = shader; }
 
         const Shared<Shader>& GetLightShader() { return m_LightShader; }
+    
+
         const std::vector<Shared<LightSource>>& GetLights() { return m_LightSources; }
 
        // LightCounters& GetLightCounters() { return m_LightCounters; }
@@ -47,7 +49,7 @@ namespace Orion
 
     private:
         static LightCounters m_LightCounters;
-        static const uint32_t MAX_LIGHTS = 25;
+        static const uint32_t MAX_LIGHTS = 100;
         Shared<Shader> m_LightShader = nullptr;
         std::vector<Shared<LightSource>> m_LightSources;
 

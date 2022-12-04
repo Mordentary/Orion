@@ -22,6 +22,7 @@ namespace Orion {
 		virtual void DoDepthTest(bool enabled) override;
 		virtual void StencilMode(uint32_t mode, int32_t num, uint32_t bitmask) override;
 
+		virtual void DoFaceCulling(bool enable) override;
 		virtual void StencilWrite(bool enabled) override;
 	};
 

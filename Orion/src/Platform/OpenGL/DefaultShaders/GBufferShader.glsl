@@ -100,7 +100,7 @@ void main()
     f_Normal = normal;
     // and the diffuse per-fragment color
     f_AlbedoSpec.rgb = texture(u_Material.diffuse, v_TextCoord).rgb * vec3(v_Color);
-    // store specular intensity in gAlbedoSpec's alpha component
-    f_AlbedoSpec.a = texture(u_Material.specular, v_TextCoord).r;
+    // store shinness in gAlbedoSpec's alpha component
+    f_AlbedoSpec.a = u_Material.shininess;
 
 }

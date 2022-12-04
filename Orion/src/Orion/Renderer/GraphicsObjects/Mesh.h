@@ -33,7 +33,7 @@ namespace Orion
 	public:
 		Mesh() = default;
 
-		Mesh(const std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material) : m_Vertices(vertices), m_Indices(indices), m_Material(material)
+		Mesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material) : m_Vertices(std::move(vertices)), m_Indices(std::move(indices)), m_Material(material)
 		{
 			SetupMesh();
 		}

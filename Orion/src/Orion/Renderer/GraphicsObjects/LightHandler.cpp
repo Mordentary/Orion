@@ -17,6 +17,7 @@ namespace Orion
 		{
 			for (auto& lightSrc : m_LightSources)
 			{
+				if(lightSrc->GetLightIndex() == 0)
 				lightSrc->SetupLight(currentShader, m_LightSources, renderFunc);
 			}
 		}

@@ -30,6 +30,7 @@ namespace Orion
 
 		virtual void FramebufferSRGBEnable(bool mode) = 0;
 
+		virtual void DoFaceCulling(bool enable) = 0;
 
 		virtual void DoDepthTest(bool enabled) = 0;
 		virtual void StencilMode(uint32_t mode, int32_t num, uint32_t bitmask) = 0;

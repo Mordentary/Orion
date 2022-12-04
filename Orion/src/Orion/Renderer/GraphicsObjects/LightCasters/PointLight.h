@@ -21,20 +21,20 @@ namespace Orion
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 
 		}
-		PointLight(Shared<Model> model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512) : LightSource(model)
+		PointLight(Shared<Model> model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512, glm::vec3 pos = {0.f,0.f,0.f }) : LightSource(model)
 		{
 			FramebufferSpecification fb;
 			fb.OnlyDepthPass = true;
 			fb.CubemapBuffer = true;
 			fb.Width = shadowWidth;
 			fb.Height = shadowHeight;
-
+			
 			m_ShadowMap = Framebuffer::Create(fb);
-
 			float nearPlane = 0.1f;
 			float farPlane = 25.0f;
 			m_Prop.FarPlane = farPlane;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
+			m_Prop.GeneralProp.Position = pos;
 
 		}
 
@@ -47,6 +47,7 @@ namespace Orion
 		virtual void SetLighAttenuation(float linear, float quadratic) override;
 		virtual void IncreaseLightCounter() override;
 
+		virtual uint32_t GetLightIndex() override { return m_LightIndex; };
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 
 

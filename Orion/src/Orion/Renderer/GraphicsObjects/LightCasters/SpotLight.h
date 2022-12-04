@@ -20,7 +20,7 @@ namespace Orion
 			float farPlane = 25.0f;
 			m_ProjMatrix = glm::perspective(glm::radians(90.0f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 		};
-		SpotLight(Shared<Model>& model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512) : LightSource(model)
+		SpotLight(Shared<Model> model, uint32_t shadowWidth = 512, uint32_t shadowHeight = 512, glm::vec3 pos = {0.0f,0.0f,0.0f}) : LightSource(model)
 		{
 			FramebufferSpecification fb;
 			fb.OnlyDepthPass = true;
@@ -32,9 +32,9 @@ namespace Orion
 
 			float nearPlane = 0.1f;
 			float farPlane = 25.0f;
-			m_ProjMatrix = glm::perspective(glm::radians(90.f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);;
+			m_ProjMatrix = glm::perspective(glm::radians(90.f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
+			m_Prop.GeneralProp.Position = pos;
 
-				
 				//glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);
 				//glm::perspective(glm::radians(m_OuterCutOff), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 
@@ -50,6 +50,7 @@ namespace Orion
 		virtual void IncreaseLightCounter() override;
 		 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
+		virtual uint32_t GetLightIndex() override { return m_LightIndex; };
 
 		inline float& GetInnerCutOff() { return m_Prop.InnerCutOff; }
 		inline float& GetOuterCutOff() { return m_Prop.OuterCutOff; }

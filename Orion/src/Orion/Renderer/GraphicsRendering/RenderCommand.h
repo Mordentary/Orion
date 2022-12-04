@@ -65,6 +65,11 @@ namespace Orion
 		{
 			s_RendererAPI->CullBackFace(cull);
 		}
+
+		inline static void DoFaceCulling(bool mode)
+		{
+			s_RendererAPI->DoFaceCulling(mode);
+		}
 	
 		inline static void DrawLines(const Shared<VertexArray>& vertexArray, uint32_t vertexCount)
 		{
