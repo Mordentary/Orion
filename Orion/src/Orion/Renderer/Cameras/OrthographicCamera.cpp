@@ -11,7 +11,7 @@ namespace Orion
 	}
 
 	OrthographicCamera::OrthographicCamera(glm::vec3& position, glm::vec3& dir, glm::vec4& borders, glm::vec2& nearFarPlanes)
-		: DummyCamera(position,  glm::lookAt(position, position + glm::normalize(glm::vec3(dir.x,dir.y,dir.z)), glm::vec3(0.0f, 1.0f, 0.0f)), (glm::ortho(borders.x, borders.y, borders.z, borders.w, nearFarPlanes.x, nearFarPlanes.y)), false)
+		: DummyCamera(position, glm::lookAt(position, position + glm::normalize(glm::vec3(dir.x, dir.y, dir.z)), glm::vec3(0.0f, 1.0f, 0.0f)), (glm::ortho(borders.x, borders.y, borders.z, borders.w, nearFarPlanes.x, nearFarPlanes.y)), false), m_Borders(borders), m_NearFar(nearFarPlanes)
 	{
 		m_CameraForward = glm::normalize(glm::vec3(dir.x, dir.y, dir.z));
 	}
@@ -58,6 +58,7 @@ namespace Orion
 	{
 		RecalculateView();
 		RecalculateProjection();
+		//UpdateFrustumCamera();
 	}
 
 	inline void OrthographicCamera::RecalculateView()
@@ -68,6 +69,40 @@ namespace Orion
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
+	void OrthographicCamera::UpdateFrustum()
+	{
+		/*CameraFrustum frustum; //TODO: Make this work
+
+
+		frustum.Near =  
+		frustum.Far =   
+		frustum.Right = 
+						
+		frustum.Left =  
+						
+		frustum.Top = 
+						
+		frustum.Bottom =
+
+		m_Frustum = std::move(frustum);*/
+	}
+	void OrthographicCamera::RenderFrustum()
+	{
+		/*CameraFrustum frustum; //TODO: Make this work
+
+
+		frustum.Near =
+		frustum.Far =
+		frustum.Right =
+
+		frustum.Left =
+
+		frustum.Top =
+
+		frustum.Bottom =
+
+		m_Frustum = std::move(frustum);*/
+	}
 
 	inline void OrthographicCamera::RecalculateProjection()
 	{

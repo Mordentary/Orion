@@ -1,7 +1,7 @@
 #include "oripch.h"
 #include "Model.h"
 #include <filesystem> 
-
+#include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
 namespace Orion
 {
     void Model::SetModelMatrix(const glm::mat4& mat)
@@ -43,10 +43,10 @@ namespace Orion
         RecalculateAABBInModelSpace(); 
     }
 
-    void Model::RenderModelAABB()
+    void Model::RenderAABB(const glm::vec3& mMin, const glm::vec3& mMax)
     {
-        glm::vec4 min = glm::vec4(m_ModelAABB.mMax.x, m_ModelAABB.mMax.y, m_ModelAABB.mMax.z, 1.0f);
-        glm::vec4 max = glm::vec4(m_ModelAABB.mMin.x, m_ModelAABB.mMin.y, m_ModelAABB.mMin.z, 1.0f);
+        glm::vec4 min = glm::vec4(mMax.x, mMax.y, mMax.z, 1.0f);
+        glm::vec4 max = glm::vec4(mMin.x, mMin.y, mMin.z, 1.0f);
         auto color = glm::vec4(1.f, 0.2f, 0.2f, 1.0f);
 
 
@@ -71,15 +71,25 @@ namespace Orion
         Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 
     }
-	void Model::Render(Shared<Shader>& shader)
-	{
-	
-        for (auto& mesh : m_Meshes)
-            mesh->Render(shader);
+    void Model::Render(Shared<Shader>& shader)
+    {
+       
+        for (Shared<Mesh>& mesh : m_Meshes) 
+        {
+            auto [min, max] = mesh->GetAABB();
+            glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
+            glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f) ;
+            if (Orion::CamerasController::GetCamera("PerspectiveCamera2")->AABBVsFrustum(transformedMin, transformedMax))
+            {
+                mesh->Render(shader);
+                RenderAABB(transformedMin, transformedMax);
+            }
+        }
+       // ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
+        //if (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
+        //      RenderModelAABB(); //works only in forward pipeline
 
-        //RenderModelAABB(); //Works only in forward pipeline
-
-	}
+    }
 
     //For retrieving scene 
 	void Model::LoadModel(const std::string& path)
@@ -111,7 +121,7 @@ namespace Orion
         m_Path = path;
 		m_Directory = path.substr(0, path.find_last_of('/'));
 
-        FindGreastestCoord(scene->mRootNode, scene);
+        FindGreastestAABBAndCoord(scene->mRootNode, scene);
 
         float scale = 1.0f / m_MaxDivider;
         m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * scale;
@@ -121,7 +131,7 @@ namespace Orion
 
 	}
 
-    void Model::FindGreastestCoord(aiNode* node, const aiScene* scene)
+    void Model::FindGreastestAABBAndCoord(aiNode* node, const aiScene* scene)
     {
 
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -143,7 +153,7 @@ namespace Orion
         } 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            FindGreastestCoord(node->mChildren[i], scene);
+            FindGreastestAABBAndCoord(node->mChildren[i], scene);
         }
 
 
@@ -181,7 +191,7 @@ namespace Orion
          indices.reserve(mesh->mNumFaces * 3);
                  
        
-        float scale = 1.0f / m_MaxDivider;
+        float scale = 1.0f / m_MaxDivider;  
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
@@ -255,9 +265,8 @@ namespace Orion
             else vertex.Color = glm::vec4(color.r, color.g, color.b, 1.0f);
 
 
-            vertex.TextureSlot = 0;
 
-            vertices.push_back(vertex);
+            vertices.emplace_back(std::move(vertex));
         }
 
         // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -305,10 +314,12 @@ namespace Orion
        else
            mat.shininess = 32.f;
         
+       mesh->mAABB.mMax *= scale;
+       mesh->mAABB.mMin *= scale;
 
         // return a mesh object created from the extracted mesh data
             
-        return CreateShared<Mesh>(vertices, indices, mat);
+       return CreateShared<Mesh>(vertices, indices, mat, glm::vec3{ mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z});
             
     }
 

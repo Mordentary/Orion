@@ -15,6 +15,8 @@ namespace Orion
 	class CameraRay
 	{
 	public:
+		
+	public:
 		CameraRay() = default;
 		CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength);
 		void Update(glm::vec3 direction, glm::vec3 origin, float rayLength);
@@ -53,7 +55,6 @@ namespace Orion
 
 	class DummyCamera
 	{
-
 	public:
 
 		DummyCamera(
@@ -71,6 +72,7 @@ namespace Orion
 		virtual void RecalculateViewProjection() = 0;
 		virtual void RecalculateProjection() = 0;
 
+		virtual void RenderFrustum() = 0;
 
 		void DragObjectAlongCameraPlane(Shared<Model>& model);
 
@@ -105,7 +107,31 @@ namespace Orion
 		inline void SetSensitivity(float rotSpeed) { m_CameraSensitivity = rotSpeed; }
 
 		const CameraRay& Raycast(float xCoord, float yCoord);
+		bool AABBVsFrustum(const glm::vec3& min, const glm::vec3& max);
+	protected:
+		struct Plane
+		{
+			// unit vector
+			glm::vec3 Normal{};
+			// point on plane
+			glm::vec3 Point{};
 
+			float Distance(const glm::vec3& p) 
+			{
+				return glm::dot(p - Point, Normal);
+			}
+		};
+		struct CameraFrustum
+		{
+			Plane Top;
+			Plane Bottom;
+
+			Plane Right;
+			Plane Left;
+
+			Plane Far;
+			Plane Near;
+		};
 	protected: 
 		float m_AspectRatio = 1.7f;
 		float m_ZoomLevel = 1.0f;
@@ -120,15 +146,16 @@ namespace Orion
 		glm::mat4 m_ProjectionViewMatrix{};
 
 		CameraRay m_Ray;
+		CameraFrustum m_Frustum; 
 
 		glm::vec2 m_ScreenSize{};
-
 	protected:
-
+		virtual void UpdateFrustum() = 0;
 
 	private:
-
-
+		float PlaneVsRay(const DummyCamera::Plane& pl, const CameraRay& ray);
+		bool PlaneVsAABB(const DummyCamera::Plane& pl, const glm::vec3& min, const glm::vec3& max);
+		bool AABBVsFrustumAccurate(const glm::vec3& min, const glm::vec3& max);
 
 
 	};

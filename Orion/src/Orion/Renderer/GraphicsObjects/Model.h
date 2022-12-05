@@ -85,12 +85,12 @@ namespace Orion
         };
 
     private:
-        void RenderModelAABB();
+        void RenderAABB(const glm::vec3& mMin, const glm::vec3& mMax);
         Shared<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
         void RecalculateModelMatrix();
         void LoadModel(const std::string& path);
-        void FindGreastestCoord(aiNode* rootNode, const aiScene* scene);
+        void FindGreastestAABBAndCoord(aiNode* rootNode, const aiScene* scene);
         void ProcessNode(aiNode* node, const aiScene* scene);
         void RecalculateAABBInModelSpace();
         void DeduceModelName();

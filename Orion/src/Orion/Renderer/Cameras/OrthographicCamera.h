@@ -27,14 +27,19 @@ namespace Orion {
 		void SetProjection(float left, float right, float bottom, float top);
 		void inline SetRotationAngles(float rotation) { m_CameraRotation = rotation; RecalculateView(); }
 	
-		virtual void RecalculateView() override;
-		virtual void RecalculateViewProjection() override;
-		virtual void RecalculateProjection() override;
+		void UpdateFrustum() override;
+		void RenderFrustum() override;
+
 
 	private:
 		bool m_ProjMatchesPixelByPixel = false;
 		float m_CameraRotation = 0.0f;
-
+		glm::vec4 m_Borders;
+		glm::vec2 m_NearFar;
+	private:
+		virtual void RecalculateView() override;
+		virtual void RecalculateViewProjection() override;
+		virtual void RecalculateProjection() override;
 
 
 	};

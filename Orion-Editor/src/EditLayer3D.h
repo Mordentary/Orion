@@ -13,15 +13,18 @@ namespace Orion {
 		void Init() override
 		{
 			Orion::Renderer::Init();
-			m_Camera = Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f));
-			auto m_Camera2 = Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f));
+	
+			Orion::CamerasController::AddCamera("OrthoCamera", Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f)));
+			
+			Orion::CamerasController::AddCamera("PerspectiveCamera2", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{2.0f,10.f}));
+			Orion::CamerasController::AddCamera("PerspectiveCamera1", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{ 0.1f,100.f }));
 
-			Orion::CamerasController::AddCamera("OrthoCamera", m_Camera2);
-			Orion::CamerasController::AddCamera("PerspectiveCamera", m_Camera);
 			m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
 			m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
 
+			Timer modelCreation("ModelCreationTimer");
 
+			modelCreation.Start();
 
 			m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx");
@@ -35,6 +38,11 @@ namespace Orion {
 			m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
 			m_ModelShield= Orion::CreateShared<Orion::Model>("assets/models/Armor/Shield/model.dae");
 		
+
+			modelCreation.Stop();
+
+			ORI_INFO("MODEL_CREATION_TIME: {0}", modelCreation.GetTimeSeconds());
+
 
 			//m_ModelScene->SetScale(glm::vec3(50.f));
 
@@ -206,7 +214,11 @@ namespace Orion {
 				}
 				if (e.GetKeyCode() == ORI_KEY_2)
 				{
-					Orion::CamerasController::SetActiveCamera("PerspectiveCamera");
+					Orion::CamerasController::SetActiveCamera("PerspectiveCamera1");
+				}
+				if (e.GetKeyCode() == ORI_KEY_3)
+				{
+					Orion::CamerasController::SetActiveCamera("PerspectiveCamera2");
 				}
 			
 			return false;
@@ -572,7 +584,6 @@ namespace Orion {
 
 		}
 	private:
-		Orion::Shared<Orion::DummyCamera> m_Camera, m_LightDirCam;
 		Orion::Shared<Orion::EventDispatcher> m_Dispatcher;
 		glm::vec4 m_Color{ 0.842f, 0.523f, 0.768f, 1.0f }, m_SunColor{0.5f};
 		glm::vec3 m_Position{ 0,0,0 };

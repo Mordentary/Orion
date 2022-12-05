@@ -59,31 +59,98 @@ namespace Orion
 		{	
 
 
-			glm::vec3 worRay = m_Ray.GetDirection();
-			glm::vec3 worRayPos = m_Ray.GetOrigin();
-
-			glm::vec3 cameraDir = -m_CameraForward;
-
+			float t = PlaneVsRay(Plane{ -m_CameraForward, model->GetPosition() }, m_Ray);
 
 			static glm::vec3 pointIntersection{};
-			float denom = glm::dot(cameraDir, worRay);
-
-			if (abs(denom) > 1e-6)
+			if (t != -1) 
 			{
-				glm::vec3 p0l0 = model->GetPosition() - worRayPos;
-				float t = glm::dot(p0l0, cameraDir) / denom;
-				if (t >= 0)
-				{
-					pointIntersection = worRayPos + (worRay * t);
-				}
+				pointIntersection = m_Ray.GetOrigin() + (m_Ray.GetDirection() * t);
 			}
-
 
 			model->SetPosition(pointIntersection);
 
 		}
 	}
 
+	float DummyCamera::PlaneVsRay(const Plane& pl, const CameraRay& ray)
+	{
+		float denom = glm::dot(pl.Normal, ray.GetDirection());
+
+		if (abs(denom) > 1e-6)
+		{
+			glm::vec3 p0l0 = pl.Point - ray.GetOrigin();
+			float t = glm::dot(p0l0, pl.Normal) / denom;
+			if (t >= 0)
+			{
+				return t;
+			}
+		}
+
+		return -1.f;
+	}
+
+
+	bool DummyCamera::AABBVsFrustum(const glm::vec3& min, const glm::vec3& max)
+	{
+		Plane* currentPlane = &m_Frustum.Top;
+		bool ret = true;
+		glm::vec3 vmin, vmax;
+
+		for (int i = 0; i < 6; ++i) 
+		{
+			// X axis 
+			if (currentPlane->Normal.x >= 0) {
+				vmin.x = min.x;
+				vmax.x = max.x;
+			}
+			else {
+				vmin.x = max.x;
+				vmax.x = min.x;
+			}
+			// Y axis 
+			if (currentPlane->Normal.y >= 0) {
+				vmin.y = min.y;
+				vmax.y = max.y;
+			}
+			else {
+				vmin.y = max.y;
+				vmax.y = min.y;
+			}
+			// Z axis 
+			if (currentPlane->Normal.z >= 0) {
+				vmin.z = min.z;
+				vmax.z = max.z;
+			}
+			else {
+				vmin.z = max.z;
+				vmax.z = min.z;
+			}
+			if (glm::dot(currentPlane->Normal, vmin) + glm::distance(currentPlane->Point, glm::vec3(0.f)) > 0)
+				return false;
+			if (glm::dot(currentPlane->Normal, vmax) + glm::distance(currentPlane->Point, glm::vec3(0.f)) >= 0)
+				ret = true;
+
+			++currentPlane;
+		}
+		return ret;
+	}
+
+
+	bool DummyCamera::PlaneVsAABB(const DummyCamera::Plane& pl, const glm::vec3& min, const glm::vec3& max)
+	{
+		// Convert AABB to center-extents representation
+		glm::vec3 center = (min + max) * 0.5f; // Compute AABB center
+		glm::vec3 extent = max - center; // Compute positive extents
+
+		// Compute the projection interval radius of b onto L(t) = b.center + t * p.n
+		float r = extent[0] * glm::abs(pl.Normal.x) + extent[1] * glm::abs(pl.Normal.y) + extent[2] * glm::abs(pl.Normal.z);
+
+		// Compute distance of box center from plane
+		float s = glm::dot(pl.Normal, center - pl.Point);
+
+		// Intersection occurs when distance s falls within [-r,+r] interval
+		return glm::abs(s) <= r;
+	}
 
 	CameraRay::CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength)
 		: m_Direction(direction), m_Origin(origin), m_Length(rayLength)

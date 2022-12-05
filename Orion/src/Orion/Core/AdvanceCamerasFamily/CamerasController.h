@@ -29,6 +29,9 @@ namespace Orion {
 		static const Shared<DummyCamera> GetCamera(std::string name);
 		static bool IsCameraExist(std::string name);
 
+		static void RenderCamerasFrustum();
+
+
 		//CamerasController() = default;
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);

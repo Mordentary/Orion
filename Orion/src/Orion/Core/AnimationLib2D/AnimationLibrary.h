@@ -7,17 +7,17 @@ namespace Orion {
 
 	struct AnimationSource
 	{
-		AnimationSource(std::string animName, uint32_t frameCount) : AnimationName(animName), Frames(new Shared<SubTexture2D>[frameCount]), TotalFrames(frameCount) {};
+		AnimationSource(const std::string& animName, uint32_t frameCount) : AnimationName(animName), Frames(new Shared<SubTexture2D>[frameCount]), TotalFrames(frameCount) {};
 		AnimationSource() = default;
 		~AnimationSource()
 		{
 			delete[] Frames;
 		}
 		std::string AnimationName;
-		Shared<SubTexture2D>* Frames;
+		Shared<SubTexture2D>* Frames = nullptr;
 		glm::uvec2 CellSize;
 		uint32_t TotalFrames;
-		Shared<Texture2D> Texture;
+		Shared<Texture2D> Texture = nullptr;
 
 	};
 

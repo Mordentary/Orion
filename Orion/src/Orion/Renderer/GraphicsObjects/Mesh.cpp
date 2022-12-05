@@ -69,7 +69,6 @@ namespace Orion
 		{Orion::ShaderDataType::Float3, "a_Bitangent"},
 		{Orion::ShaderDataType::Float4, "a_Color"},
 		{Orion::ShaderDataType::Float2, "a_TextureCoord"},
-		{Orion::ShaderDataType::Float, "a_TextureSlot"}
 			});
 
 		m_MeshVertexArray->AddVertexBuffer(vertexBuffer);

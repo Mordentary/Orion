@@ -28,7 +28,7 @@ namespace Orion
 
         };
         ~Timer() {
-            End();
+            Stop();
         };
         inline void Start() 
         {
@@ -37,7 +37,7 @@ namespace Orion
             m_StartTime = std::chrono::high_resolution_clock::now();
         }
         inline bool IsEnded() { return m_Ended; }
-        inline void End()
+        inline void Stop()
         {
             if (!m_Started) return;
 

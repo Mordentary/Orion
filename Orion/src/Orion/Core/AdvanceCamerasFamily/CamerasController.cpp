@@ -46,6 +46,17 @@ namespace Orion
 		}
 	}
 
+	void CamerasController::RenderCamerasFrustum()
+	{
+		for (auto&[name, cam] : s_CamerasController.m_CamerasStorage)
+		{
+			if (name != GetActiveCameraName()) 
+			cam->RenderFrustum();
+		}
+
+	}
+
+
 	void CamerasController::AddCamera(std::string name, const Shared<DummyCamera>& camera)
 	{
 		s_CamerasController.m_ActiveCamera = name;

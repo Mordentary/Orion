@@ -60,7 +60,7 @@ namespace Orion {
 	{
 		
 		auto& window = Application::Get().GetWindow();
-		auto VP_Prop = window.GetSubWindowProp();
+		auto& VP_Prop = window.GetSubWindowProp();
 
 		glm::vec2 mouseA = VP_Prop.MousePosInAbs;
 		glm::vec2 winA = VP_Prop.ScreenPosInAbs;

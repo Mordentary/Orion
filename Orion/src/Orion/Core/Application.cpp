@@ -89,7 +89,7 @@ namespace Orion
 
 
 
-			timer.End();
+			timer.Stop();
 		}
 	}
 	bool Application::OnWindowResize(WindowResizeEvent& e)

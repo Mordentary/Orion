@@ -13,12 +13,12 @@ namespace Orion
 		 static Shared<SubTexture2D> CreateFromCoords_Grid(const Shared<Texture2D>& texture, const glm::vec2& coords, const glm::uvec2& grid, const glm::uvec2& spriteSize = glm::vec2(1.0f));
 
 
-		 const inline const glm::vec2* GetTextureCoords() const { return m_TexCoords; }
-		 const inline const glm::vec2* GetHorizontallyMirroredCoords() const {return  m_TexHorizontallyMirroredCoords;}
-		 const inline Shared<Texture2D>& GetTexture() const { return m_Texture; }
-		 const inline const glm::uvec2& GetCellSize() const { return m_CellSize; }
-		 const inline const glm::uvec2& GetSpriteSize() const { return m_SpriteSize; }
-		 const inline const glm::uvec2& GetSheetCoords() const { return m_SheetCoords; }
+			inline const glm::vec2* GetTextureCoords() const { return m_TexCoords; }
+			inline const glm::vec2* GetHorizontallyMirroredCoords() const {return  m_TexHorizontallyMirroredCoords;}
+			inline const  Shared<Texture2D>& GetTexture() const { return m_Texture; }
+			inline const glm::uvec2& GetCellSize() const { return m_CellSize; }
+			inline const glm::uvec2& GetSpriteSize() const { return m_SpriteSize; }
+			inline const glm::uvec2& GetSheetCoords() const { return m_SheetCoords; }
 
 	private: 
 		Shared<Texture2D> m_Texture;

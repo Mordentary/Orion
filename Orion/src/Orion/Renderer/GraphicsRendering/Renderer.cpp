@@ -12,6 +12,9 @@
 #include "Orion/Core/KeyCodes.h"
 #include "Orion/Core/MouseButtonCodes.h"
 #include "Orion/Core/Input.h"
+#include "Orion/Core/AdvanceCamerasFamily/CamerasController.cpp"
+
+
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Orion
@@ -247,6 +250,9 @@ namespace Orion
 		
 		Renderer2D::BeginScene(camera);
 
+
+		
+
 		s_RenData3D.SceneCamera = camera;
 		s_RenData3D.SceneRenderFunc = renderFunc;
 		s_RenData3D.FinalFramebuffer = finalFramebuffer;
@@ -262,7 +268,7 @@ namespace Orion
 
 		s_RenData3D.Stats.m_ShadowMappingPass.Start();
 		s_RenData3D.LightManager.PrepareLights(s_RenData3D.CurrentShader, renderFunc);
-		s_RenData3D.Stats.m_ShadowMappingPass.End();
+		s_RenData3D.Stats.m_ShadowMappingPass.Stop();
 
 		
 		s_RenData3D.LightManager.LoadLightsToUBO(s_RenData3D.LigthSourcesUniformBuffer);
@@ -285,6 +291,7 @@ namespace Orion
 			s_RenData3D.DeferredShadingBuffer->Resize(mainSpec.Width, mainSpec.Height);
 
 			GeometryPass();
+			//Orion::CamerasController::RenderCamerasFrustum();
 		}
 		else 
 		{
@@ -302,7 +309,11 @@ namespace Orion
 
 			Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
 			Orion::RenderCommand::StencilWrite(false);
+			Orion::CamerasController::RenderCamerasFrustum();
+
 			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
+
+
 		}
 	}
 
@@ -465,7 +476,7 @@ namespace Orion
 
 		//Orion::RenderCommand::FramebufferSRGBEnable(false);
 		
-		s_RenData3D.Stats.m_PostProcessStageTimer.End();
+		s_RenData3D.Stats.m_PostProcessStageTimer.Stop();
 
 
 

@@ -4,21 +4,22 @@
 #include"Orion/Core/Input.h"
 #include"Orion/Core/KeyCodes.h"
 #include"Orion/Core/MouseButtonCodes.h"
+#include"Orion/Renderer/GraphicsRendering/Renderer2D.h"
 
-
-#include<glm/gtc/matrix_transform.hpp>	
+#include<glm/gtc/matrix_transform.hpp>
 #include<glm/glm.hpp>
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtx/rotate_vector.hpp>
 #include<glm/gtx/vector_angle.hpp>
 namespace Orion
 {
-	PerspectiveCamera::PerspectiveCamera(const glm::vec3& position, const glm::vec3& cameraTarget, float FOV) : DummyCamera(position), m_FOVdeg(FOV)
+	PerspectiveCamera::PerspectiveCamera(const glm::vec3& position, const glm::vec3& cameraTarget, float FOV, const glm::vec2& nearFar) : DummyCamera(position), m_FOVdeg(FOV), m_NearFar(nearFar)
 	{
-		if (position == cameraTarget) 
+		if (position == cameraTarget)
 		{
 			ORI_CORE_ASSERT(false, "Camera target and position are equal!");
 		}
+
 		m_CameraSpaceAxisZ = -glm::normalize(position - cameraTarget);
 		m_CameraSpaceAxisX = glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY));
 		m_CameraSpaceAxisY = -glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisX);
@@ -30,26 +31,19 @@ namespace Orion
 
 	void PerspectiveCamera::Update(Orion::Timestep dt)
 	{
-
 		UpdateCameraOrientation(dt);
 
 		UpdateCameraDisplacement(dt);
 
 		RecalculateViewProjection();
 
-
+		UpdateFrustum();
 	}
-
-	
 
 	void PerspectiveCamera::UpdateCameraOrientation(Orion::Timestep dt)
 	{
-
-
-
 		static bool firstClick = true;
 		Orion::Application* app;
-
 
 		if (Orion::Input::IsMouseButtonPressed(ORI_MOUSE_BUTTON_RIGHT))
 		{
@@ -58,7 +52,6 @@ namespace Orion
 			const float& height = m_ScreenSize.y;
 			const float& sensitivity = m_CameraSensitivity;
 
-
 			app->GetWindow().DisableCursor(true);
 
 			if (firstClick)
@@ -66,7 +59,6 @@ namespace Orion
 				app->GetWindow().SetCursorPosition(width / 2, height / 2);
 				firstClick = false;
 			}
-
 
 			auto& [mouseX, mouseY] = Orion::Input::GetMousePosition();
 
@@ -80,7 +72,10 @@ namespace Orion
 				m_CameraSpaceAxisZ = newOrientation;
 			}
 
-			m_CameraSpaceAxisZ = glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotY), m_CameraSpaceAxisY);
+			m_CameraSpaceAxisZ = glm::normalize(glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotY), m_CameraSpaceAxisY));
+
+			m_CameraSpaceAxisX = glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY));
+			m_CameraSpaceAxisY = -glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisX);
 
 			m_CameraForward = m_CameraSpaceAxisZ;
 			app->GetWindow().SetCursorPosition(width / 2, height / 2);
@@ -91,12 +86,10 @@ namespace Orion
 			app->GetWindow().DisableCursor(false);
 			firstClick = true;
 		}
-
 	}
 
 	void PerspectiveCamera::UpdateCameraDisplacement(Orion::Timestep ts)
 	{
-		
 		if (Orion::Input::IsKeyPressed(ORI_KEY_W))
 			m_Position += ts * m_CameraTranslationSpeed * m_CameraSpaceAxisZ;
 
@@ -109,7 +102,6 @@ namespace Orion
 		if (Orion::Input::IsKeyPressed(ORI_KEY_D))
 			m_Position += glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisY)) * (m_CameraTranslationSpeed * ts);
 
-
 		if (Orion::Input::IsKeyPressed(ORI_KEY_SPACE))
 		{
 			m_Position += ts * m_CameraTranslationSpeed * m_WorldSpaceAxisY;
@@ -119,27 +111,148 @@ namespace Orion
 			m_Position -= ts * m_CameraTranslationSpeed * m_WorldSpaceAxisY;
 		}
 
-
-
 		static bool Initial = true;
 		static float InitialSpeed;
 		if (Orion::Input::IsKeyPressed(ORI_KEY_LEFT_SHIFT))
 		{
-			if (Initial) 
+			if (Initial)
 			{
 				InitialSpeed = m_CameraTranslationSpeed;
 				Initial = false;
 			}
-			m_CameraTranslationSpeed =  (InitialSpeed * ts) + 5;
+			m_CameraTranslationSpeed = (InitialSpeed * ts) + 5;
 		}
 		else
 		{
-			if (!Initial) 
+			if (!Initial)
 			{
 				Initial = true;
 				m_CameraTranslationSpeed = InitialSpeed;
 			}
 		}
+	}
+
+	void PerspectiveCamera::UpdateFrustum()
+	{
+		CameraFrustum frustum;
+
+		float halfHeightNear = tan(m_FOVdeg / 2) * m_NearFar.x;
+		float halfWidthNear = halfHeightNear * m_AspectRatio;
+
+		float HalfHeightFar = tanf(m_FOVdeg / 2) * m_NearFar.y;
+		float HalfWidthFar = HalfHeightFar * m_AspectRatio;
+
+
+
+
+		const glm::vec3 frontMultFar = m_CameraForward * m_NearFar.y;
+
+		
+
+		m_Frustum = frustum;
+	}
+
+	void PerspectiveCamera::RenderFrustum()
+	{
+		float halfHeightNear = tan(m_FOVdeg / 2) * m_NearFar.x;
+		float halfWidthNear = halfHeightNear * m_AspectRatio;
+
+		float halfHeightFar = tanf(m_FOVdeg / 2) * m_NearFar.y;
+		float halfWidthFar = halfHeightFar * m_AspectRatio;
+
+		glm::vec3 nearPointCenter = m_Position + m_NearFar.x * m_CameraForward;
+		glm::vec3 farPointCenter = m_Position + m_NearFar.y * m_CameraForward;
+
+		glm::vec4 color{ 0.5f,0.7f,0.6f,1.0f };
+
+
+		glm::vec3 ftl = farPointCenter + (m_CameraSpaceAxisY * halfHeightFar) - (m_CameraSpaceAxisX * halfWidthFar);
+		glm::vec3 fbr = farPointCenter - (m_CameraSpaceAxisY * halfHeightFar) + (m_CameraSpaceAxisX * halfWidthFar);
+
+		glm::vec3 ftr = farPointCenter + (m_CameraSpaceAxisY * halfHeightFar) + (m_CameraSpaceAxisX * halfWidthFar);
+		glm::vec3 fbl = farPointCenter - (m_CameraSpaceAxisY * halfHeightFar) - (m_CameraSpaceAxisX * halfWidthFar);
+
+
+
+		glm::vec3 ntl = nearPointCenter + (m_CameraSpaceAxisY * halfHeightNear) - (m_CameraSpaceAxisX * halfWidthNear);
+		glm::vec3 ntr = nearPointCenter + (m_CameraSpaceAxisY * halfHeightNear) + (m_CameraSpaceAxisX * halfWidthNear);
+
+		glm::vec3 nbr = nearPointCenter - (m_CameraSpaceAxisY * halfHeightNear) + (m_CameraSpaceAxisX * halfWidthNear);
+		glm::vec3 nbl = nearPointCenter - (m_CameraSpaceAxisY * halfHeightNear) - (m_CameraSpaceAxisX * halfWidthNear);
+		
+		//NearPlane
+		Orion::Renderer2D::AddLine(ntl, ntr, color);
+		Orion::Renderer2D::AddLine(ntr, nbr, color);
+		Orion::Renderer2D::AddLine(nbr, nbl, color);
+		Orion::Renderer2D::AddLine(nbl, ntl , color);
+
+		//FarPlane
+		Orion::Renderer2D::AddLine(ftl, ftr, color);
+		Orion::Renderer2D::AddLine(ftr, fbr, color);
+		Orion::Renderer2D::AddLine(fbr, fbl, color);
+		Orion::Renderer2D::AddLine(fbl, ftl, color);
+
+		//Connections
+		Orion::Renderer2D::AddLine(ftl, ntl, color);
+		Orion::Renderer2D::AddLine(ftr, ntr, color);
+		Orion::Renderer2D::AddLine(fbr, nbr, color);
+		Orion::Renderer2D::AddLine(fbl, nbl, color);
+
+
+		//CameraAxis
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_CameraSpaceAxisX , glm::vec4(0.8f,0.5f,0.f,1.0f));
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_CameraSpaceAxisY, glm::vec4(0.8f, 0.5f, 0.f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_CameraSpaceAxisZ, glm::vec4(0.8f, 0.5f, 0.f, 1.0f));
+		
+
+		CameraFrustum frustum;
+
+
+		frustum.Near = { m_CameraForward ,nearPointCenter };
+		frustum.Far = { -m_CameraForward ,nearPointCenter };
+
+		glm::vec3 rightBorder = (nearPointCenter + m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		glm::vec3 normalRight = glm::cross(m_CameraSpaceAxisY, glm::normalize(rightBorder));
+
+		frustum.Right = { normalRight, m_Position };
+
+		glm::vec3 leftBorder = (nearPointCenter - m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		glm::vec3 normalLeft = -glm::cross(m_CameraSpaceAxisY, glm::normalize(leftBorder));
+
+		frustum.Left = { normalLeft ,m_Position };
+
+
+		glm::vec3 topBorder = (nearPointCenter + m_CameraSpaceAxisY * halfHeightNear) - m_Position;
+		glm::vec3 normalTop = -glm::cross(m_CameraSpaceAxisX, glm::normalize(topBorder));
+
+		frustum.Top = { normalTop ,m_Position };
+
+
+		glm::vec3 bottomBorder = (nearPointCenter - m_CameraSpaceAxisY * halfHeightNear) - m_Position;
+		glm::vec3 normalBottom = glm::cross(m_CameraSpaceAxisX, glm::normalize(bottomBorder));
+
+		frustum.Bottom = { normalBottom ,m_Position };
+
+
+		float scale = 5.0f;
+		//DrawNormals
+		Orion::Renderer2D::AddLine(frustum.Near.Point, frustum.Near.Point + frustum.Near.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Far.Point, frustum.Far.Point + frustum.Far.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Top.Point + topBorder * 2.5f, frustum.Top.Point + topBorder * 2.5f + frustum.Top.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Bottom.Point + bottomBorder * 2.5f, frustum.Bottom.Point + bottomBorder * 2.5f + frustum.Bottom.Normal * scale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Right.Point + rightBorder * 2.5f, frustum.Right.Point + rightBorder * 2.5f + frustum.Right.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Left.Point + leftBorder * 2.5f, frustum.Left.Point + leftBorder * 2.5f + frustum.Left.Normal * scale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+
+
+		//Borders
+		Orion::Renderer2D::AddLine(frustum.Top.Point, frustum.Top.Point + topBorder * scale, glm::vec4(0.9f,0.1f,0.1f,1.0f));
+		Orion::Renderer2D::AddLine(frustum.Bottom.Point, frustum.Bottom.Point + bottomBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Left.Point, frustum.Left.Point + leftBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+		Orion::Renderer2D::AddLine(frustum.Right.Point, frustum.Right.Point + rightBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+
+
+		m_Frustum = frustum;
+
 	}
 
 	void PerspectiveCamera::RecalculateViewProjection()
@@ -158,9 +271,7 @@ namespace Orion
 	inline void PerspectiveCamera::RecalculateProjection()
 	{
 		m_AspectRatio = m_ScreenSize.x / m_ScreenSize.y;
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg), (float)m_AspectRatio, 0.1f, 1000.0f);
-		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix; 
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOVdeg), (float)m_AspectRatio, m_NearFar.x, m_NearFar.y);
+		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
-
-
 }
