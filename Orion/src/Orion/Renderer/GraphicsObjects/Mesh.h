@@ -51,7 +51,6 @@ namespace Orion
 			SetupMesh();
 		}
 
-		Mesh(const Shared<Mesh>& mesh); 
 
 		inline MeshVertex* GetVerticesData() { return m_Vertices.data(); }
 		inline uint32_t* GetIndicesData() { return m_Indices.data(); }

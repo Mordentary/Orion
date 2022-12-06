@@ -65,14 +65,19 @@ namespace Orion
 			float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
 			float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
 
-			glm::vec3 newOrientation = glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotX), glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisY)));
 
-			if (abs(glm::angle(newOrientation, m_CameraSpaceAxisY) - glm::radians(90.0f)) <= glm::radians(85.0f))
+			/*if (rotY > 89.0f)
+				rotY = 89.0f;
+			if (rotY < -89.0f)
+				rotY = -89.0f;*/
+			glm::vec3 newOrientation = glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotX), glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY)));
+
+			if (abs(glm::angle(newOrientation, m_WorldSpaceAxisY) - glm::radians(90.0f)) <= glm::radians(85.0f))
 			{
 				m_CameraSpaceAxisZ = newOrientation;
 			}
-
-			m_CameraSpaceAxisZ = glm::normalize(glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotY), m_CameraSpaceAxisY));
+			
+			m_CameraSpaceAxisZ = glm::normalize(glm::rotate(m_CameraSpaceAxisZ, glm::radians(-rotY), m_WorldSpaceAxisY));
 
 			m_CameraSpaceAxisX = glm::normalize(glm::cross(m_CameraSpaceAxisZ, m_WorldSpaceAxisY));
 			m_CameraSpaceAxisY = -glm::cross(m_CameraSpaceAxisZ, m_CameraSpaceAxisX);
@@ -134,20 +139,43 @@ namespace Orion
 
 	void PerspectiveCamera::UpdateFrustum()
 	{
-		CameraFrustum frustum;
-
 		float halfHeightNear = tan(m_FOVdeg / 2) * m_NearFar.x;
 		float halfWidthNear = halfHeightNear * m_AspectRatio;
 
-		float HalfHeightFar = tanf(m_FOVdeg / 2) * m_NearFar.y;
-		float HalfWidthFar = HalfHeightFar * m_AspectRatio;
+		float halfHeightFar = tanf(m_FOVdeg / 2) * m_NearFar.y;
+		float halfWidthFar = halfHeightFar * m_AspectRatio;
+
+		glm::vec3 nearPointCenter = m_Position + m_NearFar.x * m_CameraForward;
+		glm::vec3 farPointCenter = m_Position + m_NearFar.y * m_CameraForward;
+
+		CameraFrustum frustum;
 
 
+		frustum.Near = { m_CameraForward ,nearPointCenter };
+		frustum.Far = { -m_CameraForward ,farPointCenter };
+
+		glm::vec3 rightBorder = (nearPointCenter + m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		glm::vec3 normalRight = glm::cross(m_CameraSpaceAxisY, glm::normalize(rightBorder));
+
+		frustum.Right = { normalRight, m_Position };
+
+		glm::vec3 leftBorder = (nearPointCenter - m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		glm::vec3 normalLeft = -glm::cross(m_CameraSpaceAxisY, glm::normalize(leftBorder));
+
+		frustum.Left = { normalLeft ,m_Position };
 
 
-		const glm::vec3 frontMultFar = m_CameraForward * m_NearFar.y;
+		glm::vec3 topBorder = (nearPointCenter + m_CameraSpaceAxisY * halfHeightNear) - m_Position;
+		glm::vec3 normalTop = -glm::cross(m_CameraSpaceAxisX, glm::normalize(topBorder));
 
-		
+		frustum.Top = { normalTop ,m_Position };
+
+
+		glm::vec3 bottomBorder = (nearPointCenter - m_CameraSpaceAxisY * halfHeightNear) - m_Position;
+		glm::vec3 normalBottom = glm::cross(m_CameraSpaceAxisX, glm::normalize(bottomBorder));
+
+		frustum.Bottom = { normalBottom ,m_Position };
+
 
 		m_Frustum = frustum;
 	}
@@ -205,53 +233,40 @@ namespace Orion
 		Orion::Renderer2D::AddLine(m_Position, m_Position + m_CameraSpaceAxisZ, glm::vec4(0.8f, 0.5f, 0.f, 1.0f));
 		
 
-		CameraFrustum frustum;
-
-
-		frustum.Near = { m_CameraForward ,nearPointCenter };
-		frustum.Far = { -m_CameraForward ,nearPointCenter };
-
 		glm::vec3 rightBorder = (nearPointCenter + m_CameraSpaceAxisX * halfWidthNear) - m_Position;
-		glm::vec3 normalRight = glm::cross(m_CameraSpaceAxisY, glm::normalize(rightBorder));
 
-		frustum.Right = { normalRight, m_Position };
 
 		glm::vec3 leftBorder = (nearPointCenter - m_CameraSpaceAxisX * halfWidthNear) - m_Position;
-		glm::vec3 normalLeft = -glm::cross(m_CameraSpaceAxisY, glm::normalize(leftBorder));
 
-		frustum.Left = { normalLeft ,m_Position };
 
 
 		glm::vec3 topBorder = (nearPointCenter + m_CameraSpaceAxisY * halfHeightNear) - m_Position;
-		glm::vec3 normalTop = -glm::cross(m_CameraSpaceAxisX, glm::normalize(topBorder));
 
-		frustum.Top = { normalTop ,m_Position };
 
 
 		glm::vec3 bottomBorder = (nearPointCenter - m_CameraSpaceAxisY * halfHeightNear) - m_Position;
-		glm::vec3 normalBottom = glm::cross(m_CameraSpaceAxisX, glm::normalize(bottomBorder));
-
-		frustum.Bottom = { normalBottom ,m_Position };
 
 
-		float scale = 5.0f;
+
+		float borderScale = m_NearFar.y / 2.f;
+		float normalScale = glm::max(m_NearFar.x * 2.f,1.0f);
+
+
 		//DrawNormals
-		Orion::Renderer2D::AddLine(frustum.Near.Point, frustum.Near.Point + frustum.Near.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Far.Point, frustum.Far.Point + frustum.Far.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Top.Point + topBorder * 2.5f, frustum.Top.Point + topBorder * 2.5f + frustum.Top.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Bottom.Point + bottomBorder * 2.5f, frustum.Bottom.Point + bottomBorder * 2.5f + frustum.Bottom.Normal * scale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Right.Point + rightBorder * 2.5f, frustum.Right.Point + rightBorder * 2.5f + frustum.Right.Normal * scale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Left.Point + leftBorder * 2.5f, frustum.Left.Point + leftBorder * 2.5f + frustum.Left.Normal * scale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Near.Point, m_Frustum.Near.Point + m_Frustum.Near.Normal * normalScale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Far.Point, m_Frustum.Far.Point + m_Frustum.Far.Normal * normalScale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Top.Point + topBorder * (borderScale / 2), m_Frustum.Top.Point + topBorder * (borderScale/2) + m_Frustum.Top.Normal * normalScale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Bottom.Point + bottomBorder * (borderScale / 2), m_Frustum.Bottom.Point + bottomBorder * (borderScale / 2) + m_Frustum.Bottom.Normal * normalScale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Right.Point + rightBorder * (borderScale / 2), m_Frustum.Right.Point + rightBorder * (borderScale / 2) + m_Frustum.Right.Normal * normalScale, glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Left.Point + leftBorder * (borderScale / 2), m_Frustum.Left.Point + leftBorder * (borderScale / 2) + m_Frustum.Left.Normal * normalScale,  glm::vec4(0.1f, 0.7f, 0.7f, 1.0f));
 
 
 		//Borders
-		Orion::Renderer2D::AddLine(frustum.Top.Point, frustum.Top.Point + topBorder * scale, glm::vec4(0.9f,0.1f,0.1f,1.0f));
-		Orion::Renderer2D::AddLine(frustum.Bottom.Point, frustum.Bottom.Point + bottomBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Left.Point, frustum.Left.Point + leftBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
-		Orion::Renderer2D::AddLine(frustum.Right.Point, frustum.Right.Point + rightBorder * scale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Top.Point, m_Frustum.Top.Point + topBorder * borderScale, glm::vec4(0.9f,0.1f,0.1f,1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Bottom.Point, m_Frustum.Bottom.Point + bottomBorder * borderScale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Left.Point, m_Frustum.Left.Point + leftBorder * borderScale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
+		Orion::Renderer2D::AddLine(m_Frustum.Right.Point, m_Frustum.Right.Point + rightBorder * borderScale, glm::vec4(0.9f, 0.1f, 0.1f, 1.0f));
 
-
-		m_Frustum = frustum;
 
 	}
 

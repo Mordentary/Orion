@@ -71,23 +71,29 @@ namespace Orion
         Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 
     }
-    void Model::Render(Shared<Shader>& shader)
+    void Model::Render(Shared<Shader>& shader, bool doNotCull)
     {
        
         for (Shared<Mesh>& mesh : m_Meshes) 
         {
-            auto [min, max] = mesh->GetAABB();
+            auto& [min, max] = mesh->GetAABB();
             glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
-            glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f) ;
-            if (Orion::CamerasController::GetCamera("PerspectiveCamera2")->AABBVsFrustum(transformedMin, transformedMax))
+            glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f);
+            if (doNotCull || Orion::CamerasController::GetActiveCamera()->AABBVsFrustum(transformedMin, transformedMax))
             {
                 mesh->Render(shader);
-                RenderAABB(transformedMin, transformedMax);
             }
+            if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
+            {
+                RenderAABB(transformedMin, transformedMax); //works only in forward pipeline
+            }
+            
         }
-       // ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
-        //if (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
-        //      RenderModelAABB(); //works only in forward pipeline
+
+      
+
+        //ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
+  
 
     }
 

@@ -22,6 +22,12 @@ namespace Orion
 			auto& cam = s_CamerasController.m_CamerasStorage[s_CamerasController.m_ActiveCamera];
 
 			cam->Update(ts);
+
+			for (auto& [name, cam] : s_CamerasController.m_CamerasStorage)
+			{
+				if (name == GetActiveCameraName()) continue;
+				cam->UpdateFrustum();
+			}
 		}
 	}
 
@@ -50,8 +56,10 @@ namespace Orion
 	{
 		for (auto&[name, cam] : s_CamerasController.m_CamerasStorage)
 		{
-			if (name != GetActiveCameraName()) 
+			if (name == GetActiveCameraName()) continue;
+
 			cam->RenderFrustum();
+
 		}
 
 	}

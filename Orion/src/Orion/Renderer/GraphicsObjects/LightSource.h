@@ -89,7 +89,7 @@ namespace Orion
 		virtual uint32_t GetLightIndex() = 0;
 
 		const Shared<Model> GetLightModel() const {return m_LightModel;}
-		void SetLightModel(Shared<Model> model) { m_LightModel = model; }
+		void SetLightModel(Shared<Model> model) { m_LightModel = model;  }
 
 
 		Shared<Texture2D> GetShadowmap() const { return m_ShadowMap->GetDepthAttachmentTexture(); }

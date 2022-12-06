@@ -17,7 +17,9 @@ namespace Orion
              DeduceModelName();
              RecalculateAABBInModelSpace();
         }
-        void Render(Shared<Shader>& shader);
+
+       
+        void Render(Shared<Shader>& shader, bool doNotCull = false);
         bool IsIntersect(const CameraRay& ray);
 
 

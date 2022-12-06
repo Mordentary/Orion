@@ -73,6 +73,7 @@ namespace Orion
 		virtual void RecalculateProjection() = 0;
 
 		virtual void RenderFrustum() = 0;
+		virtual void UpdateFrustum() = 0;
 
 		void DragObjectAlongCameraPlane(Shared<Model>& model);
 
@@ -108,6 +109,8 @@ namespace Orion
 
 		const CameraRay& Raycast(float xCoord, float yCoord);
 		bool AABBVsFrustum(const glm::vec3& min, const glm::vec3& max);
+		bool PointVsFrustum(const glm::vec3& point);
+
 	protected:
 		struct Plane
 		{
@@ -150,13 +153,9 @@ namespace Orion
 
 		glm::vec2 m_ScreenSize{};
 	protected:
-		virtual void UpdateFrustum() = 0;
 
 	private:
 		float PlaneVsRay(const DummyCamera::Plane& pl, const CameraRay& ray);
-		bool PlaneVsAABB(const DummyCamera::Plane& pl, const glm::vec3& min, const glm::vec3& max);
-		bool AABBVsFrustumAccurate(const glm::vec3& min, const glm::vec3& max);
-
 
 	};
 

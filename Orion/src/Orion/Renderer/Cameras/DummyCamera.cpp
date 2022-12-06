@@ -88,69 +88,58 @@ namespace Orion
 
 		return -1.f;
 	}
+	bool DummyCamera::PointVsFrustum(const glm::vec3& point)
+	{	
+
+		Plane* currentPlane = &m_Frustum.Top;
+		for (int i = 0; i < 6; ++i)
+		{
+			if (currentPlane->Distance(point) <= 0)
+				return false;
+
+			++currentPlane;
+		} 
+		return true;
+	}
 
 
 	bool DummyCamera::AABBVsFrustum(const glm::vec3& min, const glm::vec3& max)
 	{
 		Plane* currentPlane = &m_Frustum.Top;
-		bool ret = true;
-		glm::vec3 vmin, vmax;
 
-		for (int i = 0; i < 6; ++i) 
+		for (int i = 0; i < 6; ++i)
 		{
-			// X axis 
-			if (currentPlane->Normal.x >= 0) {
-				vmin.x = min.x;
-				vmax.x = max.x;
+			glm::vec3 normal = currentPlane->Normal;
+			glm::vec3 p = min;
+			glm::vec3 n = max;
+
+			if (normal.x >= 0) 
+			{
+				p.x = max.x;
+				n.x = min.x;
 			}
-			else {
-				vmin.x = max.x;
-				vmax.x = min.x;
+			if (normal.y >= 0) 
+			{
+				p.y = max.y;
+				n.y = min.y;
 			}
-			// Y axis 
-			if (currentPlane->Normal.y >= 0) {
-				vmin.y = min.y;
-				vmax.y = max.y;
+			if (normal.z >= 0) 
+			{
+				p.z = max.z;
+				n.z = min.z;
 			}
-			else {
-				vmin.y = max.y;
-				vmax.y = min.y;
-			}
-			// Z axis 
-			if (currentPlane->Normal.z >= 0) {
-				vmin.z = min.z;
-				vmax.z = max.z;
-			}
-			else {
-				vmin.z = max.z;
-				vmax.z = min.z;
-			}
-			if (glm::dot(currentPlane->Normal, vmin) + glm::distance(currentPlane->Point, glm::vec3(0.f)) > 0)
+
+			
+			if (currentPlane->Distance(p) <= 0 && currentPlane->Distance(n) <= 0)
 				return false;
-			if (glm::dot(currentPlane->Normal, vmax) + glm::distance(currentPlane->Point, glm::vec3(0.f)) >= 0)
-				ret = true;
 
 			++currentPlane;
 		}
-		return ret;
+		return true;
 	}
 
 
-	bool DummyCamera::PlaneVsAABB(const DummyCamera::Plane& pl, const glm::vec3& min, const glm::vec3& max)
-	{
-		// Convert AABB to center-extents representation
-		glm::vec3 center = (min + max) * 0.5f; // Compute AABB center
-		glm::vec3 extent = max - center; // Compute positive extents
 
-		// Compute the projection interval radius of b onto L(t) = b.center + t * p.n
-		float r = extent[0] * glm::abs(pl.Normal.x) + extent[1] * glm::abs(pl.Normal.y) + extent[2] * glm::abs(pl.Normal.z);
-
-		// Compute distance of box center from plane
-		float s = glm::dot(pl.Normal, center - pl.Point);
-
-		// Intersection occurs when distance s falls within [-r,+r] interval
-		return glm::abs(s) <= r;
-	}
 
 	CameraRay::CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength)
 		: m_Direction(direction), m_Origin(origin), m_Length(rayLength)

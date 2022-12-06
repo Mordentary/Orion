@@ -41,6 +41,12 @@ class Model;
 				float GaussianCurve[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
 			};
 
+			struct DebugSettings
+			{
+				bool RenderOtherCamerasFrustum = false;
+				bool RenderModelsAABB = false;
+			};
+
 	public:
 		static void Init();
 		static void BeginScene(const Shared<DummyCamera>& camera, const Shared<Framebuffer>& finalFramebuffer, std::function<void()> renderFunc);
@@ -63,6 +69,8 @@ class Model;
 		static void AddModelToScene(const Shared<Model>& model);
 
 		static void PostProcessing(const PostProcessSpec& spec);
+		static DebugSettings& GetVisualDebuggingOptions();
+
 
 		static size_t GetSceneCubemapCount();
 		static const Shared<Model>& GetSelectedModel();
@@ -79,8 +87,6 @@ class Model;
 
 		static void ClosestObjectToRayHit();
 		static void ClosestLightToRayHit();
-
-
 
 
 	////////////////////////

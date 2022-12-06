@@ -16,8 +16,8 @@ namespace Orion {
 	
 			Orion::CamerasController::AddCamera("OrthoCamera", Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f)));
 			
-			Orion::CamerasController::AddCamera("PerspectiveCamera2", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{2.0f,10.f}));
 			Orion::CamerasController::AddCamera("PerspectiveCamera1", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{ 0.1f,100.f }));
+			Orion::CamerasController::AddCamera("PerspectiveCamera2", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{0.1f,100.f}));
 
 			m_DiffuseMap = Orion::Texture2D::Create("assets/textures/container.png");
 			m_SpecularMap = Orion::Texture2D::Create("assets/textures/container_specular.png");
@@ -32,7 +32,7 @@ namespace Orion {
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
 			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae");
-		//	m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
+			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
 			m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
@@ -87,19 +87,19 @@ namespace Orion {
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
 
 			Orion::Renderer::AddModelToScene(m_ModelCrate);
-		//	Orion::Renderer::AddModelToScene(m_ModelScene);
+			//Orion::Renderer::AddModelToScene(m_ModelScene);
 
 
 			Orion::Renderer::AddLightToScene(m_DirLight);
 			Orion::Renderer::AddLightToScene(m_SpotLight);
 
 			Orion::Renderer::AddLightToScene(m_PointLight);
-			Shared<LightSource> light;
-			for (int32_t i = 0; i < 11; i++)
+			
+			for (int32_t i = 0; i < 5; i++)
 			{
-				for (int32_t j = 0; j < 9; j++)
+				for (int32_t j = 0; j < 5; j++)
 				{
-					light = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024, glm::vec3(-i, rand() % 5, -j));
+					Shared<LightSource> light = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024, glm::vec3(-i, rand() % 5, -j));
 					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
@@ -110,11 +110,11 @@ namespace Orion {
 				}
 			}
 
-			for (int32_t i = 0; i < 11; i++)
+			for (int32_t i = 0; i < 5; i++)
 			{
-				for (int32_t j = 1; j < 9; j++)
+				for (int32_t j = 1; j < 5; j++)
 				{
-					 light = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp, 1024, 1024, glm::vec3(i, rand() % 5, j));
+					Shared<LightSource>  light = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp, 1024, 1024, glm::vec3(i, rand() % 5, j));
 					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
@@ -412,8 +412,22 @@ namespace Orion {
 
 				ImGui::Text("Post-Process: %f", stats.GetTotalTimePostProcessPass());
 			}
-			
+
 			ImGui::Checkbox("Enable deferred pipeline", &Orion::Renderer::IsPipelineDeferred());
+
+			if (ImGui::CollapsingHeader(("Visual debugging options")))
+			{
+				auto& opt = Orion::Renderer::GetVisualDebuggingOptions();
+
+
+				ImGui::Checkbox("Render model AABB", &opt.RenderModelsAABB);
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Render frustums of other cameras", &opt.RenderOtherCamerasFrustum);
+
+			}
+			
 
 
 

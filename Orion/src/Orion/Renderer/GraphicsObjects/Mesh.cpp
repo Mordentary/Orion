@@ -3,21 +3,6 @@
 
 namespace Orion 
 {
-	Mesh::Mesh(const Shared<Mesh>& mesh)
-	{
-		m_Material = mesh->GetMaterial();
-		m_Indices.reserve(mesh->GetIndicesCount());
-		m_Vertices.reserve(mesh->GetVerticesCount());
-
-
-		memcpy(m_Vertices.data(), mesh->GetVerticesData(), sizeof(MeshVertex) * mesh->GetVerticesCount());
-		memcpy(m_Indices.data(), mesh->GetVerticesData(), sizeof(uint32_t) * mesh->GetIndicesCount());
-
-
-
-		SetupMesh();
-	}
-
 
 	void Mesh::Render(Shared<Shader>& shader)
 	{

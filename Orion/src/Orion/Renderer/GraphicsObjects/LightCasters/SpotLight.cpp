@@ -7,8 +7,10 @@ namespace Orion
 	{
 		if (m_LightModel)
 		{
+
+			m_LightModel->SetModelMatrix(glm::translate(glm::mat4(1.0f), m_Prop.GeneralProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
 			shader->Bind();
-			shader->SetMat4("u_ModelMatrix", glm::translate(glm::mat4(1.0f), m_Prop.GeneralProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
+			shader->SetMat4("u_ModelMatrix", m_LightModel->GetModelMatrix());
 			shader->SetFloat3("u_LightColor", m_Prop.GeneralProp.DiffuseLightColor);
 
 			m_LightModel->Render(shader);

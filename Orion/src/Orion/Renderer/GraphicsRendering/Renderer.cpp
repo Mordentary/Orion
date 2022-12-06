@@ -56,6 +56,8 @@ namespace Orion
 		Shared<DummyCamera> SceneCamera = nullptr;
 
 		Orion::Renderer::Statistics3D Stats;
+		Orion::Renderer::DebugSettings DebugSettings;
+
 
 		Shared<UniformBuffer> MatricesUniformBuffer = nullptr;
 		Shared<UniformBuffer> PostProcessUniformBuffer = nullptr;
@@ -78,6 +80,10 @@ namespace Orion
 		Shared<Framebuffer> DeferredShadingBuffer = nullptr;
 
 		bool DeferredPipeline = true;
+
+
+		
+
 
 
 	};
@@ -284,6 +290,8 @@ namespace Orion
 
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
+		if(s_RenData3D.DebugSettings.RenderOtherCamerasFrustum)
+		Orion::CamerasController::RenderCamerasFrustum();
 
 		if (s_RenData3D.DeferredPipeline) 
 		{
@@ -291,7 +299,6 @@ namespace Orion
 			s_RenData3D.DeferredShadingBuffer->Resize(mainSpec.Width, mainSpec.Height);
 
 			GeometryPass();
-			//Orion::CamerasController::RenderCamerasFrustum();
 		}
 		else 
 		{
@@ -309,7 +316,7 @@ namespace Orion
 
 			Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
 			Orion::RenderCommand::StencilWrite(false);
-			Orion::CamerasController::RenderCamerasFrustum();
+
 
 			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
 
@@ -485,7 +492,7 @@ namespace Orion
 	{
 		if(s_RenData3D.DeferredPipeline)
 		LightingPass();
-
+	
 		Renderer2D::EndScene();
 
 	}
@@ -516,6 +523,7 @@ namespace Orion
 		s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->Bind(10);
 		s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->Bind(11);
 		s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->Bind(12);
+
 		s_RenData3D.DeferredShadingBuffer->ActivateDrawingToColorTexture(0);
 
 		s_RenData3D.DeferredShader->Bind();
@@ -534,7 +542,6 @@ namespace Orion
 
 		s_RenData3D.DeferredShadingBuffer->Unbind();
 
-
 		s_RenData3D.DeferredShadingBuffer->Bind();
 
 		s_RenData3D.DeferredShadingBuffer->ActivateDrawingToAllTextures();
@@ -542,8 +549,9 @@ namespace Orion
 		s_RenData3D.DeferredShadingBuffer->Bind();
 
 		s_RenData3D.LightManager.RenderLights();
+		
 
-		s_RenData3D.DeferredShadingBuffer->Unbind();
+
 
 		//ORI_INFO("SIZE: {0}", sizeof(glm::vec3));
 	}
@@ -552,7 +560,7 @@ namespace Orion
 	{
 		if (light->GetLightModel() == nullptr)
 		{
-			light->SetLightModel(s_RenData3D.Sphere);
+			light->SetLightModel(CreateShared<Model>(*s_RenData3D.Sphere.get()));
 		}
 		s_RenData3D.LightManager.AddLightSource(light);
 		
@@ -604,7 +612,7 @@ namespace Orion
 		s_RenData3D.CubemapShader->SetMat4("u_ViewProj", s_RenData3D.SceneCamera->GetProjectionMatrix()  * glm::mat4(glm::mat3(s_RenData3D.SceneCamera->GetViewMatrix())));
 
 		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, nullptr,  0.0f });
-		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader);
+		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader, true);
 
 		RenderCommand::CullBackFace(true);
 		RenderCommand::DepthWrite(true);
@@ -653,6 +661,10 @@ namespace Orion
 	Orion::Renderer::Statistics3D& Renderer::GetStats()
 	{
 		return s_RenData3D.Stats;
+	}
+	Orion::Renderer::DebugSettings& Renderer::GetVisualDebuggingOptions()
+	{
+		return s_RenData3D.DebugSettings;
 	}
 
 	bool& Renderer::IsPipelineDeferred()
