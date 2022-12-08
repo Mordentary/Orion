@@ -16,6 +16,7 @@
 
 
 #include <glm/gtc/type_ptr.hpp>
+#include <random>
 
 namespace Orion
 {
@@ -24,6 +25,8 @@ namespace Orion
 		Shared<Texture2D> WhiteTexture = nullptr;
 
 		Shared<Shader> PhongShader = nullptr;
+		Shared<Shader> PBRShader = nullptr;
+
 		Shared<Shader> CubemapShader = nullptr;
 		Shared<Shader> GaussianBlurShader = nullptr;
 		Shared<Shader> PostProcessingShader = nullptr;
@@ -112,6 +115,9 @@ namespace Orion
 		s_RenData3D.SelectModelShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/SelectModelShader.glsl");
 		s_RenData3D.GaussianBlurShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GaussianBlurShader.glsl");
 		s_RenData3D.PostProcessingShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PostProcessingShader.glsl");
+
+		s_RenData3D.PBRShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PBRShader.glsl");
+
 
 		s_RenData3D.LightManager.SetLightShader(ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl"));
 
@@ -394,8 +400,28 @@ namespace Orion
 
 		if (s_RenData3D.DeferredPipeline) 
 		{
-			sceneBuffer = s_RenData3D.DeferredShadingBuffer;
-			s_RenData3D.GBuffer->BlitStencilToBuffer(sceneBuffer);
+			if (spec.DeferredOutputTexture == 0)
+			{
+				sceneBuffer = s_RenData3D.DeferredShadingBuffer;
+				s_RenData3D.GBuffer->BlitStencilToBuffer(sceneBuffer);
+			}
+			if (spec.DeferredOutputTexture == 1) // Position
+			{
+				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 0, 0);
+
+				return;
+			}
+			if (spec.DeferredOutputTexture == 2) // Normals
+			{
+				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 1, 0);
+				return;
+			}
+			if (spec.DeferredOutputTexture == 3) // Albedo+Spec
+			{
+				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 2,0);
+				return;
+				
+			}
 		}
 		else sceneBuffer = s_RenData3D.MS_Framebuffer;
 
@@ -555,6 +581,31 @@ namespace Orion
 
 		//ORI_INFO("SIZE: {0}", sizeof(glm::vec3));
 	}
+	float lerp(float a, float b, float f)
+	{
+		return a + f * (b - a);
+	}
+	//void Renderer::ComputeUnitHemisphere() //For future SSAO
+	//{
+	//	std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+	//	std::default_random_engine generator;
+	//	std::vector<glm::vec3> ssaoKernel;
+	//	for (unsigned int i = 0; i < 64; ++i)
+	//	{
+	//		glm::vec3 sample(
+	//			randomFloats(generator) * 2.0 - 1.0,
+	//			randomFloats(generator) * 2.0 - 1.0,
+	//			randomFloats(generator)
+	//		);
+	//		sample = glm::normalize(sample);
+	//		sample *= randomFloats(generator);
+	//		float scale = (float)i / 64.0;
+	//		scale = lerp(0.1f, 1.0f, scale * scale);
+	//		sample *= scale;
+	//		ssaoKernel.push_back(sample);
+	//	}
+	//}
+	//
 
 	void Renderer::AddLightToScene(const Shared<LightSource>& light)
 	{

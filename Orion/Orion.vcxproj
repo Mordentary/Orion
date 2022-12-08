@@ -679,6 +679,7 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\GaussianBlurShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LightShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\LineShader.glsl" />
+    <None Include="src\Platform\OpenGL\DefaultShaders\PBRShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\PhongShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\PostProcessingShader.glsl" />
     <None Include="src\Platform\OpenGL\DefaultShaders\QuadShader.glsl" />

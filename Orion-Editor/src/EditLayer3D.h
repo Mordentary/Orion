@@ -372,7 +372,7 @@ namespace Orion {
 				if (m_PostProcessSpec.HDR_Enable)
 				{
 				
-					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\0Reinhard\0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
+					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\ \0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
 					//ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
 
 					if (m_PostProcessSpec.HDR_CurrentModel == 2 || m_PostProcessSpec.HDR_CurrentModel == 3)
@@ -414,6 +414,13 @@ namespace Orion {
 			}
 
 			ImGui::Checkbox("Enable deferred pipeline", &Orion::Renderer::IsPipelineDeferred());
+
+			if (Orion::Renderer::IsPipelineDeferred())
+			{
+
+				ImGui::Combo("Output texture", &m_PostProcessSpec.DeferredOutputTexture, "FinalImage\0Position\0Normals\0Albedo\0");
+				//ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
+			}
 
 			if (ImGui::CollapsingHeader(("Visual debugging options")))
 			{

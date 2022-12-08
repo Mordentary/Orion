@@ -2,12 +2,12 @@
 #version 450 core
 
 
-layout (location = 0) in vec3 a_Position;
-layout (location = 1) in vec3 a_Normal;
-layout (location = 2) in vec3 a_Tangent;
-layout (location = 3) in vec3 a_Bitangent;
-layout (location = 4) in vec4 a_Color;
-layout (location = 5) in vec2 a_TextureCoord;
+layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec3 a_Normal;
+layout(location = 2) in vec3 a_Tangent;
+layout(location = 3) in vec3 a_Bitangent;
+layout(location = 4) in vec4 a_Color;
+layout(location = 5) in vec2 a_TextureCoord;
 
 
 
@@ -30,20 +30,20 @@ uniform mat4 u_ModelMatrix;
 void main()
 {
 
-   v_Normal =  mat3(transpose(inverse(u_ModelMatrix))) * a_Normal; 
-   v_Color = a_Color;
-   v_TextCoord = a_TextureCoord;
+    v_Normal = mat3(transpose(inverse(u_ModelMatrix))) * a_Normal;
+    v_Color = a_Color;
+    v_TextCoord = a_TextureCoord;
 
 
-   vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent, 0.0)));
-   vec3 B = normalize(vec3(u_ModelMatrix * vec4(a_Bitangent, 0.0)));
-   vec3 N = normalize(vec3(u_ModelMatrix * vec4(a_Normal, 0.0)));
+    vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent, 0.0)));
+    vec3 B = normalize(vec3(u_ModelMatrix * vec4(a_Bitangent, 0.0)));
+    vec3 N = normalize(vec3(u_ModelMatrix * vec4(a_Normal, 0.0)));
 
-   v_TBN = mat3(T, B, N);
+    v_TBN = mat3(T, B, N);
 
-   v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
+    v_FragPos = vec3(u_ModelMatrix * vec4(a_Position, 1.0));
 
-   gl_Position =  u_ViewProj * vec4(v_FragPos, 1.0);
+    gl_Position = u_ViewProj * vec4(v_FragPos, 1.0);
 
 
 }
@@ -66,7 +66,7 @@ struct Material {
     sampler2D normals;
 
     float shininess;
-}; 
+};
 
 struct DirectionalLight
 {
@@ -124,7 +124,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
 
 float ShadowCalculationDir(vec4 shadowFrag, vec3 normal);
 float ShadowCalculationPoint(PointLight light, vec3 shadowFrag);
-float ShadowCalculationSpot(SpotLight light,  vec4 shadowFrag, vec3 normal);
+float ShadowCalculationSpot(SpotLight light, vec4 shadowFrag, vec3 normal);
 
 
 #define MAX_LIGHTS 100
@@ -164,28 +164,28 @@ void main()
 {
 
     vec3 Normal = texture(u_Material.normals, v_TextCoord).rgb;
-    if(Normal != vec3(1.0f))
+    if (Normal != vec3(1.0f))
     {
         Normal = Normal * 2.0 - 1.0;
         Normal = normalize(v_TBN * Normal);;
     }
-    else 
+    else
     {
         Normal = normalize(v_Normal);
     }
-    
+
     vec3 viewDir = normalize(u_CameraPos - v_FragPos);
     vec4 result = vec4(0.0f);
 
 
     for (int i = 0; i < PointLightCount; i++)
     {
-       
-            result += CalcPointLight(u_PointLights[i], Normal, v_FragPos, viewDir);
+
+        result += CalcPointLight(u_PointLights[i], Normal, v_FragPos, viewDir);
     }
     for (int i = 0; i < SpotLightCount; i++)
     {
-       
+
         vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(v_FragPos, 1.0f);
         result += CalcSpotLight(u_SpotLights[i], Normal, v_FragPos, viewDir, FragPosSpotLight);
     }
@@ -195,12 +195,12 @@ void main()
     vec4 FragPosDirLight = u_DirLight.VPMatrix * vec4(v_FragPos, 1.0f);
     result += CalcDirectionalLight(u_DirLight, Normal, viewDir, FragPosDirLight);
 
-    if(result.a < 0.1f) discard;
+    if (result.a < 0.1f) discard;
 
     f_Color = vec4(result);
     f_LightSources = vec4(0.0, 0.0, 0.0, 1.0);
 
-} 
+}
 
 
 
@@ -211,7 +211,7 @@ float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(u_ShadowMapDir, projCoords.xy).r; 
+    float closestDepth = texture(u_ShadowMapDir, projCoords.xy).r;
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
@@ -234,10 +234,10 @@ float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
     }
     shadow /= float(pow(filterSize, 2));
 
-     if(projCoords.z > 1.0)
+    if (projCoords.z > 1.0)
         shadow = 0.0;
     return shadow;
-}  
+}
 
 float ShadowCalculationSpot(SpotLight light, vec4 fragPosLightSpace, vec3 normal)
 {
@@ -267,7 +267,7 @@ float ShadowCalculationSpot(SpotLight light, vec4 fragPosLightSpace, vec3 normal
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }
     }
-    shadow /= float(pow(filterSize,2));
+    shadow /= float(pow(filterSize, 2));
 
 
     return shadow;
@@ -277,7 +277,7 @@ float ShadowCalculationPoint(PointLight light, vec3 fragPos)
 {
     vec3 fragToLight = fragPos - light.position;
 
- 
+
     float currentDepth = length(fragToLight);
 
     float shadow = 0.0;
@@ -314,27 +314,27 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     // specular shading
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Material.shininess);
     //float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
     // attenuation
-    float distance    = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + 
-  			     light.quadratic * (distance * distance));    
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance +
+        light.quadratic * (distance * distance));
     // combine results
-    vec3 ambient  = light.ambient * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
+    vec3 ambient = light.ambient * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
     vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
 
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
+    ambient *= attenuation;
+    diffuse *= attenuation;
     specular *= attenuation;
 
     float shadow = ShadowCalculationPoint(light, fragPos);
- 
+
     vec3 finalColor = vec3(diffuse + specular) * (1.0f - 0.0f) + ambient;
 
- 
+
 
     return vec4(finalColor, texture(u_Material.diffuse, v_TextCoord).w);
 
@@ -382,16 +382,16 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     //vec3 reflectDir = reflect(-lightDir, normal);
-      vec3 halfwayDir = normalize(lightDir + viewDir);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
 
-    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), u_Material.shininess);
     // combine results
-    vec3 ambient  = light.ambient * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
+    vec3 ambient = light.ambient * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
     vec3 diffuse = light.diffuse * diff * vec3(texture(u_Material.diffuse, v_TextCoord)) * vec3(v_Color);
     vec3 specular = light.specular * spec * vec3(texture(u_Material.specular, v_TextCoord));
 
     float shadow = ShadowCalculationDir(fragLightSpace, normal);
 
-    return vec4(vec3(diffuse + specular) * (1.f-shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
+    return vec4(vec3(diffuse + specular) * (1.f - shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 
-}  
+}

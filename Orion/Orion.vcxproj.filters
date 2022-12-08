@@ -1647,5 +1647,6 @@
     <None Include="src\Platform\OpenGL\DefaultShaders\TextureDepthShader.glsl">
       <Filter>src\Platform\OpenGL\DefaultShaders</Filter>
     </None>
+    <None Include="src\Platform\OpenGL\DefaultShaders\PBRShader.glsl" />
   </ItemGroup>
 </Project>

@@ -48,8 +48,8 @@ void main()
 #version 450 core
 
 
-layout(location = 0) out vec3 f_Position;
-layout(location = 1) out vec3 f_Normal;
+layout(location = 0) out vec4 f_Position;
+layout(location = 1) out vec4 f_Normal;
 layout(location = 2) out vec4 f_AlbedoSpec;
 
 
@@ -74,9 +74,7 @@ in vec2 v_TextCoord;
 in vec3 v_FragPos;
 in mat3 v_TBN;
 
-
 uniform Material u_Material;
-
 
 
 void main()
@@ -94,9 +92,9 @@ void main()
         normal = normalize(v_Normal);
     }
     // store the fragment position vector in the first gbuffer texture
-    f_Position = v_FragPos;
+    f_Position =  vec4(v_FragPos,1.0f);
     // also store the per-fragment normals into the gbuffer
-    f_Normal = normal;
+    f_Normal = vec4(normal,1.0f);
     // and the diffuse per-fragment color
     f_AlbedoSpec.rgb = texture(u_Material.diffuse, v_TextCoord).rgb * vec3(v_Color);
     // store shinness in gAlbedoSpec's alpha component

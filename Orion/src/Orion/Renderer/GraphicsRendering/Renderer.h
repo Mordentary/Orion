@@ -39,6 +39,8 @@ class Model;
 
 				uint32_t NumberBlurPasses = 10;
 				float GaussianCurve[5] = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
+
+				int32_t DeferredOutputTexture;
 			};
 
 			struct DebugSettings
@@ -84,7 +86,7 @@ class Model;
 		static void LightingPass();
 		static void RenderSelectedModelOutline();
 		static void DrawCubemap();
-
+		static void ComputeUnitHemisphere();
 		static void ClosestObjectToRayHit();
 		static void ClosestLightToRayHit();
 
