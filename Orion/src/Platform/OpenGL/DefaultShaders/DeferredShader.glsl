@@ -126,13 +126,13 @@ void main()
     vec4 result = vec4(0.0f);
 
 
-    for (int i = 0; i < PointLightCount; i++)
+    for (int i = 0; i < 1; i++)
     {
         /*float distance = length(u_PointLights[i].position - FragPos);
             if (distance < u_PointLights[i].radius)*/
         result += CalcPointLight(u_PointLights[i], Normal, FragPos, viewDir);
     }
-    for (int i = 0; i < SpotLightCount; i++)
+    for (int i = 0; i < 1; i++)
     {
         vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(FragPos, 1.0f);
         result += CalcSpotLight(u_SpotLights[i], Normal, FragPos, viewDir, FragPosSpotLight);
@@ -280,7 +280,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     float shadow = ShadowCalculationPoint(light, fragPos);
 
-    vec3 finalColor = vec3(diffuse + specular) * (1.f - 0.0f) + ambient;
+    vec3 finalColor = vec3(diffuse + specular) * (1.f - shadow) + ambient;
 
     return vec4(finalColor, 1.0f);
 
@@ -290,7 +290,6 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
@@ -304,7 +303,8 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     // combine results
     vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
+    float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
     vec3 specular = light.specular * spec ;
 
     ambient *= attenuation * intensity;
@@ -313,7 +313,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
     float shadow = ShadowCalculationSpot(light, fragPosLightSpace, normal);
 
-    return vec4((diffuse + specular) * (1.0f - 0.0f) + ambient, 1.0f);
+    return vec4((diffuse + specular) * (1.0f - shadow) + ambient, 1.0f);
 
 
 }

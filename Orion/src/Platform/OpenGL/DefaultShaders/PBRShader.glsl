@@ -127,6 +127,15 @@ float ShadowCalculationPoint(PointLight light, vec3 shadowFrag);
 float ShadowCalculationSpot(SpotLight light, vec4 shadowFrag, vec3 normal);
 
 
+float DistributionGGX(vec3 normal, vec3 halfWayVec, float roughness);
+
+float GeometrySchlickGGX(float normaldotVectir, float k);
+float GeometrySmith(vec3 normal, vec3 view, vec3 ligthDir, float k);
+vec3 FresnelSchlick(float cosTheta, vec3 F0);
+
+
+
+#define PI 3.1415926535897932384626433832795
 #define MAX_LIGHTS 100
 
 in vec3 v_Normal;
@@ -203,6 +212,41 @@ void main()
 }
 
 
+float DistributionGGX(vec3 N, vec3 H, float a)
+{
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float nom = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float k)
+{
+    float nom = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float k)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx1 = GeometrySchlickGGX(NdotV, k);
+    float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+    return ggx1 * ggx2;
+}
+
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
 
 float ShadowCalculationDir(vec4 fragPosLightSpace, vec3 normal)
 {
@@ -381,6 +425,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
     // diffuse shading
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
+    // 
     //vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);
 

@@ -82,7 +82,7 @@ namespace Orion
 		Shared<Framebuffer> GBuffer = nullptr;
 		Shared<Framebuffer> DeferredShadingBuffer = nullptr;
 
-		bool DeferredPipeline = true;
+		bool DeferredPipeline = false;
 
 
 		

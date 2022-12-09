@@ -26,17 +26,17 @@ namespace Orion {
 
 			modelCreation.Start();
 
-			m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
+		/*	m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
 			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx");
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
 			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
-			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");
+			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");*/
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae");
 			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
-			m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
-			m_ModelShield= Orion::CreateShared<Orion::Model>("assets/models/Armor/Shield/model.dae");
+			//m_ModelCrate = Orion::CreateShared<Orion::Model>("assets/models/WoodenCrate/Crate.obj");
+			//m_ModelShield= Orion::CreateShared<Orion::Model>("assets/models/Armor/Shield/model.dae");
 		
 
 			modelCreation.Stop();
@@ -46,7 +46,7 @@ namespace Orion {
 
 			//m_ModelScene->SetScale(glm::vec3(50.f));
 
-			m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
+		/*	m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
 
 			m_ModelPlatform->SetScale(glm::vec3(50.0f, 10.0f, 50.0f));
@@ -57,7 +57,7 @@ namespace Orion {
 
 			m_ModelCar->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 			m_ModelCar->SetPosition(glm::vec3(-0.7, -0.7, -5.2));
-
+*/
 
 			m_ModelDragon->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 			m_ModelDragon->SetPosition(glm::vec3(-0.6, -0.6, -6.2));
@@ -80,51 +80,51 @@ namespace Orion {
 			
 
 
-			Orion::Renderer::AddModelToScene(m_ModelCat);
+		/*	Orion::Renderer::AddModelToScene(m_ModelCat);
 			Orion::Renderer::AddModelToScene(m_ModelPlatform);
 			Orion::Renderer::AddModelToScene(m_ModelTree);   
-			Orion::Renderer::AddModelToScene(m_ModelCar);
+			Orion::Renderer::AddModelToScene(m_ModelCar);*/
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
 
-			Orion::Renderer::AddModelToScene(m_ModelCrate);
-			//Orion::Renderer::AddModelToScene(m_ModelScene);
+			//Orion::Renderer::AddModelToScene(m_ModelCrate);
+			////Orion::Renderer::AddModelToScene(m_ModelScene);
 
 
 			Orion::Renderer::AddLightToScene(m_DirLight);
 			Orion::Renderer::AddLightToScene(m_SpotLight);
-
 			Orion::Renderer::AddLightToScene(m_PointLight);
-			
-			for (int32_t i = 0; i < 5; i++)
-			{
-				for (int32_t j = 0; j < 5; j++)
-				{
-					Shared<LightSource> light = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024, glm::vec3(-i, rand() % 5, -j));
-					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-					light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF,  0.45f * randF);
-					light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
+			//
+			//for (int32_t i = 0; i < 5; i++)
+			//{
+			//	for (int32_t j = 0; j < 5; j++)
+			//	{
+			//		Shared<LightSource> light = Orion::CreateShared<Orion::PointLight>(nullptr, 1024, 1024, glm::vec3(-i, rand() % 5, -j));
+			//		float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			//		float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-					Orion::Renderer::AddLightToScene(light);
-				}
-			}
+			//		light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF,  0.45f * randF);
+			//		light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
 
-			for (int32_t i = 0; i < 5; i++)
-			{
-				for (int32_t j = 1; j < 5; j++)
-				{
-					Shared<LightSource>  light = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp, 1024, 1024, glm::vec3(i, rand() % 5, j));
-					float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			//		Orion::Renderer::AddLightToScene(light);
+			//	}
+			//}
 
-					light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF);
-					light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
-					light->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+			//for (int32_t i = 0; i < 5; i++)
+			//{
+			//	for (int32_t j = 1; j < 5; j++)
+			//	{
+			//		Shared<LightSource>  light = Orion::CreateShared<Orion::SpotLight>(m_ModelLamp, 1024, 1024, glm::vec3(i, rand() % 5, j));
+			//		float randF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			//		float randFF = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-					Orion::Renderer::AddLightToScene(light);
-				}
-			}
+			//		light->GetGeneralLightProp().DiffuseLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF);
+			//		light->GetGeneralLightProp().SpecularLightColor = glm::vec3(0.576f * randFF, randF * 0.42f * randFF, 0.45f * randF) / 2.f;
+			//		light->GetGeneralLightProp().Direction = glm::vec3(0.0f, -1.0f, 0.0f);
+
+			//		Orion::Renderer::AddLightToScene(light);
+			//	}
+			//}
 
 			
 			Orion::Renderer::AddSceneCubemap(Texture2D::CreateCubemap("assets/textures/CubemapSea"));
@@ -159,7 +159,7 @@ namespace Orion {
 			m_PointLight->GetGeneralLightProp().DiffuseLightColor =  m_Color;
 			m_PointLight->GetGeneralLightProp().SpecularLightColor = m_Color / 2.f;
 
-			m_ModelCar->SetPosition(m_ModelCar->GetPosition());
+			//m_ModelCar->SetPosition(m_ModelCar->GetPosition());
 
 			m_SpotLight->GetGeneralLightProp().Position = glm::vec3(cos(time) , -1.0f, sin(time));
 

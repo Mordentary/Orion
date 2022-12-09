@@ -310,11 +310,12 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     vec3 lightDir = normalize(light.position - fragPos);
     // diffuse shading
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    // specular shading
+    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
     float diff = max(dot(normal, lightDir), 0.0);
 
-    // specular shading
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0),  u_Material.shininess);
+
     //float spec = pow(max(dot(viewDir, reflectDir), 0.0), u_Material.shininess);
     // attenuation
     float distance    = length(light.position - fragPos);
@@ -332,7 +333,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     float shadow = ShadowCalculationPoint(light, fragPos);
  
-    vec3 finalColor = vec3(diffuse + specular) * (1.0f - 0.0f) + ambient;
+    vec3 finalColor = vec3(diffuse + specular) * (1.0f - shadow) + ambient;
 
  
 
@@ -368,7 +369,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
     float shadow = ShadowCalculationSpot(light, fragLightSpace, normal);
 
-    return vec4((diffuse + specular) * (1.0 - 0.0f) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
+    return vec4((diffuse + specular) * (1.0f - shadow) + ambient, texture(u_Material.diffuse, v_TextCoord).w);
 
 
 }
