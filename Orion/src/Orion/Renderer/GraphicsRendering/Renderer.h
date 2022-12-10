@@ -13,6 +13,7 @@ namespace Orion {
 class LightSource;
 class Mesh;
 struct Material;
+
 class Model;
 
 
@@ -78,6 +79,8 @@ class Model;
 		static const Shared<Model>& GetSelectedModel();
 		
 		static bool& IsPipelineDeferred();
+		static bool& IsPBR();
+
 
 	private:
 		friend struct RendererData3D;

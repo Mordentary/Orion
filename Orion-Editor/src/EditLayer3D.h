@@ -26,12 +26,13 @@ namespace Orion {
 
 			modelCreation.Start();
 
-		/*	m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj");
-			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx");
-			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX");
-			m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");
-			m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj");*/
-			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae");
+			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae", SHADING_MODELS::PBR);
+			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX", SHADING_MODELS::PBR);
+			m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx", SHADING_MODELS::PBR);
+			//m_ModelCat = Orion::CreateShared<Orion::Model>("assets/models/Cat/Cat.obj", SHADING_MODELS::PBR);
+			//m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx");
+		/*	m_ModelTree = Orion::CreateShared<Orion::Model>("assets/models/Tree/Tree.obj");*/
+			//m_ModelCar = Orion::CreateShared<Orion::Model>("assets/models/Car/source/hw6.obj", SHADING_MODELS::PBR);
 			//m_ModelScene = Orion::CreateShared<Orion::Model>("assets/models/Scene/sponza/NewSponza_Main_Yup_002.fbx");
 
 
@@ -49,8 +50,7 @@ namespace Orion {
 		/*	m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
 
-			m_ModelPlatform->SetScale(glm::vec3(50.0f, 10.0f, 50.0f));
-			m_ModelPlatform->SetPosition(glm::vec3(0.0, -4.0f, 5.0));
+		
 
 			m_ModelTree->SetScale(glm::vec3(20.0f, 15.0f, 20.0f));
 			m_ModelTree->SetPosition(glm::vec3(-0.3, -4.0f, 10.5));
@@ -58,6 +58,10 @@ namespace Orion {
 			m_ModelCar->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 			m_ModelCar->SetPosition(glm::vec3(-0.7, -0.7, -5.2));
 */
+
+			m_ModelPlatform->SetScale(glm::vec3(50.0f, 10.0f, 50.0f));
+			m_ModelPlatform->SetPosition(glm::vec3(0.0, -4.0f, 5.0));
+
 
 			m_ModelDragon->SetScale(glm::vec3(5.0f, 5.0f, 5.0f));
 			m_ModelDragon->SetPosition(glm::vec3(-0.6, -0.6, -6.2));
@@ -75,16 +79,16 @@ namespace Orion {
 
 		
 
-			Orion::Renderer::AddSphereToScene(glm::mat4(1.0f), { nullptr,nullptr,nullptr, 32.f });
-			Orion::Renderer::AddCubeToScene(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.f)), { nullptr,nullptr,nullptr, 32.f  });
+			//Orion::Renderer::AddSphereToScene(glm::mat4(1.0f), { nullptr,nullptr,nullptr, 32.f });
+			//Orion::Renderer::AddCubeToScene(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0f, 0.f)), { nullptr,nullptr,nullptr, 32.f  });
 			
 
 
-		/*	Orion::Renderer::AddModelToScene(m_ModelCat);
-			Orion::Renderer::AddModelToScene(m_ModelPlatform);
+		/*		//Orion::Renderer::AddModelToScene(m_ModelCat);
 			Orion::Renderer::AddModelToScene(m_ModelTree);   
 			Orion::Renderer::AddModelToScene(m_ModelCar);*/
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
+			Orion::Renderer::AddModelToScene(m_ModelPlatform);
 
 			//Orion::Renderer::AddModelToScene(m_ModelCrate);
 			////Orion::Renderer::AddModelToScene(m_ModelScene);
@@ -357,8 +361,8 @@ namespace Orion {
 
 				ImGui::Separator();
 
-				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.01f, 5.f);
-				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.01f, 5.0f);
+				ImGui::SliderFloat("Linear Attenuation", &m_LightSettings.x, 0.001f, 5.f);
+				ImGui::SliderFloat("Quadratic Attenuation", &m_LightSettings.y, 0.001f, 5.0f);
 			}
 			if (ImGui::CollapsingHeader(("PostProcess")))
 			{
@@ -415,12 +419,15 @@ namespace Orion {
 
 			ImGui::Checkbox("Enable deferred pipeline", &Orion::Renderer::IsPipelineDeferred());
 
+
 			if (Orion::Renderer::IsPipelineDeferred())
 			{
 
 				ImGui::Combo("Output texture", &m_PostProcessSpec.DeferredOutputTexture, "FinalImage\0Position\0Normals\0Albedo\0");
 				//ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
 			}
+
+			ImGui::Checkbox("Enable PBR", &Orion::Renderer::IsPBR());
 
 			if (ImGui::CollapsingHeader(("Visual debugging options")))
 			{
@@ -504,39 +511,119 @@ namespace Orion {
 				uint32_t index = 0;
 				if (ImGui::CollapsingHeader("Material Properties"))
 				{
-					for (auto& mesh : selectedObject->GetMeshes())
+
+					if(selectedObject->IsPBRModel())
 					{
-					
-					
-						if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
+						for (auto& mesh : selectedObject->GetMeshes())
 						{
-								auto& mat = mesh->GetMaterial();
+							static bool useCustomValue = false;
+							ImGui::Checkbox("Use custom value", &useCustomValue);
+							ImGui::Separator();
 
-								if (mat.diffuseMap)
+							if (useCustomValue) 
+							{
+								static float  metallic  = selectedObject->GetCustomMaterialValues().Metallic;
+								static float  roughness = selectedObject->GetCustomMaterialValues().Roughness;
+								ImGui::SliderFloat("Metallic ", &metallic, 0.0f, 1.f);
+								ImGui::SliderFloat("Roughness ", &roughness, 0.05f, 0.95f);
+								selectedObject->SetCustomMaterialValues(roughness, metallic);
+								selectedObject->ApplyCustomMaterialValues();
+
+							}
+							else
+							{
+								selectedObject->ApplyDefaultMaterialValues();
+
+							}
+
+
+							if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
+							{
+								
+								auto& mat = mesh->GetCurrentMaterial();
+
+								if (mat.Albedo)
 								{
-									ImGui::Text("DiffuseTexture:");
-									ImGui::Image((void*)mat.diffuseMap->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Text("Albedo texture:");
+									ImGui::Image((void*)mat.Albedo->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 									ImGui::Separator();
 
 								}
-								if (mat.specularMap)
+								if (mat.Roughness)
 								{
-									ImGui::Text("SpecularTexture:");
-									ImGui::Image((void*)mat.specularMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Text("Roughness texture:");
+									ImGui::Image((void*)mat.Roughness->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 									ImGui::Separator();
 
 								}
-								if (mat.normalMap)
+							
+								if (mat.Mettalic)
 								{
-									ImGui::Text("NormalMap:");
-									ImGui::Image((void*)mat.normalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Text("Metallic texture:");
+									ImGui::Image((void*)mat.Mettalic->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 									ImGui::Separator();
 
 								}
+								if (mat.NormalMap)
+								{
+									ImGui::Text("Normal map:");
+									ImGui::Image((void*)mat.NormalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
 
-								ImGui::SliderFloat("Shininess factor: ", &mesh->GetMaterial().shininess, 16.0f, 128.f);
+								}
+								if (mat.Emission)
+								{
+									ImGui::Text("Emission map:");
+									ImGui::Image((void*)mat.Emission->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+								if (mat.AO)
+								{
+									ImGui::Text("Ambient occlusion map:");
+									ImGui::Image((void*)mat.AO->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+							}
+							++index;
 						}
-						++index;
+					}
+					else 
+					{
+						for (auto& mesh : selectedObject->GetMeshes())
+						{
+
+							if (ImGui::CollapsingHeader(("Mesh: " + std::to_string(index)).c_str()))
+							{
+								auto& mat = mesh->GetCurrentMaterial();
+
+								if (mat.Albedo)
+								{
+									ImGui::Text("Diffuse texture:");
+									ImGui::Image((void*)mat.Albedo->GetRendererID(), { (winSize.x / 2.f), (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+								if (mat.Roughness)
+								{
+									ImGui::Text("Specular texture:");
+									ImGui::Image((void*)mat.Roughness->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+								if (mat.NormalMap)
+								{
+									ImGui::Text("Normal map:");
+									ImGui::Image((void*)mat.NormalMap->GetRendererID(), { (winSize.x / 2.f) , (winSize.y / 2.f) * AR }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+									ImGui::Separator();
+
+								}
+
+								ImGui::SliderFloat("Shininess factor: ", &mesh->GetCurrentMaterial().Shininess, 16.0f, 128.f);
+							}
+							++index;
+						}
 					}
 				}
 

@@ -23,6 +23,8 @@ namespace Orion
 	struct RendererData3D
 	{
 		Shared<Texture2D> WhiteTexture = nullptr;
+		Shared<Texture2D> BlackTexture = nullptr;
+
 
 		Shared<Shader> PhongShader = nullptr;
 		Shared<Shader> PBRShader = nullptr;
@@ -83,11 +85,7 @@ namespace Orion
 		Shared<Framebuffer> DeferredShadingBuffer = nullptr;
 
 		bool DeferredPipeline = false;
-
-
-		
-
-
+		bool PBRPipeline = true;
 
 	};
 
@@ -104,7 +102,9 @@ namespace Orion
 		uint32_t whiteTextureData = 0xffffffff;
 		s_RenData3D.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-
+		s_RenData3D.BlackTexture = Texture2D::Create(1, 1);
+		uint32_t blackTextureData = 0x00000000;
+		s_RenData3D.BlackTexture->SetData(&blackTextureData, sizeof(uint32_t));
 	
 		//Shader preparing
 
@@ -138,6 +138,7 @@ namespace Orion
 		s_RenData3D.MatricesUniformBuffer->Bind(0);
 
 		s_RenData3D.PhongShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
+		s_RenData3D.PBRShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 		s_RenData3D.SelectModelShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 		s_RenData3D.GBufferShader->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
 		s_RenData3D.LightManager.GetLightShader()->LinkUniformBuffer(s_RenData3D.MatricesUniformBuffer);
@@ -197,21 +198,22 @@ namespace Orion
 			"u_LightSources"
 			
 		);
-
 		
 
 		s_RenData3D.LigthSourcesUniformBuffer->Bind(2);
 		s_RenData3D.DeferredShader->LinkUniformBuffer(s_RenData3D.LigthSourcesUniformBuffer);
 		s_RenData3D.PhongShader->LinkUniformBuffer(s_RenData3D.LigthSourcesUniformBuffer);
+		s_RenData3D.PBRShader->LinkUniformBuffer(s_RenData3D.LigthSourcesUniformBuffer);
+
 
 
 		s_RenData3D.DefaultMaterial =
 		{
-			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture, s_RenData3D.WhiteTexture,  32.f
+			s_RenData3D.WhiteTexture , s_RenData3D.WhiteTexture, s_RenData3D.WhiteTexture,s_RenData3D.BlackTexture, s_RenData3D.BlackTexture,s_RenData3D.BlackTexture,  32.f
 		};
 
-		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Cube.obj");
-		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Sphere.obj");
+		s_RenData3D.Cube = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Cube.obj", SHADING_MODELS::PBR);
+		s_RenData3D.Sphere = Orion::CreateShared<Orion::Model>("../Orion/src/Assets/models/PrimitiveShapes/Sphere.obj", SHADING_MODELS::PBR);
 
 		
 	}
@@ -291,7 +293,9 @@ namespace Orion
 
 		s_RenData3D.HorizontalPassBlur->Resize(mainSpec.Width, mainSpec.Height);
 		s_RenData3D.VerticalPassBlur->Resize(mainSpec.Width, mainSpec.Height);
+
 		s_RenData3D.WhiteTexture->Bind(0);
+		s_RenData3D.BlackTexture->Bind(1);
 
 
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -301,6 +305,7 @@ namespace Orion
 
 		if (s_RenData3D.DeferredPipeline) 
 		{
+
 			s_RenData3D.GBuffer->Resize(mainSpec.Width, mainSpec.Height);
 			s_RenData3D.DeferredShadingBuffer->Resize(mainSpec.Width, mainSpec.Height);
 
@@ -309,22 +314,26 @@ namespace Orion
 		else 
 		{
 
+
+
+
+
 			s_RenData3D.MS_Framebuffer->Resize(mainSpec.Width, mainSpec.Height);
-
-			s_RenData3D.PhongShader->Bind();
-			s_RenData3D.PhongShader->SetFloat3("u_CameraPos", camera->GetPosition());
-
-
 			s_RenData3D.MS_Framebuffer->Bind();
 			Orion::RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
-
-			s_RenData3D.CurrentShader = s_RenData3D.PhongShader;
 
 			Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
 			Orion::RenderCommand::StencilWrite(false);
 
 
-			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.PhongShader);
+			if (s_RenData3D.PBRPipeline) s_RenData3D.CurrentShader = s_RenData3D.PBRShader;
+			else
+			s_RenData3D.CurrentShader = s_RenData3D.PhongShader;
+
+			s_RenData3D.CurrentShader->Bind();
+			s_RenData3D.CurrentShader->SetFloat3("u_CameraPos", camera->GetPosition());
+
+			s_RenData3D.LightManager.LoadLightsToShaderAndRender(s_RenData3D.CurrentShader);
 
 
 		}
@@ -627,7 +636,7 @@ namespace Orion
 	{
 		Model model = *s_RenData3D.Cube.get();
 
-		model.GetMeshData()[0]->SetMaterial(material);
+		model.GetMeshData()[0]->SetCurrentMaterial(material);
 		model.SetModelMatrix(modelMatrix);
 
 		s_RenData3D.Models.push_back(CreateShared<Model>(model));
@@ -638,7 +647,7 @@ namespace Orion
 	{
 		Model model = *s_RenData3D.Sphere.get();
 
-		model.GetMeshData()[0]->SetMaterial(material);
+		model.GetMeshData()[0]->SetCurrentMaterial(material);
 		model.SetModelMatrix(modelMatrix);
 
 		s_RenData3D.Models.push_back(CreateShared<Model>(model));
@@ -662,7 +671,7 @@ namespace Orion
 
 		s_RenData3D.CubemapShader->SetMat4("u_ViewProj", s_RenData3D.SceneCamera->GetProjectionMatrix()  * glm::mat4(glm::mat3(s_RenData3D.SceneCamera->GetViewMatrix())));
 
-		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial({ nullptr, nullptr, nullptr,  0.0f });
+		s_RenData3D.Cube->GetMeshData()[0]->SetCurrentMaterial(s_RenData3D.DefaultMaterial);
 		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader, true);
 
 		RenderCommand::CullBackFace(true);
@@ -677,7 +686,7 @@ namespace Orion
 		s_RenData3D.CurrentShader->Bind();
 
 		s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", modelMatrix);
-		s_RenData3D.Cube->GetMeshData()[0]->SetMaterial(material);
+		s_RenData3D.Cube->GetMeshData()[0]->SetCurrentMaterial(material);
 		s_RenData3D.Cube->SetModelMatrix(modelMatrix);
 
 
@@ -690,7 +699,7 @@ namespace Orion
 		s_RenData3D.CurrentShader->Bind();
 		s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", modelMatrix);
 
-		s_RenData3D.Sphere->GetMeshData()[0]->SetMaterial(s_RenData3D.DefaultMaterial);
+		s_RenData3D.Sphere->GetMeshData()[0]->SetCurrentMaterial(material);
 		s_RenData3D.Sphere->SetModelMatrix(modelMatrix);
 
 
@@ -723,5 +732,9 @@ namespace Orion
 		return s_RenData3D.DeferredPipeline;
 	}
 
+	bool& Renderer::IsPBR() 
+	{
+		return s_RenData3D.PBRPipeline;
+	}
 
 }

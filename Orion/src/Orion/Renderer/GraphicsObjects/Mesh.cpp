@@ -7,30 +7,88 @@ namespace Orion
 	void Mesh::Render(Shared<Shader>& shader)
 	{
 		 shader->Bind();
-		 if (m_Material.diffuseMap) 
+		 if (shader == Orion::ShaderLibrary::Get("PhongShader")) 
 		 {
-			 m_Material.diffuseMap->Bind(1);
-			 shader->SetInt("u_Material.diffuse", m_Material.diffuseMap->GetCurrentSlot());
-		 }
-		 else shader->SetInt("u_Material.diffuse", 0);
+			 if (m_CurrentMaterial.Albedo)
+			 {
+				 m_CurrentMaterial.Albedo->Bind(2);
+				 shader->SetInt("u_Material.diffuse", m_CurrentMaterial.Albedo->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.diffuse", 0);
 
-		 if (m_Material.specularMap) 
+			 if (m_CurrentMaterial.Roughness)
+			 {
+				 m_CurrentMaterial.Roughness->Bind(3);
+				 shader->SetInt("u_Material.specular", m_CurrentMaterial.Roughness->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.specular", 0);
+
+			 if (m_CurrentMaterial.NormalMap)
+			 {
+				 m_CurrentMaterial.NormalMap->Bind(4);
+				 shader->SetInt("u_Material.normals", m_CurrentMaterial.NormalMap->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.normals", 0);
+
+			 if (m_CurrentMaterial.Shininess)
+				 shader->SetFloat("u_Material.shininess", m_CurrentMaterial.Shininess);
+			 else  shader->SetFloat("u_Material.shininess", 16.0f);
+		 }
+
+		 if (shader == Orion::ShaderLibrary::Get("PBRShader"))
 		 {
-			 m_Material.specularMap->Bind(2);
-			 shader->SetInt("u_Material.specular", m_Material.specularMap->GetCurrentSlot());
-		 }
-		 else shader->SetInt("u_Material.specular", 0);
 
-		 if (m_Material.normalMap)
-		 {
-			 m_Material.normalMap->Bind(3);
-			 shader->SetInt("u_Material.normals", m_Material.normalMap->GetCurrentSlot());
-		 }
-		 else shader->SetInt("u_Material.normals", 0);
+			 if (m_CurrentMaterial.Albedo)
+			 {
+				 m_CurrentMaterial.Albedo->Bind(2);
+				 shader->SetInt("u_Material.albedo", m_CurrentMaterial.Albedo->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.albedo", 0);
 
-		 if(m_Material.shininess)
-		 shader->SetFloat("u_Material.shininess", m_Material.shininess);
-		 else  shader->SetFloat("u_Material.shininess", 16.0f);
+
+			 if (m_CurrentMaterial.Roughness)
+			 {
+				 m_CurrentMaterial.Roughness->Bind(3);
+				 shader->SetInt("u_Material.roughness", m_CurrentMaterial.Roughness->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.roughness", 1);
+
+			 if (m_CurrentMaterial.Mettalic)
+			 {
+				 m_CurrentMaterial.Mettalic->Bind(4);
+				 shader->SetInt("u_Material.mettalic", m_CurrentMaterial.Mettalic->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.mettalic", 1);
+
+
+			 if (m_CurrentMaterial.NormalMap)
+			 {
+				 m_CurrentMaterial.NormalMap->Bind(5);
+				 shader->SetInt("u_Material.normals", m_CurrentMaterial.NormalMap->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.normals", 0);
+
+
+			 if (m_CurrentMaterial.Emission)
+			 {
+
+				 m_CurrentMaterial.Emission->Bind(6);
+				 shader->SetInt("u_Material.emission", m_CurrentMaterial.Emission->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.emission", 1);
+
+
+
+			 if (m_CurrentMaterial.AO)
+			 {
+				 m_CurrentMaterial.AO->Bind(7);
+				 shader->SetInt("u_Material.ao", m_CurrentMaterial.AO->GetCurrentSlot());
+			 }
+			 else shader->SetInt("u_Material.ao", 1);
+
+		 }
+
+
 
 		// RenderCommand::DrawArray(m_MeshVertexArray, m_Vertices.size());
 

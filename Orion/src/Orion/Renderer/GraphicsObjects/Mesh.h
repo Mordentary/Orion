@@ -10,13 +10,20 @@
 
 namespace Orion
 {
-	struct Material {
-		Shared<Texture2D> diffuseMap = nullptr;
-		Shared<Texture2D> specularMap = nullptr;
-		Shared<Texture2D> normalMap = nullptr;
 
-		float shininess;
+	struct Material 
+	{
+		Shared<Texture2D> Albedo = nullptr;
+		Shared<Texture2D> NormalMap = nullptr;
+		Shared<Texture2D> Mettalic = nullptr;
+		Shared<Texture2D> Roughness = nullptr;
+		Shared<Texture2D> Emission = nullptr;
+		Shared<Texture2D> AO = nullptr;
+
+		//For non PBR_MATERIALS
+		float Shininess = 0.0f;
 	};
+
 
 	struct MeshVertex
 	{
@@ -46,30 +53,44 @@ namespace Orion
 	public:
 		Mesh() = default;
 
-		Mesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material, glm::vec3& min, glm::vec3& max) : m_Vertices(std::move(vertices)), m_Indices(std::move(indices)) , m_AABBMin(std::move(min)), m_AABBMax(std::move(max)), m_Material(material)
+		Mesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material, glm::vec3& min, glm::vec3& max) : m_Vertices(std::move(vertices)), m_Indices(std::move(indices)), m_AABBMin(std::move(min)), m_AABBMax(std::move(max)), m_DefaultMaterial(material)
 		{
+			m_CurrentMaterial = m_DefaultMaterial;
 			SetupMesh();
 		}
-
 
 		inline MeshVertex* GetVerticesData() { return m_Vertices.data(); }
 		inline uint32_t* GetIndicesData() { return m_Indices.data(); }
 		inline Shared<VertexArray>& GetVertexArray() { return m_MeshVertexArray; }
 		inline size_t GetVerticesCount() { return m_Vertices.size(); }
 		inline size_t GetIndicesCount() { return m_Indices.size(); }
-		inline Material& GetMaterial() { return m_Material; }
-		void SetMaterial(const Material& material) { m_Material = material; }
+
+		inline  Material& GetCurrentMaterial() { return m_CurrentMaterial; }
+		inline const Material& GetDefaultMaterial() { return m_DefaultMaterial; }
+
+		void SetCurrentMaterial(const Material& material) { m_CurrentMaterial = material; }
+
+
+
 		inline std::pair<glm::vec3&, glm::vec3&> GetAABB() { return {m_AABBMin, m_AABBMax}; }
 
 		void Render(Shared<Shader>& shader);
 	protected:
 		void SetupMesh();
+
 		Shared<VertexArray>m_MeshVertexArray;
+
 		std::vector<MeshVertex> m_Vertices;
 		std::vector<uint32_t> m_Indices;
+
 		glm::vec3 m_AABBMin;
 		glm::vec3 m_AABBMax;
 
-		Material m_Material;
+		Material m_CurrentMaterial;
+		Material m_DefaultMaterial;
+
+
+
+
 	};
 }

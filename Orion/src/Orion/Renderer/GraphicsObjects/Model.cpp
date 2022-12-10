@@ -85,12 +85,11 @@ namespace Orion
             }
             if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
             {
-                RenderAABB(transformedMin, transformedMax); //works only in forward pipeline
+                RenderAABB(transformedMin, transformedMax); 
             }
             
         }
 
-      
 
         //ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
   
@@ -124,46 +123,22 @@ namespace Orion
 			return;
 		}
 
-        m_Path = path;
-		m_Directory = path.substr(0, path.find_last_of('/'));
 
         FindGreastestAABBAndCoord(scene->mRootNode, scene);
 
-        float scale = 1.0f / m_MaxDivider;
-        m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * scale;
-        m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * scale;
+        float CoordNormalizer = 1.0f / m_CoordNormalizationFactor;
+        m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * CoordNormalizer;
+        m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * CoordNormalizer;
+
+
         m_Meshes.reserve(scene->mNumMeshes);
-		ProcessNode(scene->mRootNode, scene);
+
+        ProcessNode(scene->mRootNode, scene);
 
 	}
 
-    void Model::FindGreastestAABBAndCoord(aiNode* node, const aiScene* scene)
-    {
-
-        for (unsigned int i = 0; i < node->mNumMeshes; i++)
-        {
-            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-
-            aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
-            float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
-
-            if (diff.x >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).x &&
-                diff.y >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).y &&
-                diff.z >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).z) 
-            {
-                m_OriginModelAABB = mesh->mAABB;
-            }
-
-          //  m_ModelAABB = mesh->mAABB;
-            if (scaleF > m_MaxDivider) m_MaxDivider = scaleF;
-        } 
-        for (unsigned int i = 0; i < node->mNumChildren; i++)
-        {
-            FindGreastestAABBAndCoord(node->mChildren[i], scene);
-        }
-
-
-    }
+  
+  
 
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
@@ -197,17 +172,20 @@ namespace Orion
          indices.reserve(mesh->mNumFaces * 3);
                  
        
-        float scale = 1.0f / m_MaxDivider;  
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+
         aiColor3D color(0.f, 0.f, 0.f);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
         glm::vec3 colorLinear = glm::pow(glm::vec3(color.r, color.g, color.b),glm::vec3(2.2f));
-
         color = aiColor3D(colorLinear.r, colorLinear.g, colorLinear.b);
+        
 
-        float shin = 0.f;
-        material->Get(AI_MATKEY_SHININESS, shin);
-     
+        float scale = 1.0f / m_CoordNormalizationFactor;  
+        mesh->mAABB.mMax *= scale;
+        mesh->mAABB.mMin *= scale;
+
+
         MeshVertex vertex{};
         glm::vec3 vector{};
         for (uint32_t i = 0; i < mesh->mNumVertices; i++)
@@ -283,50 +261,85 @@ namespace Orion
             for (uint32_t j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
-        // process materials
     
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
-        Material mat{};
+        
 
-     
-        // 1. diffuse maps
-        Shared<Texture2D> diffuseMap = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "DiffuseMap");
-        // 2. specular maps
-        Shared<Texture2D> specularMap = LoadMaterialTextures(material, aiTextureType_SPECULAR, "SpecularMap");
-        // 3. normal maps
-        Shared<Texture2D> normalMap = LoadMaterialTextures(material, aiTextureType_HEIGHT, "NormalMap");
-        // 4. shineness maps
-        Shared<Texture2D> shininessMap = LoadMaterialTextures(material, aiTextureType_SHININESS, "HeightMap");
-        // 4. base color maps
-        Shared<Texture2D> colorMap = LoadMaterialTextures(material, aiTextureType_BASE_COLOR, "ColorMap");
        
+        if (m_ShadingModel == SHADING_MODELS::PBR)
+            return CreateShared<Mesh>(vertices, indices, SetupPBRMaterial(material), glm::vec3{mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z});
+        else
+            return CreateShared<Mesh>(vertices, indices, SetupNonPBRMaterial(material), glm::vec3{ mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z }, glm::vec3{ mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z });
 
 
-
-        if (diffuseMap) 
-            mat.diffuseMap = diffuseMap;
-        if (normalMap) 
-            mat.normalMap = normalMap;
-       if(specularMap)
-            mat.specularMap = specularMap;
+       
         
-       if (shin)
-           mat.shininess = shin;
-       else
-           mat.shininess = 32.f;
-        
-       mesh->mAABB.mMax *= scale;
-       mesh->mAABB.mMin *= scale;
-
+    
         // return a mesh object created from the extracted mesh data
             
-       return CreateShared<Mesh>(vertices, indices, mat, glm::vec3{ mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z});
             
+    }
+
+        
+    Material Model::SetupNonPBRMaterial(aiMaterial* mat) 
+    {
+        Material returnMat{};
+        
+
+        // 1. diffuse maps
+        Shared<Texture2D> diffuseMap = LoadMaterialTextures(mat, aiTextureType_DIFFUSE, "DiffuseMap");
+        // 2. specular maps
+        Shared<Texture2D> specularMap = LoadMaterialTextures(mat, aiTextureType_SPECULAR, "SpecularMap");
+        // 3. normal maps
+        Shared<Texture2D> normalMap = LoadMaterialTextures(mat, aiTextureType_HEIGHT, "NormalMap");
+
+        float shin = 0.f;
+        mat->Get(AI_MATKEY_SHININESS, shin);
+
+        if (diffuseMap)
+            returnMat.Albedo = diffuseMap;
+        if (normalMap)
+            returnMat.NormalMap = normalMap;
+        if (specularMap)
+            returnMat.Mettalic= specularMap;
+        if (shin)
+            returnMat.Shininess = shin;
+        else
+            returnMat.Shininess = 32.f;
+
+        return returnMat;
+    }
+    Material Model::SetupPBRMaterial(aiMaterial* mat)
+    {
+        Material returnMat{};
+ 
+        // 1. albedo 
+        Shared<Texture2D> albedo =          LoadPBRMaterialTextures(mat, aiTextureType_BASE_COLOR, "Albedo");
+        // 2. normal maps
+        Shared<Texture2D> normalMap =       LoadPBRMaterialTextures(mat, aiTextureType_HEIGHT, "NormalMap");
+        // 3. metallic
+        Shared<Texture2D> metallnessMap =   LoadPBRMaterialTextures(mat, aiTextureType_METALNESS, "MetallicMap");
+        // 4. roughness
+        Shared<Texture2D> roughnessMap =    LoadPBRMaterialTextures(mat, aiTextureType_DIFFUSE_ROUGHNESS, "RoughnessMap");
+        // 4. emmesive
+        Shared<Texture2D> emmisionMap =     LoadPBRMaterialTextures(mat, aiTextureType_EMISSION_COLOR, "EmissionMap");
+        // 4. AO
+        Shared<Texture2D> ambientOcc =      LoadPBRMaterialTextures(mat, aiTextureType_AMBIENT_OCCLUSION, "AO");
+
+        if (albedo)
+            returnMat.Albedo= albedo;
+        if (normalMap)
+            returnMat.NormalMap = normalMap;
+        if (metallnessMap)
+            returnMat.Mettalic = metallnessMap;
+        if (roughnessMap)
+            returnMat.Roughness = roughnessMap;
+        if (emmisionMap)
+            returnMat.Emission = emmisionMap;
+        if (ambientOcc)
+            returnMat.AO = ambientOcc;
+
+
+        return returnMat;
     }
 
     Shared<Texture2D> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
@@ -385,10 +398,117 @@ namespace Orion
                     return Texture2D::Create(path + "specular.jpeg");
             }
 
-
-            
             return nullptr;
 	}
+    Shared<Texture2D> Model::LoadPBRMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) 
+    {
+
+        if (mat->GetTextureCount(type) != 0)
+        {
+            aiString str;
+            mat->GetTexture(type, 0, &str);
+
+            if (type == aiTextureType_BASE_COLOR)
+            {
+                return Texture2D::Create(this->m_Directory + '/' + str.C_Str(), { true, true });
+            }
+            else
+            {
+                return Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+
+            }
+        }
+
+        // If textures didn't link to the model then manually search for them.
+        std::string path = this->m_Directory + '/' + "textures" + '/' + std::to_string(m_MeshIndex) + "_";
+
+        int32_t bitField = 0;
+
+        if (type == aiTextureType_BASE_COLOR)
+        {
+            bitField |= (std::filesystem::exists(path + "albedo.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "albedo.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "albedo.png") * FILE_FORMATS::PNG);
+
+            if (bitField & FILE_FORMATS::JPG)
+                return Texture2D::Create(path + "albedo.jpg", { true, true });
+
+            if (bitField & FILE_FORMATS::JPEG)
+                return Texture2D::Create(path + "albedo.jpeg", { true, true });
+
+            if (bitField & FILE_FORMATS::PNG)
+                return  Texture2D::Create(path + "albedo.png", { true, true });
+
+        }
+        else if (type == aiTextureType_HEIGHT && std::filesystem::exists(path + "normal.png"))
+        {
+            return  Texture2D::Create(path + "normal.png");
+        }
+        else if (type == aiTextureType_METALNESS)
+        {
+            bitField |= (std::filesystem::exists(path + "metallic.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "metallic.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "metallic.png") * FILE_FORMATS::PNG);
+
+            if (bitField & FILE_FORMATS::JPG)
+                return Texture2D::Create(path + "metallic.jpg");
+
+            if (bitField & FILE_FORMATS::JPEG)
+                return Texture2D::Create(path + "metallic.jpeg");
+
+            if (bitField & FILE_FORMATS::PNG)
+                return  Texture2D::Create(path + "metallic.png");
+
+        }
+
+        else if (type == aiTextureType_DIFFUSE_ROUGHNESS)
+        {
+            bitField |= (std::filesystem::exists(path + "roughness.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "roughness.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "roughness.png") * FILE_FORMATS::PNG);
+
+            if (bitField & FILE_FORMATS::JPG)
+                return Texture2D::Create(path + "roughness.jpg");
+
+            if (bitField & FILE_FORMATS::JPEG)
+                return Texture2D::Create(path + "roughness.jpeg");
+
+            if (bitField & FILE_FORMATS::PNG)
+                return  Texture2D::Create(path + "roughness.png");
+
+        }
+
+        else if (type == aiTextureType_EMISSION_COLOR)
+        {
+            bitField |= (std::filesystem::exists(path + "emissive.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "emissive.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "emissive.png") * FILE_FORMATS::PNG);
+
+            if (bitField & FILE_FORMATS::JPG)
+                return Texture2D::Create(path + "emissive.jpg");
+
+            if (bitField & FILE_FORMATS::JPEG)
+                return Texture2D::Create(path + "emissive.jpeg");
+
+            if (bitField & FILE_FORMATS::PNG)
+                return  Texture2D::Create(path + "emissive.png");
+
+        }
+
+
+        else if (type == aiTextureType_AMBIENT_OCCLUSION)
+        {
+            bitField |= (std::filesystem::exists(path + "AO.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "AO.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "AO.png") * FILE_FORMATS::PNG);
+
+            if (bitField & FILE_FORMATS::JPG)
+                return Texture2D::Create(path + "AO.jpg");
+
+            if (bitField & FILE_FORMATS::JPEG)
+                return Texture2D::Create(path + "AO.jpeg");
+
+            if (bitField & FILE_FORMATS::PNG)
+                return  Texture2D::Create(path + "AO.png");
+
+        }
+
+ 
+
+
+  
+        return nullptr;
+    }
 
    
     bool Model::IsIntersect(const CameraRay& ray)
@@ -442,6 +562,73 @@ namespace Orion
 
     }
 
- 
+    void Model::FindGreastestAABBAndCoord(aiNode* node, const aiScene* scene)
+    {
 
+        for (unsigned int i = 0; i < node->mNumMeshes; i++)
+        {
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+            aiVector3D diff = (mesh->mAABB.mMax - mesh->mAABB.mMin);
+            float scaleF = glm::max(glm::max(diff.x, diff.y), diff.z);
+
+            if (diff.x >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).x &&
+                diff.y >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).y &&
+                diff.z >= (m_OriginModelAABB.mMax - m_OriginModelAABB.mMin).z)
+            {
+                m_OriginModelAABB = mesh->mAABB;
+            }
+
+            //  m_ModelAABB = mesh->mAABB;
+            if (scaleF > m_CoordNormalizationFactor) m_CoordNormalizationFactor = scaleF;
+        }
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            FindGreastestAABBAndCoord(node->mChildren[i], scene);
+        }
+
+
+    }
+    void Model::SetCustomMaterialValues(float roughness, float metallic)
+    { 
+        if (m_CustomMaterial.Roughness == roughness && m_CustomMaterial.Metallic == metallic) return;
+
+        m_CustomMaterial.Roughness = roughness; 
+        m_CustomMaterial.Metallic = metallic;
+
+       
+
+        char metallicData[] =  { m_CustomMaterial.Metallic * 255, m_CustomMaterial.Metallic * 255, m_CustomMaterial.Metallic * 255, 255 };
+        char roughnessData[] = { m_CustomMaterial.Roughness * 255, m_CustomMaterial.Roughness * 255, m_CustomMaterial.Roughness * 255, 255 };
+
+
+        m_CustomMaterial.CustomRougnessMap->SetData(&roughnessData, sizeof(uint32_t));
+        m_CustomMaterial.CustomMetallicMap->SetData(&metallicData, sizeof(uint32_t));
+
+    }
+
+    void Model::ApplyCustomMaterialValues() 
+    {
+
+        for (auto& mesh : m_Meshes)
+        {
+            Material meshMat = mesh->GetDefaultMaterial();
+            meshMat.Mettalic =  m_CustomMaterial.CustomMetallicMap;
+            meshMat.Roughness = m_CustomMaterial.CustomRougnessMap;
+
+            mesh->SetCurrentMaterial(meshMat);
+        }
+    }
+
+    void Model::ApplyDefaultMaterialValues() 
+    {
+        for (auto& mesh : m_Meshes)
+        {
+            Material meshMat = mesh->GetDefaultMaterial();
+         
+
+            mesh->SetCurrentMaterial(meshMat);
+        }
+    }
+    
 }

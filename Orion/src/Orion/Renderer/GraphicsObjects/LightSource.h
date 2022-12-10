@@ -16,7 +16,7 @@ namespace Orion
 		{
 			glm::vec3 AmbientLightColor{ 0.01f, 0.01f, 0.01f };
 			float padding0;
-			glm::vec3 DiffuseLightColor{ 0.7f, 0.7f, 0.7f};
+			glm::vec3 DiffuseLightColor{ 25.0f, 25.f, 25.0f};
 			float padding1;
 			glm::vec3 SpecularLightColor{ 0.5f, 0.5f, 0.5f };
 			float padding2;
@@ -59,8 +59,8 @@ namespace Orion
 			float LinearAttenuation = 0.065f;
 			float QuadraticAttenuation = 0.1f;
 			
-			float OuterCutOff = 6.0f;
-			float InnerCutOff = 5.f;
+			float OuterCutOff = 3.0f;
+			float InnerCutOff = 2.0f;
 
 
 			glm::mat4 ViewProj{1.0f};
