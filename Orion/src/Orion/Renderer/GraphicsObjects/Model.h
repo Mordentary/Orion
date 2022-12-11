@@ -27,9 +27,11 @@ namespace Orion
 
             Shared<Texture2D> CustomRougnessMap = nullptr;
             Shared<Texture2D> CustomMetallicMap = nullptr;
+            Shared<Texture2D> CustomEmissionMap = nullptr;
 
             float Roughness = 0.1f;
             float Metallic = 0.5f;
+            glm::vec3 Emission{};
 
         };
     public:
@@ -41,6 +43,8 @@ namespace Orion
 
              m_CustomMaterial.CustomRougnessMap = Texture2D::Create(1, 1);
              m_CustomMaterial.CustomMetallicMap = Texture2D::Create(1, 1);
+             m_CustomMaterial.CustomEmissionMap= Texture2D::Create(1, 1);
+
 
 
         }
@@ -78,7 +82,7 @@ namespace Orion
         bool IsPBRModel() { return m_ShadingModel == SHADING_MODELS::PBR; }
 
 
-        void SetCustomMaterialValues(float roughness, float metallic);
+        void SetCustomMaterialValues(float roughness, float metallic, const glm::vec3 emmision);
 
         void SetModelMatrix(const glm::mat4& mat);
 

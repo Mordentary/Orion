@@ -313,15 +313,15 @@ namespace Orion
         Material returnMat{};
  
         // 1. albedo 
-        Shared<Texture2D> albedo =          LoadPBRMaterialTextures(mat, aiTextureType_BASE_COLOR, "Albedo");
+        Shared<Texture2D> albedo =          LoadPBRMaterialTextures(mat, aiTextureType_DIFFUSE, "Albedo");
         // 2. normal maps
-        Shared<Texture2D> normalMap =       LoadPBRMaterialTextures(mat, aiTextureType_HEIGHT, "NormalMap");
+        Shared<Texture2D> normalMap =       LoadPBRMaterialTextures(mat, aiTextureType_NORMALS, "NormalMap");
         // 3. metallic
         Shared<Texture2D> metallnessMap =   LoadPBRMaterialTextures(mat, aiTextureType_METALNESS, "MetallicMap");
         // 4. roughness
         Shared<Texture2D> roughnessMap =    LoadPBRMaterialTextures(mat, aiTextureType_DIFFUSE_ROUGHNESS, "RoughnessMap");
         // 4. emmesive
-        Shared<Texture2D> emmisionMap =     LoadPBRMaterialTextures(mat, aiTextureType_EMISSION_COLOR, "EmissionMap");
+        Shared<Texture2D> emmisionMap =     LoadPBRMaterialTextures(mat, aiTextureType_EMISSIVE, "EmissionMap");
         // 4. AO
         Shared<Texture2D> ambientOcc =      LoadPBRMaterialTextures(mat, aiTextureType_AMBIENT_OCCLUSION, "AO");
 
@@ -348,7 +348,7 @@ namespace Orion
             {
                 aiString str;
                 mat->GetTexture(type, 0, &str);
-
+                
                 if (type == aiTextureType_DIFFUSE)
                 {
                     return Texture2D::Create(this->m_Directory + '/' + str.C_Str(), { true, true });
@@ -406,9 +406,13 @@ namespace Orion
         if (mat->GetTextureCount(type) != 0)
         {
             aiString str;
-            mat->GetTexture(type, 0, &str);
+            ORI_ASSERT(mat->GetTexture(type, 0, &str) == aiReturn_SUCCESS, "Texture not loaded correctly!!");
 
-            if (type == aiTextureType_BASE_COLOR)
+            //std::string name = str.C_Str();
+            //uint32_t lastSlash = name.find_last_of('\\');
+            //name = name.substr(lastSlash + 1, name.size() - lastSlash);
+
+            if (type == aiTextureType_DIFFUSE)
             {
                 return Texture2D::Create(this->m_Directory + '/' + str.C_Str(), { true, true });
             }
@@ -424,7 +428,7 @@ namespace Orion
 
         int32_t bitField = 0;
 
-        if (type == aiTextureType_BASE_COLOR)
+        if (type == aiTextureType_DIFFUSE)
         {
             bitField |= (std::filesystem::exists(path + "albedo.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "albedo.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "albedo.png") * FILE_FORMATS::PNG);
 
@@ -472,7 +476,7 @@ namespace Orion
 
         }
 
-        else if (type == aiTextureType_EMISSION_COLOR)
+        else if (type == aiTextureType_EMISSIVE)
         {
             bitField |= (std::filesystem::exists(path + "emissive.jpg") * FILE_FORMATS::JPG) | (std::filesystem::exists(path + "emissive.jpeg") * FILE_FORMATS::JPEG) | ((int32_t)std::filesystem::exists(path + "emissive.png") * FILE_FORMATS::PNG);
 
@@ -589,21 +593,26 @@ namespace Orion
 
 
     }
-    void Model::SetCustomMaterialValues(float roughness, float metallic)
+    void Model::SetCustomMaterialValues(float roughness, float metallic, const glm::vec3 emmision)
     { 
-        if (m_CustomMaterial.Roughness == roughness && m_CustomMaterial.Metallic == metallic) return;
+        if (m_CustomMaterial.Roughness == roughness && m_CustomMaterial.Metallic == metallic && m_CustomMaterial.Emission == emmision) return;
 
         m_CustomMaterial.Roughness = roughness; 
         m_CustomMaterial.Metallic = metallic;
+        m_CustomMaterial.Emission = emmision;
+
 
        
 
         char metallicData[] =  { m_CustomMaterial.Metallic * 255, m_CustomMaterial.Metallic * 255, m_CustomMaterial.Metallic * 255, 255 };
         char roughnessData[] = { m_CustomMaterial.Roughness * 255, m_CustomMaterial.Roughness * 255, m_CustomMaterial.Roughness * 255, 255 };
+        char emissionData[] = { m_CustomMaterial.Emission.x * 255, m_CustomMaterial.Emission.y * 255, m_CustomMaterial.Emission.z * 255, 255 };
 
 
         m_CustomMaterial.CustomRougnessMap->SetData(&roughnessData, sizeof(uint32_t));
         m_CustomMaterial.CustomMetallicMap->SetData(&metallicData, sizeof(uint32_t));
+        m_CustomMaterial.CustomEmissionMap->SetData(&emissionData, sizeof(uint32_t));
+
 
     }
 
@@ -615,6 +624,8 @@ namespace Orion
             Material meshMat = mesh->GetDefaultMaterial();
             meshMat.Mettalic =  m_CustomMaterial.CustomMetallicMap;
             meshMat.Roughness = m_CustomMaterial.CustomRougnessMap;
+            meshMat.Emission = m_CustomMaterial.CustomEmissionMap;
+
 
             mesh->SetCurrentMaterial(meshMat);
         }

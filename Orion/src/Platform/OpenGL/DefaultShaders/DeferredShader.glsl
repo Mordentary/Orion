@@ -83,6 +83,13 @@ float ShadowCalculationDir(vec4 shadowFrag,  vec3 normal);
 float ShadowCalculationPoint(PointLight light, vec3 shadowFrag);
 float ShadowCalculationSpot (SpotLight light, vec4 shadowFrag, vec3 normal);
 
+float DistributionGGX(vec3 N, vec3 H, float a);
+float GeometrySchlickGGX(float NdotV, float k);
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float k);
+vec3 FresnelSchlick(float cosTheta, vec3 F0);
+
+
+
 
 in vec2 v_TextCoord;
 
@@ -92,14 +99,15 @@ uniform sampler2D u_ShadowMapDir;
 uniform sampler2D u_ShadowMapSpot;
 uniform samplerCube u_ShadowCubemap;
 
-uniform sampler2D u_gPosition;
-uniform sampler2D u_gNormal;
-uniform sampler2D u_gAlbedoSpec;
+uniform sampler2D u_gPosition_Rougness;
+uniform sampler2D u_gNormals;
+uniform sampler2D u_gAlbedo_Metallic;
+uniform sampler2D u_gEmissionAO;
 
 
 uniform vec3 u_CameraPos;
 
-
+#define PI 3.1415926535897932384626433832795
 #define MAX_LIGHTS 100
 
 layout(std140) uniform u_LightSources
@@ -119,8 +127,10 @@ layout(std140) uniform u_LightSources
 void main()
 {
 
-    vec3 FragPos = texture(u_gPosition, v_TextCoord).rgb;
-    vec3 Normal = normalize(texture(u_gNormal, v_TextCoord).rgb);
+
+
+    vec3 FragPos = texture(u_gPosition_Rougness, v_TextCoord).rgb;
+    vec3 Normal = normalize(texture(u_gNormals, v_TextCoord).rgb);
 
     vec3 viewDir = normalize(u_CameraPos - FragPos);
     vec4 result = vec4(0.0f);
@@ -128,8 +138,8 @@ void main()
 
     for (int i = 0; i < 1; i++)
     {
-        /*float distance = length(u_PointLights[i].position - FragPos);
-            if (distance < u_PointLights[i].radius)*/
+        float distance = length(u_PointLights[i].position - FragPos);
+            if (distance < u_PointLights[i].radius)
         result += CalcPointLight(u_PointLights[i], Normal, FragPos, viewDir);
     }
     for (int i = 0; i < 1; i++)
@@ -144,6 +154,202 @@ void main()
 
     f_Color = result;
 }
+
+
+float DistributionGGX(vec3 N, vec3 H, float a)
+{
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float nom = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float k)
+{
+    float nom = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float k)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx1 = GeometrySchlickGGX(NdotV, k);
+    float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+    return ggx1 * ggx2;
+}
+
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+
+
+
+
+vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+
+
+    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance +
+        light.quadratic * (distance * distance));
+
+    vec3 radiance = light.diffuse * attenuation;
+
+    float mettalic = texture(u_gAlbedo_Metallic, v_TextCoord).a;
+    float roughness = texture(u_gPosition_Rougness, v_TextCoord).a;
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedoColor, mettalic);
+
+    float NDF = DistributionGGX(normal, halfwayDir, roughness);
+    vec3 F = FresnelSchlick(max(dot(halfwayDir, viewDir), 0.0), F0);
+    float G = GeometrySmith(normal, viewDir, lightDir, roughness);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - mettalic;
+
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
+    vec3 specular = numerator / denominator;
+
+    float NdotL = max(dot(normal, lightDir), 0.0);
+
+    vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + ((kD * albedoColor / PI + specular) * radiance * NdotL);
+
+    vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a * attenuation;
+
+    float shadow = ShadowCalculationPoint(light, fragPos);
+    //outgoingLight *= (1.0 - shadow);
+
+    vec3 finalColor = ambient + outgoingLight;
+
+
+    return vec4(finalColor, 1.0f);
+
+}
+
+vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragLightSpace)
+{
+    
+
+    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    float theta = dot(lightDir, normalize(-light.direction));
+
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+
+
+    if (theta >= light.outerCutOff)
+    {
+        float epsilon = (light.innerCutOff - light.outerCutOff);
+        float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+        vec3 radiance = light.diffuse * attenuation * intensity;
+
+        float mettalic = texture(u_gAlbedo_Metallic, v_TextCoord).a;
+        float roughness = texture(u_gPosition_Rougness, v_TextCoord).a;
+
+        vec3 F0 = vec3(0.04);
+        F0 = mix(F0, albedoColor, mettalic);
+
+        float NDF = DistributionGGX(normal, halfwayDir, roughness);
+        vec3 F = FresnelSchlick(max(dot(halfwayDir, viewDir), 0.0), F0);
+        float G = GeometrySmith(normal, viewDir, lightDir, roughness);
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - mettalic;
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
+        vec3 specular = numerator / denominator;
+
+        float NdotL = max(dot(normal, lightDir), 0.0);
+
+        vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
+
+        vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a;
+
+        float shadow = ShadowCalculationSpot(light, fragLightSpace, normal);
+
+        // outgoingLight *= (1.0 - shadow);
+
+        vec3 finalColor = ambient + outgoingLight;
+
+        return vec4(finalColor * intensity, 1.0f);
+    }
+    else
+    {
+        vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a;
+        return vec4(ambient * attenuation, 1.0f);
+    }
+
+
+}
+
+
+
+vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec4 fragLightSpace)
+{
+
+    vec3 lightDir = normalize(-light.direction);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    vec3 radiance = light.diffuse;
+
+    float mettalic = texture(u_gAlbedo_Metallic, v_TextCoord).a;
+    float roughness = texture(u_gPosition_Rougness, v_TextCoord).a;
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedoColor, mettalic);
+
+    float NDF = DistributionGGX(normal, halfwayDir, roughness);
+    vec3 F = FresnelSchlick(max(dot(halfwayDir, viewDir), 0.0), F0);
+    float G = GeometrySmith(normal, viewDir, lightDir, roughness);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - mettalic;
+
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
+    vec3 specular = numerator / denominator;
+
+    float NdotL = max(dot(normal, lightDir), 0.0);
+
+    vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
+
+    vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a;
+
+    float shadow = ShadowCalculationDir(fragLightSpace, normal);
+    outgoingLight *= (1.0 - shadow);
+
+    vec3 finalColor = ambient + outgoingLight;
+
+    return vec4(finalColor, 1.0f);
+}
+
 
 
 
@@ -250,91 +456,3 @@ float ShadowCalculationPoint(PointLight light, vec3 fragPos)
 
 }
 
-
-vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-   // vec3 reflectDir = reflect(-lightDir, normal);
-
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
-    //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0f);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance +
-        light.quadratic * (distance * distance));
-    // combine results
-    vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec;
-
-
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-
-    float shadow = ShadowCalculationPoint(light, fragPos);
-
-    vec3 finalColor = vec3(diffuse + specular) * (1.f - shadow) + ambient;
-
-    return vec4(finalColor, 1.0f);
-
-}
-
-vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragPosLightSpace)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    // specular shading
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    // spotlight intensity
-    float theta = dot(lightDir, normalize(-light.direction));
-    float epsilon = light.innerCutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
-    vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec ;
-
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-
-    float shadow = ShadowCalculationSpot(light, fragPosLightSpace, normal);
-
-    return vec4((diffuse + specular) * (1.0f - shadow) + ambient, 1.0f);
-
-
-}
-
-vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec4 fragPosLightSpace)
-{
-    vec3 lightDir = normalize(-light.direction);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    //vec3 reflectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), texture(u_gAlbedoSpec, v_TextCoord).a);
-    // combine results
-    vec3 ambient = light.ambient * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 diffuse = light.diffuse * diff * texture(u_gAlbedoSpec, v_TextCoord).rgb;
-    vec3 specular = light.specular * spec;
-
-    float shadow = ShadowCalculationDir(fragPosLightSpace, normal);
-
-    return vec4(vec3(diffuse + specular) * (1.f - shadow) + ambient, 1.0f);
-
-}

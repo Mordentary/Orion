@@ -35,7 +35,7 @@ namespace Orion
 			 else  shader->SetFloat("u_Material.shininess", 16.0f);
 		 }
 
-		 if (shader == Orion::ShaderLibrary::Get("PBRShader"))
+		 if (shader == Orion::ShaderLibrary::Get("PBRShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
 		 {
 
 			 if (m_CurrentMaterial.Albedo)
@@ -84,7 +84,7 @@ namespace Orion
 				 m_CurrentMaterial.AO->Bind(7);
 				 shader->SetInt("u_Material.ao", m_CurrentMaterial.AO->GetCurrentSlot());
 			 }
-			 else shader->SetInt("u_Material.ao", 1);
+			 else shader->SetInt("u_Material.ao", 0);
 
 		 }
 

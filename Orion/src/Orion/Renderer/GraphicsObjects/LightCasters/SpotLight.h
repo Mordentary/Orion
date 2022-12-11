@@ -31,8 +31,8 @@ namespace Orion
 			m_ShadowMap = Framebuffer::Create(fb);
 
 			float nearPlane = 0.1f;
-			float farPlane = 25.0f;
-			m_ProjMatrix = glm::perspective(glm::radians(90.f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
+			float farPlane = 100.0f;
+			m_ProjMatrix = glm::perspective(glm::radians(160.f), static_cast<float>(fb.Width / fb.Height), nearPlane, farPlane);
 			m_Prop.GeneralProp.Position = pos;
 
 				//glm::ortho(-20.f, 20.f, -20.f, 20.f, -20.f, 20.f);

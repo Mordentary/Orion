@@ -8,6 +8,8 @@ namespace Orion
 	{
 		if (m_LightModel)
 		{
+			//m_LightModel->SetCustomMaterialValues(0.0f, 0.4f, m_Prop.GeneralProp.DiffuseLightColor);
+			//m_LightModel->ApplyCustomMaterialValues();
 
 			m_LightModel->SetModelMatrix(glm::translate(glm::mat4(1.0f), m_Prop.GeneralProp.Position) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
 			shader->Bind();

@@ -48,9 +48,10 @@ void main()
 #version 450 core
 
 
-layout(location = 0) out vec4 f_Position;
-layout(location = 1) out vec4 f_Normal;
-layout(location = 2) out vec4 f_AlbedoSpec;
+layout(location = 0) out vec4 f_Position_Rougness;
+layout(location = 1) out vec4 f_Normals;
+layout(location = 2) out vec4 f_Albedo_Metallic;
+layout(location = 3) out vec4 f_EmissionAO;
 
 
 
@@ -58,12 +59,15 @@ layout(location = 2) out vec4 f_AlbedoSpec;
 
 
 
-struct Material {
-    sampler2D diffuse;
-    sampler2D specular;
+
+struct Material 
+{
+    sampler2D albedo;
+    sampler2D roughness;
+    sampler2D mettalic;
     sampler2D normals;
-
-    float shininess;
+    sampler2D emission;
+    sampler2D ao;
 };
 
 
@@ -79,7 +83,7 @@ uniform Material u_Material;
 
 void main()
 {
-    if (texture(u_Material.diffuse, v_TextCoord).a < 0.1f) discard;
+    if (texture(u_Material.albedo, v_TextCoord).a < 0.1f) discard;
 
     vec3 normal = texture(u_Material.normals, v_TextCoord).rgb;
     if (normal != vec3(1.0f))
@@ -91,13 +95,21 @@ void main()
     {
         normal = normalize(v_Normal);
     }
-    // store the fragment position vector in the first gbuffer texture
-    f_Position =  vec4(v_FragPos,1.0f);
-    // also store the per-fragment normals into the gbuffer
-    f_Normal = vec4(normal,1.0f);
-    // and the diffuse per-fragment color
-    f_AlbedoSpec.rgb = texture(u_Material.diffuse, v_TextCoord).rgb * vec3(v_Color);
-    // store shinness in gAlbedoSpec's alpha component
-    f_AlbedoSpec.a = u_Material.shininess;
+
+
+
+    float roughness = texture(u_Material.roughness, v_TextCoord).r;
+    float mettalic = texture(u_Material.mettalic, v_TextCoord).r;
+    float AO = texture(u_Material.ao, v_TextCoord).r;
+
+
+    f_Position_Rougness =  vec4(v_FragPos, roughness);
+
+    f_Albedo_Metallic.rgb = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color);
+    f_Albedo_Metallic.a = mettalic;
+
+    f_Normals = vec4(normal,1.0f);
+
+    f_EmissionAO = vec4(texture(u_Material.emission, v_TextCoord).rgb, AO);
 
 }

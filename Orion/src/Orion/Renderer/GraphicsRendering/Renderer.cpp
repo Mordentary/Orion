@@ -120,7 +120,7 @@ namespace Orion
 
 
 		s_RenData3D.LightManager.SetLightShader(ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl"));
-
+		//s_RenData3D.LightManager.SetLightShader(s_RenData3D.PBRShader);
 
 		s_RenData3D.GBufferShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GBufferShader.glsl");
 		s_RenData3D.DeferredShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/DeferredShader.glsl");
@@ -154,7 +154,7 @@ namespace Orion
 
 
 		specFB.Samples = 1;
-		specFB.ColorAttachments = 3;
+		specFB.ColorAttachments = 4;
 		s_RenData3D.GBuffer = Orion::Framebuffer::Create(specFB);
 
 
@@ -414,7 +414,7 @@ namespace Orion
 				sceneBuffer = s_RenData3D.DeferredShadingBuffer;
 				s_RenData3D.GBuffer->BlitStencilToBuffer(sceneBuffer);
 			}
-			if (spec.DeferredOutputTexture == 1) // Position
+			if (spec.DeferredOutputTexture == 1) // Position+Metallic
 			{
 				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 0, 0);
 
@@ -425,11 +425,15 @@ namespace Orion
 				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 1, 0);
 				return;
 			}
-			if (spec.DeferredOutputTexture == 3) // Albedo+Spec
+			if (spec.DeferredOutputTexture == 3) // Albedo+Metallic
 			{
 				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 2,0);
 				return;
-				
+			}
+			if (spec.DeferredOutputTexture == 4) // Emission+AO
+			{
+				s_RenData3D.GBuffer->BlitColorToBuffer(s_RenData3D.FinalFramebuffer, 3, 0);
+				return;
 			}
 		}
 		else sceneBuffer = s_RenData3D.MS_Framebuffer;
@@ -555,9 +559,11 @@ namespace Orion
 		s_RenData3D.DeferredShadingBuffer->Bind();
 		RenderCommand::Clear(ORI_CLEAR_COLOR | ORI_CLEAR_DEPTH | ORI_CLEAR_STENCIL);
 
-		s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->Bind(10);
-		s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->Bind(11);
-		s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->Bind(12);
+		s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->Bind(8);
+		s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->Bind(9);
+		s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->Bind(10);
+		s_RenData3D.GBuffer->GetColorAttachmentTexture(3)->Bind(11);
+
 
 		s_RenData3D.DeferredShadingBuffer->ActivateDrawingToColorTexture(0);
 
@@ -565,9 +571,11 @@ namespace Orion
 
 		s_RenData3D.DeferredShader->SetFloat3("u_CameraPos", s_RenData3D.SceneCamera->GetPosition());
 
-		s_RenData3D.DeferredShader->SetInt("u_gPosition", s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->GetCurrentSlot());
-		s_RenData3D.DeferredShader->SetInt("u_gNormal", s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->GetCurrentSlot());
-		s_RenData3D.DeferredShader->SetInt("u_gAlbedoSpec", s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->GetCurrentSlot());
+		s_RenData3D.DeferredShader->SetInt("u_gPosition_Rougness", s_RenData3D.GBuffer->GetColorAttachmentTexture(0)->GetCurrentSlot());
+		s_RenData3D.DeferredShader->SetInt("u_gNormals", s_RenData3D.GBuffer->GetColorAttachmentTexture(1)->GetCurrentSlot());
+		s_RenData3D.DeferredShader->SetInt("u_gAlbedo_Metallic", s_RenData3D.GBuffer->GetColorAttachmentTexture(2)->GetCurrentSlot());
+		s_RenData3D.DeferredShader->SetInt("u_gEmissionAO", s_RenData3D.GBuffer->GetColorAttachmentTexture(3)->GetCurrentSlot());
+
 
 		s_RenData3D.LightManager.LoadLightsToShader(s_RenData3D.DeferredShader);
 
@@ -590,10 +598,7 @@ namespace Orion
 
 		//ORI_INFO("SIZE: {0}", sizeof(glm::vec3));
 	}
-	float lerp(float a, float b, float f)
-	{
-		return a + f * (b - a);
-	}
+	
 	//void Renderer::ComputeUnitHemisphere() //For future SSAO
 	//{
 	//	std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
