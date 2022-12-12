@@ -341,6 +341,9 @@ namespace Orion
 
 	void Renderer::DrawScene()
 	{
+		if(s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+		s_RenData3D.Stats.m_ForwardRenderPass.Start();
+
 		s_RenData3D.CurrentShader->Bind();
 
 
@@ -351,6 +354,9 @@ namespace Orion
 
 			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", model->GetModelMatrix());
 			model->Render(s_RenData3D.CurrentShader);
+
+			if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+				s_RenData3D.Stats.m_DrawCalls++;
 		}
 
 		if (s_RenData3D.SelectedModel)
@@ -368,6 +374,10 @@ namespace Orion
 			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
 
 		}
+
+		if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+		s_RenData3D.Stats.m_ForwardRenderPass.Stop();
+
 	}
 
 

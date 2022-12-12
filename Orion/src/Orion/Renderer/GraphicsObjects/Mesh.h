@@ -53,30 +53,44 @@ namespace Orion
 	public:
 		Mesh() = default;
 
-		Mesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material, glm::vec3& min, glm::vec3& max) : m_Vertices(std::move(vertices)), m_Indices(std::move(indices)), m_AABBMin(std::move(min)), m_AABBMax(std::move(max)), m_DefaultMaterial(material)
+		Mesh(std::vector<MeshVertex>& vertices, std::vector<uint32_t>& indices, const Material& material, uint32_t materialIndex, glm::vec3& min, glm::vec3& max) 
+		: m_Vertices(std::move(vertices)), m_Indices(std::move(indices)), m_AABBMin(std::move(min)), m_AABBMax(std::move(max)), m_DefaultMaterial(material), m_MaterialIndex(materialIndex)
 		{
 			m_CurrentMaterial = m_DefaultMaterial;
-			SetupMesh();
+			 SetupMesh();
+			
 		}
 
 		inline MeshVertex* GetVerticesData() { return m_Vertices.data(); }
 		inline uint32_t* GetIndicesData() { return m_Indices.data(); }
+
+		inline std::move_iterator<std::vector<MeshVertex>::iterator> GetVerticesBeginMoveIterator() { return std::make_move_iterator(m_Vertices.begin()); }
+		inline std::move_iterator<std::vector<uint32_t>::iterator> GetIndicesBeginMoveIterator() { return std::make_move_iterator(m_Indices.begin()); }
+
+		inline std::move_iterator<std::vector<MeshVertex>::iterator> GetVerticesEndMoveIterator() { return std::make_move_iterator(m_Vertices.end()); }
+		inline std::move_iterator<std::vector<uint32_t>::iterator> GetIndicesEndMoveIterator() { return std::make_move_iterator(m_Indices.end()); }
+
+
 		inline Shared<VertexArray>& GetVertexArray() { return m_MeshVertexArray; }
 		inline size_t GetVerticesCount() { return m_Vertices.size(); }
 		inline size_t GetIndicesCount() { return m_Indices.size(); }
 
+		inline uint32_t GetMaterialIndex() { return m_MaterialIndex; }
+
+		inline std::pair<glm::vec3&, glm::vec3&> GetAABB() { return {m_AABBMin, m_AABBMax};
+		}
 		inline  Material& GetCurrentMaterial() { return m_CurrentMaterial; }
 		inline const Material& GetDefaultMaterial() { return m_DefaultMaterial; }
 
 		void SetCurrentMaterial(const Material& material) { m_CurrentMaterial = material; }
 
+	
 
-
-		inline std::pair<glm::vec3&, glm::vec3&> GetAABB() { return {m_AABBMin, m_AABBMax}; }
-
+		void SetupMesh();
 		void Render(Shared<Shader>& shader);
 	protected:
-		void SetupMesh();
+
+		uint32_t m_MaterialIndex = 0;
 
 		Shared<VertexArray>m_MeshVertexArray;
 
@@ -88,9 +102,6 @@ namespace Orion
 
 		Material m_CurrentMaterial;
 		Material m_DefaultMaterial;
-
-
-
 
 	};
 }

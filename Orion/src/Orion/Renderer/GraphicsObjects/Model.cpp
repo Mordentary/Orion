@@ -2,6 +2,7 @@
 #include "Model.h"
 #include <filesystem> 
 #include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
+
 namespace Orion
 {
     void Model::SetModelMatrix(const glm::mat4& mat)
@@ -14,7 +15,7 @@ namespace Orion
 
     void Model::RecalculateAABBInModelSpace()
     {
-      
+        
         glm::vec4 min = m_ModelMatrix * glm::vec4(m_OriginModelAABB.mMin.x, m_OriginModelAABB.mMin.y, m_OriginModelAABB.mMin.z, 1.0f);
         glm::vec4 max = m_ModelMatrix * glm::vec4(m_OriginModelAABB.mMax.x, m_OriginModelAABB.mMax.y, m_OriginModelAABB.mMax.z, 1.0f);
 
@@ -52,6 +53,7 @@ namespace Orion
 
        // Orion::Renderer2D::AddLine(glm::vec3(0.0f), m_LastHitedPoint, color + glm::vec4(0.2f));
 
+        
 
         Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, min.y, min.z), color);
         Orion::Renderer2D::AddLine(glm::vec3(max.x, min.y, min.z), glm::vec3(max.x, min.y, max.z), color);
@@ -73,27 +75,116 @@ namespace Orion
     }
     void Model::Render(Shared<Shader>& shader, bool doNotCull)
     {
-       
-        for (Shared<Mesh>& mesh : m_Meshes) 
+        for (size_t i = 0; i < m_Materials.size(); i++)
         {
-            auto& [min, max] = mesh->GetAABB();
-            glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
-            glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f);
-            if (doNotCull || Orion::CamerasController::GetActiveCamera()->AABBVsFrustum(transformedMin, transformedMax))
+                BindMaterialAt(shader, i);
+            for (auto& mesh : m_Meshes)
             {
-                mesh->Render(shader);
-            }
-            if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
-            {
-                RenderAABB(transformedMin, transformedMax); 
-            }
-            
-        }
+                if (mesh->GetMaterialIndex() != i) continue;
 
+                auto& [min, max] = mesh->GetAABB();
+                glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
+                glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f);
+
+                if (doNotCull || Orion::CamerasController::GetActiveCamera()->AABBVsFrustum(transformedMin, transformedMax))
+                {
+                    mesh->Render(shader);
+                }
+
+                if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
+                {
+                    RenderAABB(transformedMin, transformedMax);
+                }
+
+            }
+        }
 
         //ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
   
 
+    }
+    void Model::BindMaterialAt(Shared<Shader>& shader, uint32_t index)
+    {
+        shader->Bind();
+        if (shader == Orion::ShaderLibrary::Get("PhongShader"))
+        {
+            if (m_Materials[index].Albedo)
+            {
+                m_Materials[index].Albedo->Bind(2);
+                shader->SetInt("u_Material.diffuse", m_Materials[index].Albedo->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.diffuse", 0);
+
+            if (m_Materials[index].Roughness)
+            {
+                m_Materials[index].Roughness->Bind(3);
+                shader->SetInt("u_Material.specular", m_Materials[index].Roughness->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.specular", 0);
+
+            if (m_Materials[index].NormalMap)
+            {
+                m_Materials[index].NormalMap->Bind(4);
+                shader->SetInt("u_Material.normals", m_Materials[index].NormalMap->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.normals", 0);
+
+            if (m_Materials[index].Shininess)
+                shader->SetFloat("u_Material.shininess", m_Materials[index].Shininess);
+            else  shader->SetFloat("u_Material.shininess", 16.0f);
+        }
+
+        if (shader == Orion::ShaderLibrary::Get("PBRShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
+        {
+
+            if (m_Materials[index].Albedo)
+            {
+                m_Materials[index].Albedo->Bind(2);
+                shader->SetInt("u_Material.albedo", m_Materials[index].Albedo->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.albedo", 0);
+
+
+            if (m_Materials[index].Roughness)
+            {
+                m_Materials[index].Roughness->Bind(3);
+                shader->SetInt("u_Material.roughness", m_Materials[index].Roughness->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.roughness", 1);
+
+            if (m_Materials[index].Mettalic)
+            {
+                m_Materials[index].Mettalic->Bind(4);
+                shader->SetInt("u_Material.mettalic", m_Materials[index].Mettalic->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.mettalic", 1);
+
+
+            if (m_Materials[index].NormalMap)
+            {
+                m_Materials[index].NormalMap->Bind(5);
+                shader->SetInt("u_Material.normals", m_Materials[index].NormalMap->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.normals", 0);
+
+
+            if (m_Materials[index].Emission)
+            {
+
+                m_Materials[index].Emission->Bind(6);
+                shader->SetInt("u_Material.emission", m_Materials[index].Emission->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.emission", 1);
+
+
+            if (m_Materials[index].AO)
+            {
+                m_Materials[index].AO->Bind(7);
+                shader->SetInt("u_Material.ao", m_Materials[index].AO->GetCurrentSlot());
+            }
+            else shader->SetInt("u_Material.ao", 0);
+
+        }
     }
 
     //For retrieving scene 
@@ -104,14 +195,18 @@ namespace Orion
 		const aiScene* scene = import.ReadFile(path, 
 
             aiProcess_Triangulate  | 
-            aiProcess_SortByPType |
+           // aiProcess_SortByPType |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_PreTransformVertices |
             aiProcess_OptimizeMeshes |
             aiProcess_OptimizeGraph |
+            //aiProcess_SplitLargeMeshes |
             aiProcess_JoinIdenticalVertices |
             aiProcess_GenBoundingBoxes | 
             aiProcess_ImproveCacheLocality |
+
+      
+
            // aiProcess_FlipUVs | 
             aiProcess_GenUVCoords |
             aiProcess_CalcTangentSpace);
@@ -130,25 +225,55 @@ namespace Orion
         m_OriginModelAABB.mMin = m_OriginModelAABB.mMin * CoordNormalizer;
         m_OriginModelAABB.mMax = m_OriginModelAABB.mMax * CoordNormalizer;
 
-
-        m_Meshes.reserve(scene->mNumMeshes);
+        if (m_ShadingModel == SHADING_MODELS::PBR)
+        SetupPBRMaterials(scene);
+        else
+        SetupNonPBRMaterials(scene);
 
         ProcessNode(scene->mRootNode, scene);
 
-	}
+       // ConcatenateMeshByMaterial();
 
-  
+
+	}
+    void  Model::SetupPBRMaterials(const aiScene* scene)
+    {
+        m_Materials.reserve(scene->mNumMaterials);
+        if(scene->HasMaterials())
+        {
+             for  (uint32_t i = 0; i < scene->mNumMaterials; i++)
+            {
+                m_Materials.push_back(SetupPBRMaterial(scene->mMaterials[i]));
+            }
+
+        }
+    }
+
+    void  Model::SetupNonPBRMaterials(const aiScene* scene)
+    {
+        m_Materials.reserve(scene->mNumMaterials);
+        if (scene->HasMaterials())
+        {
+            for (uint32_t i = 0; i < scene->mNumMaterials; i++)
+            {
+                m_Materials.push_back(SetupNonPBRMaterial(scene->mMaterials[i]));
+            }
+
+        }
+    }
+
+
   
 
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
-	{
-            
+	{  
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
             {
                 // the node object only contains indices to index the actual objects in the scene. 
                 // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
                 m_Meshes.push_back(ProcessMesh(mesh, scene));
 
                 ++m_MeshIndex;
@@ -160,6 +285,74 @@ namespace Orion
             }
            
 	}
+    void Model::ConcatenateMeshByMaterial()
+    {
+        std::unordered_map<uint32_t, std::list<Shared<Mesh>>> meshesMap;
+
+        for (auto& mesh : m_Meshes)
+        {
+            meshesMap[mesh->GetMaterialIndex()].push_back(mesh);
+        }
+
+        m_Meshes.clear();
+        m_Meshes.shrink_to_fit();
+
+        m_Meshes.reserve(m_Materials.size());
+
+        for (size_t i = 0; i < m_Materials.size(); i++)
+        {
+            if (meshesMap[i].size() > 1) 
+            {
+                uint32_t verticesCount = 0;
+                uint32_t indicesCount = 0;
+
+                for (auto& mesh : meshesMap[i])
+                {
+                    verticesCount += mesh->GetVerticesCount();
+                    indicesCount += mesh->GetIndicesCount();
+                }
+
+                std::vector<MeshVertex> batchVertices;
+                batchVertices.reserve(verticesCount);
+
+                std::vector<uint32_t> batchIndices;
+                batchIndices.reserve(indicesCount);
+
+
+                for (auto& mesh : meshesMap[i])
+                {
+                    batchVertices.insert(batchVertices.end(), mesh->GetVerticesBeginMoveIterator(), mesh->GetVerticesEndMoveIterator());
+                    batchIndices.insert(batchIndices.end(), mesh->GetIndicesBeginMoveIterator(), mesh->GetIndicesEndMoveIterator());
+                }
+
+                auto& [min, max] = (*meshesMap[i].begin())->GetAABB();
+                glm::vec3 minRes = min;
+                glm::vec3 maxRes = max;
+
+                for (auto& mesh : meshesMap[i])
+                {
+                    auto& [min,max] = mesh->GetAABB();
+                    minRes = glm::min(minRes, min);
+                    maxRes = glm::max(maxRes, max);
+
+
+                }
+
+                auto& mesh = CreateShared<Mesh>(batchVertices, batchIndices, m_Materials[i], i, minRes, maxRes);
+                mesh->SetupMesh();
+                m_Meshes.emplace_back(mesh);
+
+             
+            }
+            else 
+            {
+                auto& mesh = *meshesMap[i].begin();
+                mesh->SetupMesh();
+                m_Meshes.emplace_back(mesh);
+            }
+        }
+
+    }
 
     Shared<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     {
@@ -262,20 +455,9 @@ namespace Orion
                 indices.push_back(face.mIndices[j]);
         }
     
-        
 
        
-        if (m_ShadingModel == SHADING_MODELS::PBR)
-            return CreateShared<Mesh>(vertices, indices, SetupPBRMaterial(material), glm::vec3{mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z});
-        else
-            return CreateShared<Mesh>(vertices, indices, SetupNonPBRMaterial(material), glm::vec3{ mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z }, glm::vec3{ mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z });
-
-
-       
-        
-    
-        // return a mesh object created from the extracted mesh data
-            
+        return CreateShared<Mesh>(vertices, indices, m_Materials[mesh->mMaterialIndex], mesh->mMaterialIndex, glm::vec3{mesh->mAABB.mMin.x,mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z});
             
     }
 
@@ -402,23 +584,34 @@ namespace Orion
 	}
     Shared<Texture2D> Model::LoadPBRMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) 
     {
-
+        
         if (mat->GetTextureCount(type) != 0)
         {
             aiString str;
-            ORI_ASSERT(mat->GetTexture(type, 0, &str) == aiReturn_SUCCESS, "Texture not loaded correctly!!");
+           aiReturn ret = mat->GetTexture(type, 0, &str);
+            ORI_ASSERT(ret == aiReturn_SUCCESS, "Texture not loaded correctly!!");
+            
 
-            //std::string name = str.C_Str();
-            //uint32_t lastSlash = name.find_last_of('\\');
-            //name = name.substr(lastSlash + 1, name.size() - lastSlash);
+            std::string str2 = str.C_Str();
+            uint32_t lastSlash = str2.find_last_of('\\');
+
+
+            //if (lastSlash != std::string::npos) 
+            //{
+            //    str2 = str2.substr(lastSlash + 1, str2.size() - lastSlash);
+            //    str2 = "textures/" + str2;
+            //}
+        
+            ORI_INFO("Path: {0}", str2.c_str());
+
 
             if (type == aiTextureType_DIFFUSE)
             {
-                return Texture2D::Create(this->m_Directory + '/' + str.C_Str(), { true, true });
+                return Texture2D::Create(this->m_Directory + '/' + str2.c_str(), { true, true });
             }
             else
             {
-                return Texture2D::Create(this->m_Directory + '/' + str.C_Str());
+                return Texture2D::Create(this->m_Directory + '/' + str2.c_str());
 
             }
         }

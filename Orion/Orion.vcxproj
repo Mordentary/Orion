@@ -104,7 +104,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;ORI_PLATFORM_WINDOWS;ORI_BUILD_DLL;GLFW_INCLUDE_NONE;IMGUI_IMPL_OPENGL_LOADER_CUSTOM;ORI_REALESE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\stb_image;vendor\assimp\Release\include;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -156,7 +156,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightHandler.h" />
     <ClInclude Include="src\Orion.h" />
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h" />
     <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h" />
@@ -192,6 +191,7 @@
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\DirectionalLight.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\PointLight.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightCasters\SpotLight.h" />
+    <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightHandler.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\LightSource.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Mesh.h" />
     <ClInclude Include="src\Orion\Renderer\GraphicsObjects\Model.h" />

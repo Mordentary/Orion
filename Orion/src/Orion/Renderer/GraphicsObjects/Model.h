@@ -45,8 +45,6 @@ namespace Orion
              m_CustomMaterial.CustomMetallicMap = Texture2D::Create(1, 1);
              m_CustomMaterial.CustomEmissionMap= Texture2D::Create(1, 1);
 
-
-
         }
 
        
@@ -106,6 +104,7 @@ namespace Orion
         aiAABB m_OriginModelAABB;
         aiAABB m_ModelAABB;
 
+        std::vector<Material> m_Materials;
 
         std::vector<Shared<Mesh>> m_Meshes;
 
@@ -126,20 +125,26 @@ namespace Orion
 
     private:
         void RenderAABB(const glm::vec3& mMin, const glm::vec3& mMax);
+
+        void SetupNonPBRMaterials(const aiScene* scene);
+        void SetupPBRMaterials(const aiScene* scene);
+
         Shared<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         Shared<Texture2D> LoadPBRMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
-
+        Material SetupPBRMaterial(aiMaterial* mat);
+        Material SetupNonPBRMaterial(aiMaterial* mat);
 
         Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+
+        void ConcatenateMeshByMaterial();
 
         void RecalculateModelMatrix();
         void LoadModel(const std::string& path);
         void FindGreastestAABBAndCoord(aiNode* rootNode, const aiScene* scene);
         void ProcessNode(aiNode* node, const aiScene* scene);
         
-        Material SetupNonPBRMaterial(aiMaterial* mat);
-        Material SetupPBRMaterial(aiMaterial* mat);
+        void BindMaterialAt(Shared<Shader>& shader, uint32_t index);
 
 
         void RecalculateAABBInModelSpace();

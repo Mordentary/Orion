@@ -60,7 +60,7 @@ namespace Orion {
 
 		uint32_t index = 0;
 		const auto& layout = vertexBuffer->GetLayout();
-		{ 
+		 
 			
 			for (const auto& element : layout)
 			{
@@ -74,7 +74,7 @@ namespace Orion {
 				);
 				index++;
 			}
-		}
+		
 		m_VertexBuffers.push_back(vertexBuffer);
 
 	}

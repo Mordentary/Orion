@@ -26,7 +26,7 @@ namespace Orion {
 
 			modelCreation.Start();
 
-			//m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/Chinese/source/model.dae", SHADING_MODELS::PBR);
+			//m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/scene/sponza/NewSponza_Main_glTF_002.gltf", SHADING_MODELS::PBR);
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae", SHADING_MODELS::PBR);
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX", SHADING_MODELS::PBR);
 			//m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx", SHADING_MODELS::PBR);
@@ -46,7 +46,7 @@ namespace Orion {
 			ORI_INFO("MODEL_CREATION_TIME: {0}", modelCreation.GetTimeSeconds());
 
 
-			//m_ModelScene->SetScale(glm::vec3(50.f));
+		//	m_ModelScene->SetScale(glm::vec3(50.f));
 
 		/*	m_ModelCat->SetPosition(glm::vec3(0.0, 0.0, 1.0));
 
@@ -98,8 +98,8 @@ namespace Orion {
 			//Orion::Renderer::AddModelToScene(m_ModelCrate);
 			////Orion::Renderer::AddModelToScene(m_ModelScene);
 
-
 			Orion::Renderer::AddLightToScene(m_DirLight);
+			
 			Orion::Renderer::AddLightToScene(m_SpotLight);
 			Orion::Renderer::AddLightToScene(m_PointLight);
 
@@ -377,7 +377,7 @@ namespace Orion {
 				if (m_PostProcessSpec.HDR_Enable)
 				{
 				
-					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\ \0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
+					ImGui::Combo("Tone mapping model", &m_PostProcessSpec.HDR_CurrentModel, "ACES_Narkowicz\0Reinhard\0ReinhardExt\0ReinhardExtLuminence\0ReinhardJodie\0HableFilmic\0");
 					//ORI_INFO("Index: {0}", m_PostProcessSpec.HDR_CurrentModel);
 
 					if (m_PostProcessSpec.HDR_CurrentModel == 2 || m_PostProcessSpec.HDR_CurrentModel == 3)
@@ -405,17 +405,25 @@ namespace Orion {
 
 			}
 
-			if (ImGui::CollapsingHeader(("Performance")))
+			if (ImGui::CollapsingHeader(("Performance and statistic")))
 			{
 				auto& stats = Orion::Renderer::GetStats();
 
 				ImGui::Text("TotalMs: %f | FPS: %f", ts.GetSeconds(), ts.GetFPS());
 				ImGui::Separator();
 
+				ImGui::Text("Forward Render: %f", stats.GetTotalTimeForwardRenderPass());
+				ImGui::Separator();
+
 				ImGui::Text("Shadow Mapping: %f", stats.GetTotalTimeShadowMappingPass());
 				ImGui::Separator();
 
 				ImGui::Text("Post-Process: %f", stats.GetTotalTimePostProcessPass());
+				ImGui::Separator();
+
+				ImGui::Text("Draw calls: %d", stats.GetTotalDrawCalls());
+
+
 			}
 
 			ImGui::Checkbox("Enable deferred pipeline", &Orion::Renderer::IsPipelineDeferred());

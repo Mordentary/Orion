@@ -44,6 +44,11 @@ namespace Orion
 
 			dataFormat = GL_RGB;
 		}
+		if (channels == 2)
+		{
+			internalFormat = GL_RG8;
+			dataFormat = GL_RG;
+		}
 		if (channels == 1)
 		{
 			internalFormat = GL_R8;

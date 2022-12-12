@@ -106,16 +106,25 @@ class Model;
 			float GetTotalTimePostProcessPass() { return m_PostProcessStageTimer.GetTimeSeconds(); }
 			float GetTotalTimeLightPass() { return m_LightPassTime.GetTimeSeconds(); }
 			float GetTotalTimeShadowMappingPass() { return m_ShadowMappingPass.GetTimeSeconds(); }
+			float GetTotalTimeForwardRenderPass() { return m_ForwardRenderPass.GetTimeSeconds(); }
+			float GetTotalDrawCalls() { return m_DrawCalls; }
+
+
 
 			friend class Renderer;
 		private:
 			Orion::Timer  m_PostProcessStageTimer;
 			Orion::Timer  m_ShadowMappingPass;
-
+			Orion::Timer  m_ForwardRenderPass;
 
 			Orion::Timer  m_LightPassTime;
 			Orion::Timer  m_GeometryPassTime;
+
+			uint32_t m_DrawCalls;
 			//Add more
+
+
+			
 
 		};
 
