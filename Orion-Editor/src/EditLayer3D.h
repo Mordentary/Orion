@@ -26,7 +26,7 @@ namespace Orion {
 
 			modelCreation.Start();
 
-			//m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/scene/sponza/NewSponza_Main_glTF_002.gltf", SHADING_MODELS::PBR);
+			m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/scene/sponza/NewSponza_Main_glTF_002.gltf", SHADING_MODELS::PBR);
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae", SHADING_MODELS::PBR);
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX", SHADING_MODELS::PBR);
 			//m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx", SHADING_MODELS::PBR);
@@ -89,7 +89,7 @@ namespace Orion {
 			Orion::Renderer::AddModelToScene(m_ModelTree);   */
 			//Orion::Renderer::AddModelToScene(m_ModelCar);
 			Orion::Renderer::AddModelToScene(m_ModelDragon);
-			//Orion::Renderer::AddModelToScene(m_ModelBath);
+			Orion::Renderer::AddModelToScene(m_ModelBath);
 
 			//Orion::Renderer::AddModelToScene(m_ModelScene);
 
@@ -421,7 +421,7 @@ namespace Orion {
 				ImGui::Text("Post-Process: %f", stats.GetTotalTimePostProcessPass());
 				ImGui::Separator();
 
-				ImGui::Text("Draw calls: %d", stats.GetTotalDrawCalls());
+				//ImGui::Text("Draw calls: %d", stats.GetTotalDrawCalls());
 
 
 			}

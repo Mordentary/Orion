@@ -78,25 +78,20 @@ namespace Orion
         for (size_t i = 0; i < m_Materials.size(); i++)
         {
                 BindMaterialAt(shader, i);
-            for (auto& mesh : m_Meshes)
-            {
-                if (mesh->GetMaterialIndex() != i) continue;
-
-                auto& [min, max] = mesh->GetAABB();
+          
+                auto& [min, max] = m_Meshes[i]->GetAABB();
                 glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
                 glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f);
 
                 if (doNotCull || Orion::CamerasController::GetActiveCamera()->AABBVsFrustum(transformedMin, transformedMax))
                 {
-                    mesh->Render(shader);
+                    m_Meshes[i]->Render(shader);
                 }
 
                 if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
                 {
                     RenderAABB(transformedMin, transformedMax);
                 }
-
-            }
         }
 
         //ORI_INFO("Number meshes on screen: {0}", meshesOnScreen);
@@ -232,7 +227,7 @@ namespace Orion
 
         ProcessNode(scene->mRootNode, scene);
 
-       // ConcatenateMeshByMaterial();
+        ConcatenateMeshByMaterial();
 
 
 	}
@@ -318,12 +313,29 @@ namespace Orion
                 std::vector<uint32_t> batchIndices;
                 batchIndices.reserve(indicesCount);
 
+                // Offset to apply to the indices of each mesh
+                uint32_t indexOffset = 0;
 
                 for (auto& mesh : meshesMap[i])
                 {
                     batchVertices.insert(batchVertices.end(), mesh->GetVerticesBeginMoveIterator(), mesh->GetVerticesEndMoveIterator());
+
+                    // Update the indices of this mesh using the index offset
+                    uint32_t* meshIndices = mesh->GetIndicesData();
+
+                    for (int i = 0; i < mesh->GetIndicesCount(); i++)
+                    {
+                        meshIndices[i] += indexOffset;
+                    }
+
+                    // Add the updated indices to the batch indices
                     batchIndices.insert(batchIndices.end(), mesh->GetIndicesBeginMoveIterator(), mesh->GetIndicesEndMoveIterator());
+
+                    // Increment the index offset by the number of vertices in this mesh
+                    indexOffset += mesh->GetVerticesCount();
                 }
+
+                // Use batchVertices and batchIndices to create the concatenated mesh
 
                 auto& [min, max] = (*meshesMap[i].begin())->GetAABB();
                 glm::vec3 minRes = min;
