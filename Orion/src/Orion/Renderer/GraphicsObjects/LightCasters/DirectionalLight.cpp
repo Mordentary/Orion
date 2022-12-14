@@ -56,6 +56,14 @@ namespace Orion
 		++Orion::LightHandler::m_LightCounters.DirLightCount;
 	}
 
+
+	void DirectionalLight::UpdateFrustum()
+	{
+
+		
+	}
+
+
 	void DirectionalLight::LoadLightToUBO(const Shared<UniformBuffer>& ubo)
 	{
 		m_Prop.ViewProj = m_ProjMatrix * m_ViewMatrix;

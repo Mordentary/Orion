@@ -35,6 +35,7 @@ namespace Orion
 		virtual void SetupLight(Shared<Shader>& currentShader, std::vector<Shared<LightSource>>& otherLights, std::function<void()> renderFunc) override;
 		virtual void LoadLightToUBO(const Shared<UniformBuffer>& ubo) override;
 		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
+		virtual	void UpdateFrustum() override;
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override {};
 

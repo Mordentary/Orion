@@ -341,8 +341,8 @@ namespace Orion
 
 	void Renderer::DrawScene()
 	{
-		if(s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
-		s_RenData3D.Stats.m_ForwardRenderPass.Start();
+		/*if(s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+		s_RenData3D.Stats.m_ForwardRenderPass.Start();*/
 
 		s_RenData3D.CurrentShader->Bind();
 
@@ -375,8 +375,8 @@ namespace Orion
 
 		}
 
-		if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
-		s_RenData3D.Stats.m_ForwardRenderPass.Stop();
+		/*if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+		s_RenData3D.Stats.m_ForwardRenderPass.Stop();*/
 
 	}
 

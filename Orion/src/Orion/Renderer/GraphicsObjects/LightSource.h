@@ -91,9 +91,10 @@ namespace Orion
 		const Shared<Model> GetLightModel() const {return m_LightModel;}
 		void SetLightModel(Shared<Model> model) { m_LightModel = model;  }
 
-
 		Shared<Texture2D> GetShadowmap() const { return m_ShadowMap->GetDepthAttachmentTexture(); }
 
+	protected: 
+	virtual	void UpdateFrustum() = 0;
 
 	protected:
 
@@ -102,6 +103,7 @@ namespace Orion
 		glm::mat4 m_ProjMatrix{ 1.0f };
 		glm::mat4 m_ViewMatrix{ 1.0f };
 
+		DummyCamera::CameraFrustum m_Frustum;
 	};
 		
 }

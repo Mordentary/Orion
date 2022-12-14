@@ -111,7 +111,7 @@ namespace Orion
 		bool AABBVsFrustum(const glm::vec3& min, const glm::vec3& max);
 		bool PointVsFrustum(const glm::vec3& point);
 
-	protected:
+	public:
 		struct Plane
 		{
 			// unit vector

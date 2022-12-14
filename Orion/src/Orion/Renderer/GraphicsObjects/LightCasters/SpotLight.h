@@ -45,6 +45,9 @@ namespace Orion
 		virtual void LoadLightToUBO(const Shared<UniformBuffer>& ubo) override;
 		virtual void LoadLightToShader(const Shared<Shader>& shader) override;
 		virtual void RenderLightModel(Shared<Shader>& shader) override;
+		virtual	void UpdateFrustum() override {}
+
+
 
 		virtual void SetLighAttenuation(float linear, float quadratic) override;
 		virtual void IncreaseLightCounter() override;

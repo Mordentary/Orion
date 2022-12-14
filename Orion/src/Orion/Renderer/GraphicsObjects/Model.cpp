@@ -101,6 +101,7 @@ namespace Orion
     void Model::BindMaterialAt(Shared<Shader>& shader, uint32_t index)
     {
         shader->Bind();
+
         if (shader == Orion::ShaderLibrary::Get("PhongShader"))
         {
             if (m_Materials[index].Albedo)
@@ -128,8 +129,7 @@ namespace Orion
                 shader->SetFloat("u_Material.shininess", m_Materials[index].Shininess);
             else  shader->SetFloat("u_Material.shininess", 16.0f);
         }
-
-        if (shader == Orion::ShaderLibrary::Get("PBRShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
+        else if (shader == Orion::ShaderLibrary::Get("PBRShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
         {
 
             if (m_Materials[index].Albedo)

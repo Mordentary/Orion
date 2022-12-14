@@ -235,7 +235,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a * attenuation;
 
     float shadow = ShadowCalculationPoint(light, fragPos);
-    //outgoingLight *= (1.0 - shadow);
+    outgoingLight *= (1.0 - shadow);
 
     vec3 finalColor = ambient + outgoingLight;
 
@@ -292,7 +292,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
         float shadow = ShadowCalculationSpot(light, fragLightSpace, normal);
 
-        // outgoingLight *= (1.0 - shadow);
+         outgoingLight *= (1.0 - shadow);
 
         vec3 finalColor = ambient + outgoingLight;
 

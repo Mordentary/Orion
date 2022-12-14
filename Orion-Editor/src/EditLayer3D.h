@@ -14,7 +14,7 @@ namespace Orion {
 		{
 			Orion::Renderer::Init();
 	
-			Orion::CamerasController::AddCamera("OrthoCamera", Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f)));
+			Orion::CamerasController::AddCamera("OrthoCamera", Orion::CreateShared<Orion::OrthographicCamera>(glm::vec3(0.0, 0.0f, 0.0f), glm::vec3(0.f,0.f,-1.f), glm::vec4(-20.f, 20.f, -20.f, 20.f), glm::vec2(0.1f,30.f)));
 			
 			Orion::CamerasController::AddCamera("PerspectiveCamera1", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{ 0.1f,100.f }));
 			Orion::CamerasController::AddCamera("PerspectiveCamera2", Orion::CreateShared<Orion::PerspectiveCamera>(glm::vec3(0.0, 0.0f, 2.0f), glm::vec3(0.0f), 90.f, glm::vec2{0.1f,100.f}));
@@ -26,7 +26,7 @@ namespace Orion {
 
 			modelCreation.Start();
 
-			m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/scene/sponza/NewSponza_Main_glTF_002.gltf", SHADING_MODELS::PBR);
+			m_ModelBath = Orion::CreateShared<Orion::Model>("assets/models/scene/sponza4/Sponza.gltf", SHADING_MODELS::PBR);
 			m_ModelDragon = Orion::CreateShared<Orion::Model>("assets/models/Dragon/source/model.dae", SHADING_MODELS::PBR);
 			m_ModelLamp = Orion::CreateShared<Orion::Model>("assets/models/Lamp/source/SM_Lamp_01a.FBX", SHADING_MODELS::PBR);
 			//m_ModelPlatform = Orion::CreateShared<Orion::Model>("assets/models/Platform/platform.fbx", SHADING_MODELS::PBR);

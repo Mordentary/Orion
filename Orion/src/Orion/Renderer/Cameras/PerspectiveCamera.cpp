@@ -139,7 +139,9 @@ namespace Orion
 
 	void PerspectiveCamera::UpdateFrustum()
 	{
-		float halfHeightNear = tan(m_FOVdeg / 2) * m_NearFar.x;
+
+		//Old code
+		/*	float halfHeightNear = tan(m_FOVdeg / 2) * m_NearFar.x;
 		float halfWidthNear = halfHeightNear * m_AspectRatio;
 
 		float halfHeightFar = tanf(m_FOVdeg / 2) * m_NearFar.y;
@@ -174,11 +176,41 @@ namespace Orion
 		glm::vec3 bottomBorder = (nearPointCenter - m_CameraSpaceAxisY * halfHeightNear) - m_Position;
 		glm::vec3 normalBottom = glm::cross(m_CameraSpaceAxisX, glm::normalize(bottomBorder));
 
-		frustum.Bottom = { normalBottom ,m_Position };
+		frustum.Bottom = { normalBottom ,m_Position };*/
+
+		// Pre-compute some values
+		float tanFov = tan(m_FOVdeg / 2);
+		float halfHeightNear = tanFov * m_NearFar.x;
+		float halfWidthNear = halfHeightNear * m_AspectRatio;
+		float halfHeightFar = tanFov * m_NearFar.y;
+		float halfWidthFar = halfHeightFar * m_AspectRatio;
+
+		glm::vec3 nearPointCenter = m_Position + m_NearFar.x * m_CameraForward;
+		glm::vec3 farPointCenter = m_Position + m_NearFar.y * m_CameraForward;
 
 
-		m_Frustum = frustum;
+		// Extract the near and far planes
+		m_Frustum.Near = { m_CameraForward ,nearPointCenter };
+		m_Frustum.Far = { -m_CameraForward ,farPointCenter };
+
+		// Extract the right plane
+		glm::vec3 rightBorder = (nearPointCenter + m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		m_Frustum.Right = { glm::cross(m_CameraSpaceAxisY, glm::normalize(rightBorder)), m_Position };
+
+		// Extract the left plane
+		glm::vec3 leftBorder = (nearPointCenter - m_CameraSpaceAxisX * halfWidthNear) - m_Position;
+		m_Frustum.Left = { -glm::cross(m_CameraSpaceAxisY, glm::normalize(leftBorder)), m_Position };
+
+		// Extract the top plane
+		m_Frustum.Top = { -glm::cross(glm::normalize(rightBorder), m_CameraSpaceAxisY), m_Position };
+
+		// Extract the bottom plane
+		glm::vec3 bottomBorder = (nearPointCenter - m_CameraSpaceAxisY * halfHeightNear) - m_Position;
+		m_Frustum.Bottom = { -glm::cross(glm::normalize(bottomBorder), m_CameraSpaceAxisX), m_Position };
+
 	}
+
+
 
 	void PerspectiveCamera::RenderFrustum()
 	{
@@ -199,7 +231,6 @@ namespace Orion
 
 		glm::vec3 ftr = farPointCenter + (m_CameraSpaceAxisY * halfHeightFar) + (m_CameraSpaceAxisX * halfWidthFar);
 		glm::vec3 fbl = farPointCenter - (m_CameraSpaceAxisY * halfHeightFar) - (m_CameraSpaceAxisX * halfWidthFar);
-
 
 
 		glm::vec3 ntl = nearPointCenter + (m_CameraSpaceAxisY * halfHeightNear) - (m_CameraSpaceAxisX * halfWidthNear);
