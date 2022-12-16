@@ -3,16 +3,16 @@
 #include"../GraphicsCore/Shader.h"
 #include"../GraphicsCore/Framebuffer.h"
 
-
 namespace Orion
 {
 
 	class LightHandler;
 
+
 	class LightSource 
 	{
 	public:
-		struct GeneralLightProp //60 bytes
+		struct GeneralLightProp 
 		{
 			glm::vec3 AmbientLightColor{ 0.01f, 0.01f, 0.01f };
 			float padding0;
@@ -26,7 +26,7 @@ namespace Orion
 		
 
 		};
-		struct DirectionalLightProp // 124 bytes
+		struct DirectionalLightProp 
 		{
 			GeneralLightProp GeneralProp;
 
@@ -36,7 +36,7 @@ namespace Orion
 			glm::mat4 ViewProj{ 1.0f };
 		};
 
-		struct PointLightProp // 80 bytes
+		struct PointLightProp 
 		{
 			GeneralLightProp GeneralProp;
 
@@ -65,7 +65,12 @@ namespace Orion
 
 			glm::mat4 ViewProj{1.0f};
 		};
-
+		enum class LightCasterTypes
+		{
+			DirectionalLight = 0,
+			PointLight = 0,
+			SpotLight = 0
+		};
 	public:
 
 		LightSource() = default;
@@ -88,6 +93,11 @@ namespace Orion
 		virtual void IncreaseLightCounter() = 0;
 		virtual uint32_t GetLightIndex() = 0;
 
+		virtual LightCasterTypes GetLightType() = 0;
+
+
+		const glm::mat4& GetProjectionViewMatrix() { return m_ProjMatrix * m_ViewMatrix; }
+		const FrustumShape& GetFrustum() { return m_Frustum;  }
 		const Shared<Model> GetLightModel() const {return m_LightModel;}
 		void SetLightModel(Shared<Model> model) { m_LightModel = model;  }
 
@@ -103,7 +113,7 @@ namespace Orion
 		glm::mat4 m_ProjMatrix{ 1.0f };
 		glm::mat4 m_ViewMatrix{ 1.0f };
 
-		DummyCamera::CameraFrustum m_Frustum;
+		FrustumShape m_Frustum;
 	};
 		
 }

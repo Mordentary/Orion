@@ -26,6 +26,7 @@ namespace Orion {
 		virtual void RecalculateProjection() override;
 		virtual void UpdateFrustum() override;
 		virtual void RenderFrustum() override;
+		static void RenderFrustum(FrustumShape& frustum);
 
 	private:
 

@@ -50,6 +50,7 @@ namespace Orion
 
 		virtual uint32_t GetLightIndex() override { return m_LightIndex; };
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
+		virtual LightCasterTypes GetLightType() override { return LightCasterTypes::PointLight; }
 
 
 	private:

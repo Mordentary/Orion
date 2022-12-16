@@ -300,8 +300,13 @@ namespace Orion
 
 		Orion::RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
-		if(s_RenData3D.DebugSettings.RenderOtherCamerasFrustum)
-		Orion::CamerasController::RenderCamerasFrustum();
+		if (s_RenData3D.DebugSettings.RenderOtherCamerasFrustum) 
+		{
+			Orion::CamerasController::RenderCamerasFrustum();
+			auto& dirLight = s_RenData3D.LightManager.GetDirectionaLight();
+
+			Orion::OrthographicCamera::RenderFrustum(dirLight->GetFrustum(),dirLight->GetProjectionViewMatrix());
+		}
 
 		if (s_RenData3D.DeferredPipeline) 
 		{
@@ -351,12 +356,11 @@ namespace Orion
 		{
 			if (s_RenData3D.SelectedModel && model == s_RenData3D.SelectedModel) continue;
 
-
 			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", model->GetModelMatrix());
-			model->Render(s_RenData3D.CurrentShader);
+			model->Render(s_RenData3D.CurrentShader, s_RenData3D.LightManager.GetDirectionaLight());
 
-			if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
-				s_RenData3D.Stats.m_DrawCalls++;
+			/*if (s_RenData3D.CurrentShader == s_RenData3D.PBRShader)
+				s_RenData3D.Stats.m_DrawCalls++;*/
 		}
 
 		if (s_RenData3D.SelectedModel)
@@ -371,7 +375,7 @@ namespace Orion
 			Orion::RenderCommand::StencilMode(ORI_GL_ALWAYS, 1, 0xFF);
 
 			s_RenData3D.CurrentShader->SetMat4("u_ModelMatrix", s_RenData3D.SelectedModel->GetModelMatrix());
-			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader);
+			s_RenData3D.SelectedModel->Render(s_RenData3D.CurrentShader, s_RenData3D.LightManager.GetDirectionaLight());
 
 		}
 
@@ -687,7 +691,7 @@ namespace Orion
 		s_RenData3D.CubemapShader->SetMat4("u_ViewProj", s_RenData3D.SceneCamera->GetProjectionMatrix()  * glm::mat4(glm::mat3(s_RenData3D.SceneCamera->GetViewMatrix())));
 
 		s_RenData3D.Cube->GetMeshData()[0]->SetCurrentMaterial(s_RenData3D.DefaultMaterial);
-		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader, true);
+		s_RenData3D.Cube->Render(s_RenData3D.CubemapShader, nullptr, true);
 
 		RenderCommand::CullBackFace(true);
 		RenderCommand::DepthWrite(true);

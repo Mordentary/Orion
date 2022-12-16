@@ -1491,6 +1491,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Orion\Core\CollisionHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp">
@@ -1613,6 +1614,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Orion\Core\CollisionHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Platform\OpenGL\DefaultShaders\CubemapDepthShader.glsl">

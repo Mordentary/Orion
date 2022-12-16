@@ -160,6 +160,7 @@
     <ClInclude Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.h" />
     <ClInclude Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.h" />
     <ClInclude Include="src\Orion\Core\Application.h" />
+    <ClInclude Include="src\Orion\Core\CollisionHandler.h" />
     <ClInclude Include="src\Orion\Core\ConstValues.h" />
     <ClInclude Include="src\Orion\Core\Core.h" />
     <ClInclude Include="src\Orion\Core\EntryPoint.h" />
@@ -631,6 +632,7 @@
     <ClCompile Include="src\Orion\Core\AdvanceCamerasFamily\CamerasController.cpp" />
     <ClCompile Include="src\Orion\Core\AnimationLib2D\AnimationLibrary.cpp" />
     <ClCompile Include="src\Orion\Core\Application.cpp" />
+    <ClCompile Include="src\Orion\Core\CollisionHandler.cpp" />
     <ClCompile Include="src\Orion\Core\Log.cpp" />
     <ClCompile Include="src\Orion\Core\TimeHelper.cpp" />
     <ClCompile Include="src\Orion\ImGui\ImGuiBuild.cpp" />

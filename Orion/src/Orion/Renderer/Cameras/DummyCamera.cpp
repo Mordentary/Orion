@@ -33,7 +33,7 @@ namespace Orion
 
 	}
 
-	const CameraRay& DummyCamera::Raycast(float xCoord, float yCoord)
+	const Ray& DummyCamera::Raycast(float xCoord, float yCoord)
 	{
 		float mouse_x = xCoord;
 		float mouse_y = yCoord;
@@ -59,7 +59,7 @@ namespace Orion
 		{	
 
 
-			float t = PlaneVsRay(Plane{ -m_CameraForward, model->GetPosition() }, m_Ray);
+			float t = Orion::CollisionHandler::PlaneVsRay(Plane{ -m_CameraForward, model->GetPosition() }, m_Ray);
 
 			static glm::vec3 pointIntersection{};
 			if (t != -1) 
@@ -71,109 +71,4 @@ namespace Orion
 
 		}
 	}
-
-	float DummyCamera::PlaneVsRay(const Plane& pl, const CameraRay& ray)
-	{
-		float denom = glm::dot(pl.Normal, ray.GetDirection());
-
-		if (abs(denom) > 1e-6)
-		{
-			glm::vec3 p0l0 = pl.Point - ray.GetOrigin();
-			float t = glm::dot(p0l0, pl.Normal) / denom;
-			if (t >= 0)
-			{
-				return t;
-			}
-		}
-
-		return -1.f;
-	}
-	bool DummyCamera::PointVsFrustum(const glm::vec3& point)
-	{	
-
-		Plane* currentPlane = &m_Frustum.Top;
-		for (int i = 0; i < 6; ++i)
-		{
-			if (currentPlane->Distance(point) <= 0)
-				return false;
-
-			++currentPlane;
-		} 
-		return true;
-	}
-
-
-	bool DummyCamera::AABBVsFrustum(const glm::vec3& min, const glm::vec3& max)
-	{
-		Plane* currentPlane = &m_Frustum.Top;
-
-		for (int i = 0; i < 6; ++i)
-		{
-			glm::vec3 normal = currentPlane->Normal;
-			glm::vec3 p = min;
-			glm::vec3 n = max;
-
-			if (normal.x >= 0) 
-			{
-				p.x = max.x;
-				n.x = min.x;
-			}
-			if (normal.y >= 0) 
-			{
-				p.y = max.y;
-				n.y = min.y;
-			}
-			if (normal.z >= 0) 
-			{
-				p.z = max.z;
-				n.z = min.z;
-			}
-
-			
-			if (currentPlane->Distance(p) <= 0 && currentPlane->Distance(n) <= 0)
-				return false;
-
-			++currentPlane;
-		}
-		return true;
-	}
-
-
-
-
-	CameraRay::CameraRay(glm::vec3 direction, glm::vec3 origin, float rayLength)
-		: m_Direction(direction), m_Origin(origin), m_Length(rayLength)
-	{
-		
-	}
-	void CameraRay::Update(glm::vec3 direction, glm::vec3 origin, float rayLength)
-	{
-		m_Origin = origin;
-		m_Direction = direction;
-		m_Length = rayLength;
-		
-
-
-	}
-	void CameraRay::DebugDraw() const
-	{
-		static glm::vec3 p1{ 0.0f };
-		static glm::vec3 p2{ 0.0f };
-
-
-		if(Orion::Input::IsKeyPressed(ORI_KEY_R))
-		{
-			p1 = GetOrigin();
-			p2 = GetEndPoint();
-
-		}
-		Orion::Renderer2D::AddLine(p1, p2, glm::vec4(0.7f,0.2f,0.2f,1.0f));
-	}
-
-	glm::vec3 CameraRay::GetEndPoint() const
-	{
-		return m_Origin + (m_Direction * m_Length);
-	}
-
-
 }

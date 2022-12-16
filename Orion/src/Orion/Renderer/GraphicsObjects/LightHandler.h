@@ -7,8 +7,8 @@ namespace Orion
 	class LightSource;
 	class UniformBuffer;
 	class Shader;
-
-
+    
+ 
 
     class LightHandler
     {
@@ -36,6 +36,8 @@ namespace Orion
         void SetLightShader(const Shared<Shader>& shader) { m_LightShader = shader; }
 
         const Shared<Shader>& GetLightShader() { return m_LightShader; }
+        const Shared<LightSource>& GetDirectionaLight() { return m_DirectionalLight; }
+
     
 
         const std::vector<Shared<LightSource>>& GetLights() { return m_LightSources; }
@@ -52,6 +54,7 @@ namespace Orion
         static const uint32_t MAX_LIGHTS = 100;
         Shared<Shader> m_LightShader = nullptr;
         std::vector<Shared<LightSource>> m_LightSources;
+        Shared<LightSource> m_DirectionalLight = nullptr;
 
     };
 

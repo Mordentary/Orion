@@ -89,7 +89,7 @@ class Model;
 		static void LightingPass();
 		static void RenderSelectedModelOutline();
 		static void DrawCubemap();
-		static void ComputeUnitHemisphere();
+	//	static void ComputeUnitHemisphere();
 		static void ClosestObjectToRayHit();
 		static void ClosestLightToRayHit();
 

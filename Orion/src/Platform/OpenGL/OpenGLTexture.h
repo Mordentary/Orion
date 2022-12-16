@@ -21,18 +21,22 @@ namespace Orion
 		
 		OpenGLTexture2D(const std::string& directory); //Creates cubemap from given directory
 
-
 		virtual ~OpenGLTexture2D();
+
+		virtual bool IsContentEqualTo(Shared<Texture> texture, uint32_t channelsCountToCompare) override;
 
 		virtual inline uint32_t GetWidth() const override { return m_Width; }
 		virtual inline uint32_t GetHeight() const override { return m_Height; }
+		virtual uint32_t GetChannelsCount() const override { return m_Channels; }
 
 		virtual inline uint32_t GetRendererID() const override { return m_RendererID; }
 		virtual inline uint32_t& GetRendererID() override { return m_RendererID; }
 
 		inline uint32_t GetCurrentSlot() const override { return m_CurrentSlot; }
+		virtual void* ExtractDataFromChannel(uint32_t channelIndex) override;
 
 
+		virtual void SetDataToChannel(void* data, uint32_t channelIndex) override;
 		virtual void SetData(void* data, uint32_t size) override;
 		virtual void Bind(uint32_t slot)  override;
 		virtual void Unbind() override;
@@ -42,7 +46,7 @@ namespace Orion
 	private: 
 		std::string m_Path;
 		uint32_t m_Width = 0, m_Height = 0;
-		GLenum m_InternalFormat = 0, m_DataFormat = 0;
+		GLenum m_InternalFormat = 0, m_DataFormat = 0, m_Channels = 0;
 		uint32_t m_RendererID = 0;
 		uint32_t m_CurrentSlot = 0;
 		Texture2DParameters m_TextureParam;

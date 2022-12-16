@@ -137,6 +137,9 @@ namespace Orion
 		}
 	}
 
+
+
+
 	void PerspectiveCamera::UpdateFrustum()
 	{
 
@@ -150,7 +153,7 @@ namespace Orion
 		glm::vec3 nearPointCenter = m_Position + m_NearFar.x * m_CameraForward;
 		glm::vec3 farPointCenter = m_Position + m_NearFar.y * m_CameraForward;
 
-		CameraFrustum frustum;
+		FrustumShape frustum;
 
 
 		frustum.Near = { m_CameraForward ,nearPointCenter };
@@ -211,6 +214,10 @@ namespace Orion
 	}
 
 
+	static void RenderFrustum(FrustumShape& frustum) 
+	{
+		//TODO: Implement
+	}
 
 	void PerspectiveCamera::RenderFrustum()
 	{

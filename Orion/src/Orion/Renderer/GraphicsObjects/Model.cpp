@@ -2,6 +2,7 @@
 #include "Model.h"
 #include <filesystem> 
 #include "Orion/Core/AdvanceCamerasFamily/CamerasController.h"
+#include "Orion/Renderer/GraphicsObjects/LightCasters/DirectionalLight.h"
 
 namespace Orion
 {
@@ -73,20 +74,26 @@ namespace Orion
         Orion::Renderer2D::AddLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 
     }
-    void Model::Render(Shared<Shader>& shader, bool doNotCull)
+    void Model::Render(Shared<Shader>& shader, Shared<Orion::LightSource> dirLight, bool doNotCull)
     {
-        for (size_t i = 0; i < m_Materials.size(); i++)
+        for (auto& mesh : m_Meshes)
         {
-                BindMaterialAt(shader, i);
+                BindMaterial(shader, mesh->GetCurrentMaterial());
           
-                auto& [min, max] = m_Meshes[i]->GetAABB();
+                auto& [min, max] = mesh->GetAABB();
                 glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
                 glm::vec3 transformedMax = m_ModelMatrix * glm::vec4(max, 1.0f);
 
-                if (doNotCull || Orion::CamerasController::GetActiveCamera()->AABBVsFrustum(transformedMin, transformedMax))
+                if (doNotCull 
+                    || 
+                    Orion::CollisionHandler::AABBVsFrustum(Orion::CamerasController::GetActiveCamera()->GetCameraFrustum(), transformedMin, transformedMax) 
+                    || 
+                    (dirLight && Orion::CollisionHandler::AABBVsFrustum(dirLight->GetFrustum(), transformedMin, transformedMax)))
                 {
-                    m_Meshes[i]->Render(shader);
+                    mesh->Render(shader);
                 }
+                
+
 
                 if (Orion::Renderer::GetVisualDebuggingOptions().RenderModelsAABB && (shader == Orion::ShaderLibrary::Get("PhongShader") || shader == Orion::ShaderLibrary::Get("GBufferShader") || shader == Orion::ShaderLibrary::Get("LightShader")))
                 {
@@ -98,84 +105,84 @@ namespace Orion
   
 
     }
-    void Model::BindMaterialAt(Shared<Shader>& shader, uint32_t index)
+    void Model::BindMaterial(Shared<Shader>& shader, const Material& material)
     {
         shader->Bind();
 
         if (shader == Orion::ShaderLibrary::Get("PhongShader"))
         {
-            if (m_Materials[index].Albedo)
+            if (material.Albedo)
             {
-                m_Materials[index].Albedo->Bind(2);
-                shader->SetInt("u_Material.diffuse", m_Materials[index].Albedo->GetCurrentSlot());
+                material.Albedo->Bind(2);
+                shader->SetInt("u_Material.diffuse", material.Albedo->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.diffuse", 0);
 
-            if (m_Materials[index].Roughness)
+            if (material.Roughness)
             {
-                m_Materials[index].Roughness->Bind(3);
-                shader->SetInt("u_Material.specular", m_Materials[index].Roughness->GetCurrentSlot());
+                material.Roughness->Bind(3);
+                shader->SetInt("u_Material.specular", material.Roughness->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.specular", 0);
 
-            if (m_Materials[index].NormalMap)
+            if (material.NormalMap)
             {
-                m_Materials[index].NormalMap->Bind(4);
-                shader->SetInt("u_Material.normals", m_Materials[index].NormalMap->GetCurrentSlot());
+                material.NormalMap->Bind(4);
+                shader->SetInt("u_Material.normals", material.NormalMap->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.normals", 0);
 
-            if (m_Materials[index].Shininess)
-                shader->SetFloat("u_Material.shininess", m_Materials[index].Shininess);
+            if (material.Shininess)
+                shader->SetFloat("u_Material.shininess", material.Shininess);
             else  shader->SetFloat("u_Material.shininess", 16.0f);
         }
         else if (shader == Orion::ShaderLibrary::Get("PBRShader") || shader == Orion::ShaderLibrary::Get("GBufferShader"))
         {
 
-            if (m_Materials[index].Albedo)
+            if (material.Albedo)
             {
-                m_Materials[index].Albedo->Bind(2);
-                shader->SetInt("u_Material.albedo", m_Materials[index].Albedo->GetCurrentSlot());
+                material.Albedo->Bind(2);
+                shader->SetInt("u_Material.albedo", material.Albedo->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.albedo", 0);
 
 
-            if (m_Materials[index].Roughness)
+            if (material.Roughness)
             {
-                m_Materials[index].Roughness->Bind(3);
-                shader->SetInt("u_Material.roughness", m_Materials[index].Roughness->GetCurrentSlot());
+                material.Roughness->Bind(3);
+                shader->SetInt("u_Material.roughness", material.Roughness->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.roughness", 1);
 
-            if (m_Materials[index].Mettalic)
+            if (material.Mettalic)
             {
-                m_Materials[index].Mettalic->Bind(4);
-                shader->SetInt("u_Material.mettalic", m_Materials[index].Mettalic->GetCurrentSlot());
+                material.Mettalic->Bind(4);
+                shader->SetInt("u_Material.mettalic", material.Mettalic->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.mettalic", 1);
 
 
-            if (m_Materials[index].NormalMap)
+            if (material.NormalMap)
             {
-                m_Materials[index].NormalMap->Bind(5);
-                shader->SetInt("u_Material.normals", m_Materials[index].NormalMap->GetCurrentSlot());
+                material.NormalMap->Bind(5);
+                shader->SetInt("u_Material.normals", material.NormalMap->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.normals", 0);
 
 
-            if (m_Materials[index].Emission)
+            if (material.Emission)
             {
 
-                m_Materials[index].Emission->Bind(6);
-                shader->SetInt("u_Material.emission", m_Materials[index].Emission->GetCurrentSlot());
+                material.Emission->Bind(6);
+                shader->SetInt("u_Material.emission", material.Emission->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.emission", 1);
 
 
-            if (m_Materials[index].AO)
+            if (material.AO)
             {
-                m_Materials[index].AO->Bind(7);
-                shader->SetInt("u_Material.ao", m_Materials[index].AO->GetCurrentSlot());
+                material.AO->Bind(7);
+                shader->SetInt("u_Material.ao", material.AO->GetCurrentSlot());
             }
             else shader->SetInt("u_Material.ao", 0);
 
@@ -228,7 +235,7 @@ namespace Orion
         ProcessNode(scene->mRootNode, scene);
 
         ConcatenateMeshByMaterial();
-
+        SeparateRoughnessAndMetallicTextures();
 
 	}
     void  Model::SetupPBRMaterials(const aiScene* scene)
@@ -236,7 +243,7 @@ namespace Orion
         m_Materials.reserve(scene->mNumMaterials);
         if(scene->HasMaterials())
         {
-             for  (uint32_t i = 0; i < scene->mNumMaterials; i++)
+            for (uint32_t i = 0; i < scene->mNumMaterials; i++)
             {
                 m_Materials.push_back(SetupPBRMaterial(scene->mMaterials[i]));
             }
@@ -258,7 +265,25 @@ namespace Orion
     }
 
 
-  
+    void Model::SeparateRoughnessAndMetallicTextures()
+    {
+        for (auto& mesh : m_Meshes)
+        {
+            const Material& mat = mesh->GetDefaultMaterial();
+
+            if ((mat.Roughness && mat.Mettalic) && mat.Roughness->IsContentEqualTo(mat.Mettalic,1))
+            {
+                void* extractedMettalicData = mat.Roughness->ExtractDataFromChannel(1);
+                mat.Mettalic->SetDataToChannel(extractedMettalicData, 0);
+
+                void* extractedRoughnessData = mat.Mettalic->ExtractDataFromChannel(0);
+                mat.Roughness->SetDataToChannel(extractedRoughnessData, 0);
+
+                delete[] extractedMettalicData;
+                delete[] extractedRoughnessData;
+            }
+        }
+    }
 
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{  
@@ -720,7 +745,7 @@ namespace Orion
     }
 
    
-    bool Model::IsIntersect(const CameraRay& ray)
+    bool Model::IsIntersect(const Ray& ray)
     {
         
 
@@ -800,7 +825,7 @@ namespace Orion
     }
     void Model::SetCustomMaterialValues(float roughness, float metallic, const glm::vec3 emmision)
     { 
-        if (m_CustomMaterial.Roughness == roughness && m_CustomMaterial.Metallic == metallic && m_CustomMaterial.Emission == emmision) return;
+        if (m_CustomMaterial.Roughness == roughness && m_CustomMaterial.Metallic == metallic) return;
 
         m_CustomMaterial.Roughness = roughness; 
         m_CustomMaterial.Metallic = metallic;

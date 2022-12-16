@@ -29,6 +29,7 @@ namespace Orion {
 	
 		void UpdateFrustum() override;
 		void RenderFrustum() override;
+		static void RenderFrustum(const FrustumShape& frustum, const glm::mat4& projView);
 
 
 	private:

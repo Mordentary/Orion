@@ -7,6 +7,8 @@ namespace Orion
 	LightHandler::LightCounters LightHandler::m_LightCounters;
 	void LightHandler::AddLightSource(const Shared<LightSource>& light) 
 	{
+		if (!m_DirectionalLight && light->GetLightType() == LightSource::LightCasterTypes::DirectionalLight) m_DirectionalLight = light;
+
 		light->IncreaseLightCounter();
 		m_LightSources.push_back(light);
 	}

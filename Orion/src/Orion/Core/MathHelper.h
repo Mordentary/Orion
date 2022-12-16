@@ -1,6 +1,8 @@
 #pragma once
 #include <numeric>
 #include <math.h>
+
+
 namespace Orion
 {
 	class MathHelper
@@ -28,6 +30,9 @@ namespace Orion
             else
                 return (gcd(b, a - floor(a / b) * b));
         }
+
+
+
 	};
 }
 

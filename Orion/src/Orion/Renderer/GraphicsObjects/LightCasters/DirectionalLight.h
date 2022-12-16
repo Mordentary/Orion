@@ -1,5 +1,7 @@
 #pragma once
 #include"../LightSource.h"
+
+
 namespace Orion
 {
 	class DirectionalLight : public LightSource
@@ -40,8 +42,9 @@ namespace Orion
 		virtual void SetLighAttenuation(float linear, float quadratic) override {};
 
 		virtual void IncreaseLightCounter() override;
-		virtual uint32_t GetLightIndex() override { return 0; };
+		virtual uint32_t GetLightIndex() override { return 0; }
 
+		virtual LightCasterTypes GetLightType() override { return LightCasterTypes::DirectionalLight; }
 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 

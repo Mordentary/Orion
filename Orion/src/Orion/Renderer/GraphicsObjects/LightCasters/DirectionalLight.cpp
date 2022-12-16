@@ -16,6 +16,8 @@ namespace Orion
 
 			m_LightModel->Render(shader);
 		}*/
+
+		UpdateFrustum();
 	}
 	void DirectionalLight::SetupLight(
 		Shared<Shader>& currentShader, 
@@ -59,6 +61,41 @@ namespace Orion
 
 	void DirectionalLight::UpdateFrustum()
 	{
+		// Calculate the inverse of the projection-view matrix
+		glm::mat4 invProjView = glm::inverse(m_ProjMatrix * m_ViewMatrix);
+
+		std::array<glm::vec3, 8> corners;
+		// Calculate the corner points by transforming the eight points (-1, -1, -1), (1, -1, -1), (1, 1, -1), (-1, 1, -1),
+		// (-1, -1, 1), (1, -1, 1), (1, 1, 1), and (-1, 1, 1) through the inverse projection-view matrix
+		corners[0] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
+		corners[1] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f));
+		corners[2] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f));
+		corners[3] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f));
+
+
+		corners[4] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f));
+		corners[5] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f));
+		corners[6] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		corners[7] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f));
+
+		m_Frustum.Top.Normal = glm::normalize(glm::cross(corners[0] - corners[1], corners[4] - corners[0]));
+		m_Frustum.Top.Point = corners[2]; // top
+
+		m_Frustum.Right.Normal = glm::normalize(glm::cross(corners[0] - corners[4], corners[3] - corners[0]));
+		m_Frustum.Right.Point = corners[2]; // right
+
+		m_Frustum.Bottom.Normal = glm::normalize(glm::cross(corners[6] - corners[2], corners[7] - corners[6]));
+		m_Frustum.Bottom.Point = corners[0]; // bottom
+
+		m_Frustum.Left.Normal = -glm::normalize(glm::cross(corners[1] - corners[5], corners[2] - corners[5]));
+		m_Frustum.Left.Point = corners[0]; // left
+
+		m_Frustum.Near.Normal = glm::cross(m_Frustum.Left.Normal, m_Frustum.Top.Normal);
+		m_Frustum.Near.Point = corners[0]; // near
+
+		m_Frustum.Far.Normal = -glm::cross(m_Frustum.Left.Normal, m_Frustum.Top.Normal);
+		m_Frustum.Far.Point = corners[4]; // far
+
 
 		
 	}

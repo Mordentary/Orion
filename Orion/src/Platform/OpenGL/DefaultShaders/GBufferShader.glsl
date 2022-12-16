@@ -98,7 +98,7 @@ void main()
 
 
 
-    float roughness = texture(u_Material.roughness, v_TextCoord).g;
+    float roughness = texture(u_Material.roughness, v_TextCoord).r;
     float mettalic = texture(u_Material.mettalic, v_TextCoord).r;
     float AO = texture(u_Material.ao, v_TextCoord).r;
 

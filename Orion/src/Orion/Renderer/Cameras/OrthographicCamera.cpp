@@ -74,133 +74,106 @@ namespace Orion
 		m_ViewMatrix = glm::inverse(transform);
 		m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
-	struct Plane
-	{
-		// unit vector
-		glm::vec3 Normal{};
-		// point on plane
-		glm::vec3 Point{};
 
-		float Distance(const glm::vec3& p)
-		{
-			return glm::dot(p - Point, Normal);
-		}
-	};
-	struct CameraFrustum
-	{
-		Plane Top;
-		Plane Bottom;
-
-		Plane Right;
-		Plane Left;
-
-		Plane Far;
-		Plane Near;
-	};
 	void OrthographicCamera::UpdateFrustum()
 	{
 		
+		// Calculate the inverse of the projection-view matrix
+		glm::mat4 invProjView = glm::inverse(m_ProjectionViewMatrix);
 
-		// Create a new frustum using the updated view-projection matrix
-		CameraFrustum frustum{};
+		std::array<glm::vec3, 8> corners;
+		// Calculate the corner points by transforming the eight points (-1, -1, -1), (1, -1, -1), (1, 1, -1), (-1, 1, -1),
+		// (-1, -1, 1), (1, -1, 1), (1, 1, 1), and (-1, 1, 1) through the inverse projection-view matrix
 
-		// Calculate the planes of the frustum using the view-projection matrix
-		glm::vec3 row1 = m_ProjectionViewMatrix[0];
-		glm::vec3 row2 = m_ProjectionViewMatrix[1];
-		glm::vec3 row3 = m_ProjectionViewMatrix[2];
-		glm::vec3 row4 = m_ProjectionViewMatrix[3];
 
-		// Calculate the normal vector and point on the near plane
-		glm::vec3 nearNormal = row3;
-		glm::vec3 nearPoint = row4 + row3;
-		m_Frustum.Near = Plane{ glm::normalize(nearNormal), nearPoint };
+		corners[0] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
+		corners[1] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f));
+		corners[2] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f));
+		corners[3] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f));
 
-		// Calculate the normal vector and point on the far plane
-		glm::vec3 farNormal = -row3;
-		glm::vec3 farPoint = row4 - row3;
-		m_Frustum.Far = Plane{ glm::normalize(farNormal), farPoint };
 
-		// Calculate the normal vector and point on the top plane
-		glm::vec3 topNormal = row4 + row1;
-		glm::vec3 topPoint = row4 - row1;
-		m_Frustum.Top = Plane{ glm::normalize(topNormal), topPoint };
+		corners[4] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f));
+		corners[5] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f));
+		corners[6] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		corners[7] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f));
 
-		// Calculate the normal vector and point on the bottom plane
-		glm::vec3 bottomNormal = row4 - row1;
-		glm::vec3 bottomPoint = row4 + row1;
-		m_Frustum.Bottom = Plane{ glm::normalize(bottomNormal), bottomPoint };
+		m_Frustum.Top.Normal = glm::normalize(glm::cross(corners[0] - corners[1], corners[4] - corners[0]));
+		m_Frustum.Top.Point = corners[2]; // top
 
-		// Calculate the normal vector and point on the right plane
-		glm::vec3 rightNormal = row4 - row2;
-		glm::vec3 rightPoint = row4 + row2;
-		m_Frustum.Right = Plane{ glm::normalize(rightNormal), rightPoint };
+		m_Frustum.Bottom.Normal = glm::normalize(glm::cross(corners[6] - corners[2], corners[7] - corners[6]));
+		m_Frustum.Bottom.Point = corners[0]; // bottom
 
-		// Calculate the normal vector and point on the left plane
-		glm::vec3 leftNormal = row4 + row2;
-		glm::vec3 leftPoint = row4 - row2;
-		m_Frustum.Left = Plane{ glm::normalize(leftNormal), leftPoint };
+		m_Frustum.Right.Normal = glm::normalize(glm::cross(corners[0] - corners[4], corners[3] - corners[0]));
+		m_Frustum.Right.Point = corners[2]; // right
 
+		m_Frustum.Left.Normal = -glm::normalize(glm::cross(corners[1] - corners[5], corners[2] - corners[5]));
+		m_Frustum.Left.Point = corners[0]; // left
+
+		m_Frustum.Near.Normal = glm::cross(m_Frustum.Left.Normal, m_Frustum.Top.Normal);
+		m_Frustum.Near.Point = corners[0]; // near
+
+		m_Frustum.Far.Normal = -glm::cross(m_Frustum.Left.Normal, m_Frustum.Top.Normal);
+		m_Frustum.Far.Point = corners[4]; // far
 	
 
 	}
-	void OrthographicCamera::RenderFrustum()
+	void OrthographicCamera::RenderFrustum(const FrustumShape& frustum, const glm::mat4& projView)
+
 	{
-		// Compute the center of the frustum
-		glm::vec3 center = (m_Frustum.Right.Point + m_Frustum.Left.Point + m_Frustum.Top.Point + m_Frustum.Bottom.Point + m_Frustum.Near.Point + m_Frustum.Far.Point) / 6.0f;
+		glm::mat4 invProjView = glm::inverse(projView);
 
-		// Compute the distances from the center to each of the frustum planes
-		float dRight = glm::length(m_Frustum.Right.Point - center);
-		float dLeft = glm::length(m_Frustum.Left.Point - center);
-		float dTop = glm::length(m_Frustum.Top.Point - center);
-		float dBottom = glm::length(m_Frustum.Bottom.Point - center);
-		float dNear = glm::length(m_Frustum.Near.Point - center);
-		float dFar = glm::length(m_Frustum.Far.Point - center);
-
-		// Compute the points on the right, left, top, and bottom frustum planes that are closest to the center
-		glm::vec3 right = center + (m_Frustum.Right.Normal * dRight);
-		glm::vec3 left = center + (m_Frustum.Left.Normal * dLeft);
-
-		// Compute the top and bottom vectors using the dNear and dFar values
-		glm::vec3 top = center + (m_Frustum.Top.Normal * dNear);
-		glm::vec3 bottom = center + (m_Frustum.Bottom.Normal * dFar);
-
-		// Compute the corners of the frustum
-		glm::vec3 nearTopRight = top + (m_Frustum.Near.Normal * dNear);
-		glm::vec3 nearTopLeft = nearTopRight + (m_Frustum.Left.Normal * dLeft);
-		glm::vec3 nearBottomRight = bottom + (m_Frustum.Near.Normal * dNear);
-		glm::vec3 nearBottomLeft = nearBottomRight + (m_Frustum.Left.Normal * dLeft);
-
-		glm::vec3 farTopRight = top + (m_Frustum.Far.Normal * dFar);
-		glm::vec3 farTopLeft = farTopRight + (m_Frustum.Left.Normal * dLeft);
-		glm::vec3 farBottomRight = bottom + (m_Frustum.Far.Normal * dFar);
-		glm::vec3 farBottomLeft = farBottomRight + (m_Frustum.Left.Normal * dLeft);
-
-
+		std::array<glm::vec3, 8> corners;
+		// Calculate the corner points by transforming the eight points (-1, -1, -1), (1, -1, -1), (1, 1, -1), (-1, 1, -1),
+		// (-1, -1, 1), (1, -1, 1), (1, 1, 1), and (-1, 1, 1) through the inverse projection-view matrix
+		corners[0] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, -1.0f, 1.0f));
+		corners[1] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, -1.0f, 1.0f));
+		corners[2] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, -1.0f, 1.0f));
+		corners[3] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f));
+		corners[4] = glm::vec3(invProjView * glm::vec4(-1.0f, -1.0f, 1.0f, 1.0f));
+		corners[5] = glm::vec3(invProjView * glm::vec4(1.0f, -1.0f, 1.0f, 1.0f));
+		corners[6] = glm::vec3(invProjView * glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		corners[7] = glm::vec3(invProjView * glm::vec4(-1.0f, 1.0f, 1.0f, 1.0f));
 
 
 		//Draw lines
-		glm::vec4 color{ 0.9f,0.f,0.2f,1.0f };
+		glm::vec4 color{ 0.7f,0.7f,0.3f,1.0f };
 
 		// Connect the near plane corners
-		Orion::Renderer2D::AddLine(nearTopRight, nearTopLeft, color);
-		Orion::Renderer2D::AddLine(nearTopLeft, nearBottomLeft, color);
-		Orion::Renderer2D::AddLine(nearBottomLeft, nearBottomRight, color);
-		Orion::Renderer2D::AddLine(nearBottomRight, nearTopRight, color);
+		Orion::Renderer2D::AddLine(corners[0], corners[1], color);
+		Orion::Renderer2D::AddLine(corners[1], corners[2], color);
+		Orion::Renderer2D::AddLine(corners[2], corners[3], color);
+		Orion::Renderer2D::AddLine(corners[3], corners[0], color);
 
 		// Connect the far plane corners
-		Orion::Renderer2D::AddLine(farTopRight, farTopLeft, color);
-		Orion::Renderer2D::AddLine(farTopLeft, farBottomLeft, color);
-		Orion::Renderer2D::AddLine(farBottomLeft, farBottomRight, color);
-		Orion::Renderer2D::AddLine(farBottomRight, farTopRight, color);
+		Orion::Renderer2D::AddLine(corners[4], corners[5], color);
+		Orion::Renderer2D::AddLine(corners[5], corners[6], color);
+		Orion::Renderer2D::AddLine(corners[6], corners[7], color);
+		Orion::Renderer2D::AddLine(corners[7], corners[4], color);
+
 
 		// Connect the near and far planes
-		Orion::Renderer2D::AddLine(nearTopRight, farTopRight, color);
-		Orion::Renderer2D::AddLine(nearTopLeft, farTopLeft, color);
-		Orion::Renderer2D::AddLine(nearBottomLeft, farBottomLeft, color);
-		Orion::Renderer2D::AddLine(nearBottomRight, farBottomRight, color);
+		Orion::Renderer2D::AddLine(corners[0], corners[4], color);
+		Orion::Renderer2D::AddLine(corners[1], corners[5], color);
+		Orion::Renderer2D::AddLine(corners[2], corners[6], color);
+		Orion::Renderer2D::AddLine(corners[3], corners[7], color);
+
+		// color = { 0.2f,0.2f,0.7f,1.0f };
+		 //Draw normals
+		/*Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Bottom.Normal, color);
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Top.Normal, color);
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Right.Normal, color);
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Left.Normal, color);
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Near.Normal, color);
+		Orion::Renderer2D::AddLine(m_Position, m_Position + m_Frustum.Far.Normal, color);*/
 
 
 	}
+
+	void OrthographicCamera::RenderFrustum()
+	{
+		RenderFrustum(m_Frustum, m_ProjectionViewMatrix);
+	}
+
 
 	inline void OrthographicCamera::RecalculateProjection()
 	{

@@ -15,8 +15,19 @@ namespace Orion
 
 			virtual uint32_t GetWidth() const = 0;
 			virtual uint32_t GetHeight() const = 0;
+			virtual uint32_t GetChannelsCount() const = 0;
+
+
 
 			virtual void SetData(void* data, uint32_t size) = 0;
+			virtual void SetDataToChannel(void* data, uint32_t channelIndex) = 0;
+
+			virtual void* ExtractDataFromChannel(uint32_t channelIndex) = 0;
+
+
+
+
+			virtual bool IsContentEqualTo(Shared<Texture> texture, uint32_t channelsCountToCompare) = 0;
 
 			virtual void Bind(uint32_t slot = 1)  = 0;
 			virtual void Unbind()  = 0;

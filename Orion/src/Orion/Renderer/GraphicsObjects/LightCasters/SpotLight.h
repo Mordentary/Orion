@@ -54,6 +54,7 @@ namespace Orion
 		 
 		virtual GeneralLightProp& GetGeneralLightProp() override { return m_Prop.GeneralProp; };
 		virtual uint32_t GetLightIndex() override { return m_LightIndex; };
+		virtual LightCasterTypes GetLightType() override { return LightCasterTypes::SpotLight; }
 
 		inline float& GetInnerCutOff() { return m_Prop.InnerCutOff; }
 		inline float& GetOuterCutOff() { return m_Prop.OuterCutOff; }

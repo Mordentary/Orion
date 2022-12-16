@@ -48,8 +48,8 @@ namespace Orion
         }
 
        
-        void Render(Shared<Shader>& shader, bool doNotCull = false);
-        bool IsIntersect(const CameraRay& ray);
+        void Render(Shared<Shader>& shader, Shared<Orion::LightSource> dirLight = nullptr, bool doNotCull = false);
+        bool IsIntersect(const Ray& ray);
 
         void ApplyCustomMaterialValues();
         void ApplyDefaultMaterialValues();
@@ -84,6 +84,34 @@ namespace Orion
 
         void SetModelMatrix(const glm::mat4& mat);
 
+    private:
+        void RenderAABB(const glm::vec3& mMin, const glm::vec3& mMax);
+
+        void SetupNonPBRMaterials(const aiScene* scene);
+        void SetupPBRMaterials(const aiScene* scene);
+
+        void SeparateRoughnessAndMetallicTextures();
+
+        Shared<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+        Shared<Texture2D> LoadPBRMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+
+        Material SetupPBRMaterial(aiMaterial* mat);
+        Material SetupNonPBRMaterial(aiMaterial* mat);
+
+        Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+
+        void ConcatenateMeshByMaterial();
+
+        void RecalculateModelMatrix();
+        void LoadModel(const std::string& path);
+        void FindGreastestAABBAndCoord(aiNode* rootNode, const aiScene* scene);
+        void ProcessNode(aiNode* node, const aiScene* scene);
+        
+        void BindMaterial(Shared<Shader>& shader, const Material& material);
+
+
+        void RecalculateAABBInModelSpace();
+        void DeduceModelName();
     private:
         
 
@@ -123,31 +151,5 @@ namespace Orion
 
         };
 
-    private:
-        void RenderAABB(const glm::vec3& mMin, const glm::vec3& mMax);
-
-        void SetupNonPBRMaterials(const aiScene* scene);
-        void SetupPBRMaterials(const aiScene* scene);
-
-        Shared<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-        Shared<Texture2D> LoadPBRMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-
-        Material SetupPBRMaterial(aiMaterial* mat);
-        Material SetupNonPBRMaterial(aiMaterial* mat);
-
-        Shared<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
-
-        void ConcatenateMeshByMaterial();
-
-        void RecalculateModelMatrix();
-        void LoadModel(const std::string& path);
-        void FindGreastestAABBAndCoord(aiNode* rootNode, const aiScene* scene);
-        void ProcessNode(aiNode* node, const aiScene* scene);
-        
-        void BindMaterialAt(Shared<Shader>& shader, uint32_t index);
-
-
-        void RecalculateAABBInModelSpace();
-        void DeduceModelName();
     };
 }
