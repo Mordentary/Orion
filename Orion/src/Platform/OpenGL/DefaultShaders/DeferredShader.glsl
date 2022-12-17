@@ -21,6 +21,8 @@ void main()
 
 
 layout(location = 0) out vec4 f_Color;
+layout(location = 1) out vec4 f_Bloom;
+
 
 
 
@@ -136,13 +138,13 @@ void main()
     vec4 result = vec4(0.0f);
 
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < PointLightCount; i++)
     {
         float distance = length(u_PointLights[i].position - FragPos);
-            if (distance < u_PointLights[i].radius)
+           // if (distance < u_PointLights[i].radius)
         result += CalcPointLight(u_PointLights[i], Normal, FragPos, viewDir);
     }
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < SpotLightCount; i++)
     {
         vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(FragPos, 1.0f);
         result += CalcSpotLight(u_SpotLights[i], Normal, FragPos, viewDir, FragPosSpotLight);
@@ -152,7 +154,9 @@ void main()
     result += CalcDirectionalLight(u_DirLight, Normal, viewDir, FragPosDirLight);
     
 
+
     f_Color = result;
+    f_Bloom = vec4(texture(u_gEmissionAO, v_TextCoord).rgb,1.0f);
 }
 
 
@@ -211,7 +215,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     float mettalic = texture(u_gAlbedo_Metallic, v_TextCoord).a;
     float roughness = texture(u_gPosition_Rougness, v_TextCoord).a;
-    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb * texture(u_gEmissionAO, v_TextCoord).a;
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedoColor, mettalic);
@@ -232,10 +236,10 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + ((kD * albedoColor / PI + specular) * radiance * NdotL);
 
-    vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a * attenuation;
+    vec3 ambient = vec3(0.03) * albedoColor * attenuation;
 
     float shadow = ShadowCalculationPoint(light, fragPos);
-    outgoingLight *= (1.0 - shadow);
+   // outgoingLight *= (1.0 - shadow);
 
     vec3 finalColor = ambient + outgoingLight;
 
@@ -256,7 +260,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
     float theta = dot(lightDir, normalize(-light.direction));
 
-    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb * texture(u_gEmissionAO, v_TextCoord).a;
 
 
     if (theta >= light.outerCutOff)
@@ -288,15 +292,15 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
         vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
 
-        vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a;
+        vec3 ambient = vec3(0.03) * albedoColor * attenuation;
 
         float shadow = ShadowCalculationSpot(light, fragLightSpace, normal);
 
-         outgoingLight *= (1.0 - shadow);
+        // outgoingLight *= (1.0 - shadow);
 
         vec3 finalColor = ambient + outgoingLight;
 
-        return vec4(finalColor * intensity, 1.0f);
+        return vec4(finalColor, 1.0f);
     }
     else
     {
@@ -319,7 +323,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
 
     float mettalic = texture(u_gAlbedo_Metallic, v_TextCoord).a;
     float roughness = texture(u_gPosition_Rougness, v_TextCoord).a;
-    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb;
+    vec3 albedoColor = texture(u_gAlbedo_Metallic, v_TextCoord).rgb * texture(u_gEmissionAO, v_TextCoord).a;
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedoColor, mettalic);
@@ -340,10 +344,10 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
 
     vec3 outgoingLight = texture(u_gEmissionAO, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
 
-    vec3 ambient = vec3(0.03) * albedoColor * texture(u_gEmissionAO, v_TextCoord).a;
+    vec3 ambient = vec3(0.03) * albedoColor;
 
     float shadow = ShadowCalculationDir(fragLightSpace, normal);
-    outgoingLight *= (1.0 - shadow);
+   // outgoingLight *= (1.0 - shadow);
 
     vec3 finalColor = ambient + outgoingLight;
 

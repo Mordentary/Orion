@@ -116,8 +116,8 @@ namespace Orion
 		s_RenData3D.GaussianBlurShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/GaussianBlurShader.glsl");
 		s_RenData3D.PostProcessingShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PostProcessingShader.glsl");
 
+		
 		s_RenData3D.PBRShader = ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/PBRShader.glsl");
-
 
 		s_RenData3D.LightManager.SetLightShader(ShaderLibrary::Load("../Orion/src/Platform/OpenGL/DefaultShaders/LightShader.glsl"));
 		//s_RenData3D.LightManager.SetLightShader(s_RenData3D.PBRShader);
@@ -579,7 +579,7 @@ namespace Orion
 		s_RenData3D.GBuffer->GetColorAttachmentTexture(3)->Bind(11);
 
 
-		s_RenData3D.DeferredShadingBuffer->ActivateDrawingToColorTexture(0);
+		//s_RenData3D.DeferredShadingBuffer->ActivateDrawingToColorTexture(0);
 
 		s_RenData3D.DeferredShader->Bind();
 
@@ -597,16 +597,17 @@ namespace Orion
 
 		s_RenData3D.GBuffer->BlitDepthToBuffer(s_RenData3D.DeferredShadingBuffer);
 
-		s_RenData3D.DeferredShadingBuffer->Unbind();
+		//s_RenData3D.DeferredShadingBuffer->Unbind();
 
-		s_RenData3D.DeferredShadingBuffer->Bind();
+		//s_RenData3D.DeferredShadingBuffer->Bind();
 
-		s_RenData3D.DeferredShadingBuffer->ActivateDrawingToAllTextures();
+		//s_RenData3D.DeferredShadingBuffer->ActivateDrawingToAllTextures();
 
 		s_RenData3D.DeferredShadingBuffer->Bind();
 
 		s_RenData3D.LightManager.RenderLights();
 		
+
 
 
 

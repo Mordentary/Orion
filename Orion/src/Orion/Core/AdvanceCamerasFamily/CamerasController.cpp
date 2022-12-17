@@ -23,6 +23,7 @@ namespace Orion
 
 			cam->Update(ts);
 
+
 			for (auto& [name, cam] : s_CamerasController.m_CamerasStorage)
 			{
 				if (name == GetActiveCameraName()) continue;

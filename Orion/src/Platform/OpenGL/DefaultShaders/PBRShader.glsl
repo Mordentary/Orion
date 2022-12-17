@@ -192,11 +192,11 @@ void main()
   
 
 
-    for (int i = 0; i < PointLightCount; i++)
+    for (int i = 0; i < 1; i++)
     {
         result += CalcPointLight(u_PointLights[i], Normal, v_FragPos, viewDir);
     }
-    for (int i = 0; i < SpotLightCount; i++)
+    for (int i = 0; i < 1; i++)
     {
         vec4 FragPosSpotLight = u_SpotLights[i].VPMatrix * vec4(v_FragPos, 1.0f);
         result += CalcSpotLight(u_SpotLights[i], Normal, v_FragPos, viewDir, FragPosSpotLight);
@@ -252,7 +252,6 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0)
 
 
 
-
 vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
 
@@ -268,7 +267,7 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     float mettalic = texture(u_Material.mettalic, v_TextCoord).r;
     float roughness = texture(u_Material.roughness, v_TextCoord).r;
-    vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color);
+    vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color) * texture(u_Material.ao, v_TextCoord).r;
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedoColor, mettalic);
@@ -283,13 +282,16 @@ vec4 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
-    vec3 specular = numerator / denominator;
+    vec3 specularTerm = numerator / denominator;
+
+   
+
 
     float NdotL = max(dot(normal, lightDir), 0.0);
 
-    vec3 outgoingLight = texture(u_Material.emission, v_TextCoord).rgb + ((kD * albedoColor / PI + specular) * radiance * NdotL);
+    vec3 outgoingLight = texture(u_Material.emission, v_TextCoord).rgb + ((kD * albedoColor / PI + specularTerm) * radiance * NdotL);
 
-    vec3 ambient = vec3(0.03) * albedoColor * texture(u_Material.ao, v_TextCoord).r * attenuation;
+    vec3 ambient = vec3(0.03) * albedoColor * attenuation;
 
     float shadow = ShadowCalculationPoint(light, fragPos);
     outgoingLight *= (1.0 - shadow);
@@ -313,7 +315,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
         float theta = dot(lightDir, normalize(-light.direction));
 
-        vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color);
+        vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color) * texture(u_Material.ao, v_TextCoord).r;
 
 
         if (theta >= light.outerCutOff)
@@ -346,7 +348,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
             vec3 outgoingLight = texture(u_Material.emission, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
 
-            vec3 ambient = vec3(0.03) * albedoColor * texture(u_Material.ao, v_TextCoord).r;
+            vec3 ambient = vec3(0.03) * albedoColor * attenuation;
 
             float shadow = ShadowCalculationSpot(light, fragLightSpace, normal);
 
@@ -354,7 +356,7 @@ vec4 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec
 
             vec3 finalColor = ambient + outgoingLight;
 
-            return vec4(finalColor * intensity, texture(u_Material.albedo, v_TextCoord).w);
+            return vec4(finalColor, texture(u_Material.albedo, v_TextCoord).w);
         }
         else
         {
@@ -377,7 +379,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
 
     float mettalic = texture(u_Material.mettalic, v_TextCoord).r;
     float roughness = texture(u_Material.roughness, v_TextCoord).r;
-    vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color);
+    vec3 albedoColor = texture(u_Material.albedo, v_TextCoord).rgb * vec3(v_Color) * texture(u_Material.ao, v_TextCoord).r;
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedoColor, mettalic);
@@ -398,7 +400,7 @@ vec4 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec
 
     vec3 outgoingLight = texture(u_Material.emission, v_TextCoord).rgb + (kD * albedoColor / PI + specular) * radiance * NdotL;
 
-    vec3 ambient = vec3(0.03) * albedoColor * texture(u_Material.ao, v_TextCoord).r;
+    vec3 ambient = vec3(0.03) * albedoColor;
 
     float shadow = ShadowCalculationDir(fragLightSpace, normal);
     outgoingLight *= (1.0 - shadow);

@@ -78,7 +78,6 @@ namespace Orion
     {
         for (auto& mesh : m_Meshes)
         {
-                BindMaterial(shader, mesh->GetCurrentMaterial());
           
                 auto& [min, max] = mesh->GetAABB();
                 glm::vec3 transformedMin = m_ModelMatrix * glm::vec4(min, 1.0f);
@@ -86,10 +85,11 @@ namespace Orion
 
                 if (doNotCull 
                     || 
-                    Orion::CollisionHandler::AABBVsFrustum(Orion::CamerasController::GetActiveCamera()->GetCameraFrustum(), transformedMin, transformedMax) 
+                    Orion::CollisionHandler::AABBVsFrustum(Orion::CamerasController::GetCamera("PerspectiveCamera1")->GetCameraFrustum(), transformedMin, transformedMax)
                     || 
                     (dirLight && Orion::CollisionHandler::AABBVsFrustum(dirLight->GetFrustum(), transformedMin, transformedMax)))
                 {
+                    BindMaterial(shader, mesh->GetCurrentMaterial());
                     mesh->Render(shader);
                 }
                 
@@ -273,10 +273,10 @@ namespace Orion
 
             if ((mat.Roughness && mat.Mettalic) && mat.Roughness->IsContentEqualTo(mat.Mettalic,1))
             {
-                void* extractedMettalicData = mat.Roughness->ExtractDataFromChannel(1);
+                void* extractedMettalicData = mat.Roughness->ExtractDataFromChannel(0);
                 mat.Mettalic->SetDataToChannel(extractedMettalicData, 0);
 
-                void* extractedRoughnessData = mat.Mettalic->ExtractDataFromChannel(0);
+                void* extractedRoughnessData = mat.Roughness->ExtractDataFromChannel(1);
                 mat.Roughness->SetDataToChannel(extractedRoughnessData, 0);
 
                 delete[] extractedMettalicData;

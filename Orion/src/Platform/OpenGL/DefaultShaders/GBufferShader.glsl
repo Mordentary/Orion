@@ -30,6 +30,7 @@ void main()
     v_Color = a_Color;
     v_TextCoord = a_TextureCoord;
 
+  
 
     vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent, 0.0)));
     vec3 B = normalize(vec3(u_ModelMatrix * vec4(a_Bitangent, 0.0)));
