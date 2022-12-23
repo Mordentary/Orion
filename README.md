@@ -37,9 +37,9 @@ Some of the features that are already included in Orion:
 ![](Showcase/2.png)
 
 ![](Showcase/4.png)
-![](Showcase/2.png)
-
 ![](Showcase/3.png)
+
+![](Showcase/1.png)
 
 Interface
 ![](Showcase/5.png)
