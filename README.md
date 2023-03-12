@@ -28,6 +28,20 @@ Some of the features that are already included in Orion:
 - Other features:
   - 2D animation system (3D animation will be available in the future)
   - Mouse picking with model outlining and ability to adjust selected model as desired (transform and material properties)
+
+## Dependencies
+  - glm: for mathematics operations and transformations
+  - GLFW and glad: for window creation and OpenGL context initialization
+  - stb_image: for image loading and texture mapping
+  - spdlog: for logging and debugging purposes
+  - ImGui: for creating graphical user interfaces (GUIs) and debugging tools
+  - assimp: for importing 3D models and their associated materials and textures
+  
+## How to use it
+- Clone the project from GitHub recursively to include all submodules: git clone --recursive https://github.com/Mordentary/Orion
+- Run Premake to generate the project files for your platform: premake5 <action> (where <action> is the name of the platform-specific action, such as vs2019 for Visual Studio 2019 or gmake2 for GNU Make).
+- Open the generated project files in your IDE or build system of choice and build the project.
+- Once the project has been built, you can use it.
   
 ## Showcase
 ![](Showcase/6.png)
