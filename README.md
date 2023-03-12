@@ -4,7 +4,7 @@
 
 ## About
 
-Orion is a game engine that supports both 2D and 3D development. 
+Orion is a real-time game engine that supports both 2D and 3D development. 
 The goal of this project is to create AAA-like graphics with good FPS. Here, I am implementing all rendering techniques that are often used by game developers and other interesting features.
 
 ## Technologies
@@ -44,6 +44,7 @@ Some of the features that are already included in Orion:
 - Once the project has been built, you can use it.
   
 ## Showcase
+### Renderer output
 ![](Showcase/6.png)
 ![](Showcase/8.png)
 
@@ -55,6 +56,6 @@ Some of the features that are already included in Orion:
 
 ![](Showcase/1.png)
 
-Interface
+### Interface
 ![](Showcase/5.png)
 
